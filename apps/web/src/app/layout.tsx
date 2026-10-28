@@ -1,3 +1,4 @@
+import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { Bricolage_Grotesque, Nunito } from 'next/font/google';
 import { Providers } from '@/components/providers.client';
@@ -15,16 +16,25 @@ const bricolage = Bricolage_Grotesque({
   display: 'swap',
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: {
     default: 'Vibru',
     template: '%s · Vibru',
   },
+  applicationName: 'Vibru',
+  appleWebApp: {
+    capable: true,
+    title: 'Vibru',
+  },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F8F3EE' },
+    { media: '(prefers-color-scheme: dark)', color: '#1C1820' },
+  ],
 };
 
 type RootLayoutProps = {
