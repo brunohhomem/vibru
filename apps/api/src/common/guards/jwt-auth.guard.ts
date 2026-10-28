@@ -10,7 +10,7 @@ import type { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { TokenService } from '../../modules/auth/token.service';
 import { SessionsRepository } from '../../modules/auth/sessions.repository';
-import { AUTH_ERROR_CODES } from '@starter/shared/auth';
+import { AUTH_ERROR_CODES } from '@vibru/shared/auth';
 
 interface JwtUser {
   userId: string;

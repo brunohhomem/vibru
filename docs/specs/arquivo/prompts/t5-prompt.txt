@@ -5,9 +5,9 @@ Você é o executor de uma tarefa num monorepo pnpm. Leia tudo antes de escrever
 Monorepo pnpm. API em `apps/api` com NestJS + React Email.
 - `apps/api/tsconfig.json` já tem `"jsx": "react-jsx"` e inclui `"src/**/*.tsx"`
 - Dependências já instaladas: `react`, `react-dom`, `@react-email/components`, `@react-email/render`, `@types/react`
-- `pnpm --filter @starter/api typecheck` — typecheck
-- `pnpm --filter @starter/api test` — testes unitários (Jest)
-- `pnpm --filter @starter/api lint` — lint
+- `pnpm --filter @vibru/api typecheck` — typecheck
+- `pnpm --filter @vibru/api test` — testes unitários (Jest)
+- `pnpm --filter @vibru/api lint` — lint
 
 ## Tarefa T5 — Templates React Email
 
@@ -305,9 +305,9 @@ Nenhum outro arquivo.
 
 ### Critérios de aceite
 
-1. `pnpm --filter @starter/api test` — todos os testes passam (incluindo os novos)
-2. `pnpm --filter @starter/api typecheck` — sem erros
-3. `pnpm --filter @starter/api lint` — sem erros
+1. `pnpm --filter @vibru/api test` — todos os testes passam (incluindo os novos)
+2. `pnpm --filter @vibru/api typecheck` — sem erros
+3. `pnpm --filter @vibru/api lint` — sem erros
 
 ### Commit
 

@@ -1,8 +1,8 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Patch } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
-import { AUDIT_ACTIONS, updateSettingsRequestSchema } from '@starter/shared';
-import type { UpdateSettingsRequest } from '@starter/shared';
+import { AUDIT_ACTIONS, updateSettingsRequestSchema } from '@vibru/shared';
+import type { UpdateSettingsRequest } from '@vibru/shared';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';

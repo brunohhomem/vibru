@@ -10,9 +10,9 @@ Este repositório é o template base de um monorepo pnpm. A API é NestJS (`apps
 - `pnpm test:integration`
 - `pnpm build`
 - `pnpm format` e `pnpm format:check`
-- `pnpm --filter @starter/api start:dev`
+- `pnpm --filter @vibru/api start:dev`
 - `pnpm worker:dev`
-- `pnpm --filter @starter/web dev`
+- `pnpm --filter @vibru/web dev`
 - `pnpm infra:up` / `pnpm infra:down` / `pnpm infra:logs` / `pnpm infra:reset`
 - `pnpm keys:generate` [--file <caminho>] / `pnpm keys:rotate <NOME>` [--yes]
 - `pnpm db:generate <nome>` / `pnpm db:migrate` / `pnpm db:seed` / `pnpm db:studio`

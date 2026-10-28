@@ -5,7 +5,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { AUDIT_ACTIONS, FORGOT_PASSWORD_RESPONSE_MESSAGE } from '@starter/shared';
+import { AUDIT_ACTIONS, FORGOT_PASSWORD_RESPONSE_MESSAGE } from '@vibru/shared';
 import type { Response } from 'express';
 import { DATABASE } from '../../database/database.module';
 import type { Database, DatabaseTransaction } from '../../database/database.module';

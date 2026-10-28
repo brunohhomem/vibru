@@ -9,11 +9,11 @@ function readApiOrigin(): string {
   if (process.env.API_ORIGIN) return process.env.API_ORIGIN;
 
   const envFile = path.resolve(appDirectory, '../../.env');
-  if (!existsSync(envFile)) return 'http://localhost:3001';
+  if (!existsSync(envFile)) return 'http://localhost:3101';
 
   const match = /^API_ORIGIN=(.*)$/m.exec(readFileSync(envFile, 'utf8'));
   const value = match?.[1]?.trim();
-  if (!value) return 'http://localhost:3001';
+  if (!value) return 'http://localhost:3101';
   return value;
 }
 

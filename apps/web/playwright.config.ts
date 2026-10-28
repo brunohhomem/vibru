@@ -36,28 +36,28 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL: 'http://127.0.0.1:3100',
     viewport: { width: 390, height: 844 },
   },
   webServer: [
     {
       command: 'node ../../packages/scripts/e2e-up.mjs',
       cwd: '.',
-      url: 'http://127.0.0.1:3001/api/health',
+      url: 'http://127.0.0.1:3101/api/health',
       timeout: 120_000,
       reuseExistingServer: false,
       env: sharedEnv,
     },
     {
-      command: 'node ./node_modules/next/dist/bin/next start --port 3000',
+      command: 'node ./node_modules/next/dist/bin/next start --port 3100',
       cwd: '.',
-      url: 'http://127.0.0.1:3000',
+      url: 'http://127.0.0.1:3100',
       timeout: 120_000,
       reuseExistingServer: false,
       env: {
         ...sharedEnv,
         NODE_ENV: 'production',
-        API_ORIGIN: process.env.API_ORIGIN ?? 'http://127.0.0.1:3001',
+        API_ORIGIN: process.env.API_ORIGIN ?? 'http://127.0.0.1:3101',
       },
     },
   ],

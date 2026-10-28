@@ -14,7 +14,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { REDIS } from '../../redis/redis.module';
 import type Redis from 'ioredis';
-import { AUTH_ERROR_CODES } from '@starter/shared/auth';
+import { AUTH_ERROR_CODES } from '@vibru/shared/auth';
 import { ThrottlerStorage } from '@nestjs/throttler/dist/throttler-storage.interface';
 
 interface RequestWithBody {

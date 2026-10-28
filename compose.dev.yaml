@@ -1,3 +1,5 @@
+name: vibru
+
 services:
   postgres:
     image: postgres:18.1
@@ -44,8 +46,8 @@ services:
   mailpit:
     image: axllent/mailpit:v1.15
     ports:
-      - '127.0.0.1:1025:1025'
-      - '127.0.0.1:8025:8025'
+      - '127.0.0.1:${SMTP_PORT:-21025}:1025'
+      - '127.0.0.1:${MAILPIT_UI_PORT:-28025}:8025'
     healthcheck:
       test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8025']
       interval: 10s

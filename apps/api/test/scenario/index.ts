@@ -1,4 +1,5 @@
 import type { INestApplication } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import type { MemoryTransport } from '../../src/modules/mail/transports/memory.transport';
 import request from 'supertest';
 import { getTestPool } from '../integration-setup';
@@ -25,6 +26,25 @@ type SentEmail = {
 };
 
 type AuthAgent = Pick<request.SuperAgentTest, 'get' | 'post' | 'patch' | 'delete' | 'put'>;
+
+type CreateCoupleOpts = {
+  datingStartedOn?: string | null;
+  marriedOn?: string | null;
+  blueDisplayName?: string;
+  purpleDisplayName?: string;
+};
+
+export type CoupleLogin = {
+  user: UserCredentials;
+  agent: AuthAgent;
+  memberId: string;
+};
+
+export type CoupleScenario = {
+  coupleId: string;
+  blue: CoupleLogin;
+  purple: CoupleLogin;
+};
 
 export function makeScenario(app: INestApplication, transport?: MemoryTransport) {
   async function createUser(opts: CreateUserOpts): Promise<UserCredentials> {
@@ -91,5 +111,58 @@ export function makeScenario(app: INestApplication, transport?: MemoryTransport)
     return entry.split(';')[0];
   }
 
-  return { createUser, loginAs, lastEmailTo, extractLinkToken, cookieFrom };
+  async function createCouple(opts: CreateCoupleOpts = {}): Promise<CoupleScenario> {
+    const suffix = randomUUID();
+    const blueUser = await createUser({
+      email: `azul-${suffix}@teste.com`,
+      role: 'admin',
+    });
+    const purpleUser = await createUser({ email: `roxo-${suffix}@teste.com` });
+
+    const pool = getTestPool();
+    const coupleResult = await pool.query<{ id: string }>(
+      `INSERT INTO couples (dating_started_on, married_on) VALUES ($1, $2) RETURNING id`,
+      [opts.datingStartedOn ?? null, opts.marriedOn ?? null],
+    );
+    const coupleId = coupleResult.rows[0]?.id;
+    if (!coupleId) throw new Error('Falha ao criar casal no cenário');
+
+    const blueMember = await insertMember(
+      coupleId,
+      blueUser.email,
+      opts.blueDisplayName ?? 'Bruno',
+      'blue',
+    );
+    const purpleMember = await insertMember(
+      coupleId,
+      purpleUser.email,
+      opts.purpleDisplayName ?? 'Ela',
+      'purple',
+    );
+
+    return {
+      coupleId,
+      blue: { user: blueUser, agent: await loginAs(blueUser), memberId: blueMember },
+      purple: { user: purpleUser, agent: await loginAs(purpleUser), memberId: purpleMember },
+    };
+  }
+
+  async function insertMember(
+    coupleId: string,
+    email: string,
+    displayName: string,
+    color: 'blue' | 'purple',
+  ): Promise<string> {
+    const result = await getTestPool().query<{ id: string }>(
+      `INSERT INTO couple_members (couple_id, user_id, display_name, color)
+       SELECT $1, id, $2, $3::member_color FROM users WHERE email = $4
+       RETURNING id`,
+      [coupleId, displayName, color, email],
+    );
+    const memberId = result.rows[0]?.id;
+    if (!memberId) throw new Error(`Falha ao criar membro ${color} no cenário`);
+    return memberId;
+  }
+
+  return { createUser, createCouple, loginAs, lastEmailTo, extractLinkToken, cookieFrom };
 }

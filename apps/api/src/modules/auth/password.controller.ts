@@ -5,8 +5,8 @@ import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { PasswordService } from './password.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
-import { changePasswordRequestSchema } from '@starter/shared/auth';
-import { forgotPasswordRequestSchema, resetPasswordRequestSchema } from '@starter/shared';
+import { changePasswordRequestSchema } from '@vibru/shared/auth';
+import { forgotPasswordRequestSchema, resetPasswordRequestSchema } from '@vibru/shared';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { ERROR_SCHEMA, AUTH_RESPONSE_SCHEMA } from './auth-swagger';
 

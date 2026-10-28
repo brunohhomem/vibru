@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { AuthResponse } from '@starter/shared';
+import type { AuthResponse } from '@vibru/shared';
 import { api } from '@/lib/api';
 
 export const ME_QUERY_KEY = ['me'] as const;

@@ -1,5 +1,5 @@
 {
-  "extends": "@starter/config/tsconfig/next.json",
+  "extends": "@vibru/config/tsconfig/next.json",
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]

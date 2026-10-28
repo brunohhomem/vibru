@@ -17,9 +17,9 @@ import {
   usersQuerySchema,
   updateUserRoleRequestSchema,
   updateUserStatusRequestSchema,
-} from '@starter/shared';
+} from '@vibru/shared';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import type { UsersQuery, UpdateUserRoleRequest, UpdateUserStatusRequest } from '@starter/shared';
+import type { UsersQuery, UpdateUserRoleRequest, UpdateUserStatusRequest } from '@vibru/shared';
 
 @ApiTags('users')
 @Controller('users')

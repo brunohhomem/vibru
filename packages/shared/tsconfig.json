@@ -1,5 +1,5 @@
 {
-  "extends": "@starter/config/tsconfig/base.json",
+  "extends": "@vibru/config/tsconfig/base.json",
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],

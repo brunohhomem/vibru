@@ -4,8 +4,8 @@ import {
   phoneSchema,
   registerRequestSchema,
   resetPasswordRequestSchema,
-} from '@starter/shared';
-import { z } from '@starter/shared/zod';
+} from '@vibru/shared';
+import { z } from '@vibru/shared/zod';
 
 type DigitSchema = typeof cpfSchema;
 

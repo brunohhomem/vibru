@@ -4,7 +4,7 @@ import {
   PEOPLE_ERROR_CODES,
   errorResponseSchema,
   type ErrorResponse,
-} from '@starter/shared';
+} from '@vibru/shared';
 import axios from 'axios';
 import type { FieldValues, Path, UseFormSetError } from 'react-hook-form';
 import { toast } from 'sonner';

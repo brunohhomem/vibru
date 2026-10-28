@@ -2,9 +2,9 @@ import { Controller, Get, Patch, Body, HttpCode, HttpStatus } from '@nestjs/comm
 import { ApiTags, ApiOperation, ApiCookieAuth, ApiResponse } from '@nestjs/swagger';
 import { PeopleService } from './people.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { profileResponseSchema, updateProfileRequestSchema } from '@starter/shared';
+import { profileResponseSchema, updateProfileRequestSchema } from '@vibru/shared';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import type { UpdateProfileRequest } from '@starter/shared';
+import type { UpdateProfileRequest } from '@vibru/shared';
 
 @ApiTags('me')
 @Controller('me')

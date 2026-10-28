@@ -1,5 +1,5 @@
 {
-  "name": "@starter/config",
+  "name": "@vibru/config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -14,7 +14,7 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "echo 'no unit tests in @starter/config' && exit 0"
+    "test": "echo 'no unit tests in @vibru/config' && exit 0"
   },
   "dependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "4.8.1",

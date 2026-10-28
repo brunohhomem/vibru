@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { AuditService } from '../audit/audit.service';
-import type { UsersQuery, UserListItem, PaginatedResponse } from '@starter/shared';
-import { PEOPLE_ERROR_CODES, AUDIT_ACTIONS, buildPageMeta } from '@starter/shared';
+import type { UsersQuery, UserListItem, PaginatedResponse } from '@vibru/shared';
+import { PEOPLE_ERROR_CODES, AUDIT_ACTIONS, buildPageMeta } from '@vibru/shared';
 
 @Injectable()
 export class UsersAdminService {

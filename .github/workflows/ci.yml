@@ -86,17 +86,22 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_PASSWORD: redis
-          API_PORT: 3001
-          APP_ORIGIN: http://localhost:3000
-          WEB_ORIGIN: http://localhost:3000
+          API_PORT: 3101
+          APP_ORIGIN: http://localhost:3100
+          WEB_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
+          ADMIN_DISPLAY_NAME: Bruno
+          PARTNER_EMAIL: parceira@example.com
+          PARTNER_DISPLAY_NAME: Parceira
+          COUPLE_DATING_STARTED_ON: 2020-01-10
+          COUPLE_MARRIED_ON: 2022-05-20
           LOG_LEVEL: info
           SWAGGER_ENABLED: true
           TRUST_PROXY_HOPS: 0
           NODE_ENV: development
           MAIL_DRIVER: smtp
         run: |
-          pnpm --filter @starter/scripts keys:generate
+          pnpm --filter @vibru/scripts keys:generate
           pnpm boot:check
 
       - name: Commitlint
@@ -164,14 +169,19 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_PASSWORD: redis
-          API_PORT: 3001
-          APP_ORIGIN: http://localhost:3000
+          API_PORT: 3101
+          APP_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
+          ADMIN_DISPLAY_NAME: Bruno
+          PARTNER_EMAIL: parceira@example.com
+          PARTNER_DISPLAY_NAME: Parceira
+          COUPLE_DATING_STARTED_ON: 2020-01-10
+          COUPLE_MARRIED_ON: 2022-05-20
           LOG_LEVEL: info
           SWAGGER_ENABLED: true
           TRUST_PROXY_HOPS: 0
           NODE_ENV: test
-        run: pnpm --filter @starter/scripts keys:generate
+        run: pnpm --filter @vibru/scripts keys:generate
 
       - name: Rodar testes de integração
         env:
@@ -184,9 +194,14 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_PASSWORD: redis
-          API_PORT: 3001
-          APP_ORIGIN: http://localhost:3000
+          API_PORT: 3101
+          APP_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
+          ADMIN_DISPLAY_NAME: Bruno
+          PARTNER_EMAIL: parceira@example.com
+          PARTNER_DISPLAY_NAME: Parceira
+          COUPLE_DATING_STARTED_ON: 2020-01-10
+          COUPLE_MARRIED_ON: 2022-05-20
           LOG_LEVEL: info
           SWAGGER_ENABLED: true
           TRUST_PROXY_HOPS: 0
@@ -256,10 +271,15 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_PASSWORD: redis
-          API_PORT: 3001
-          APP_ORIGIN: http://localhost:3000
-          WEB_ORIGIN: http://localhost:3000
+          API_PORT: 3101
+          APP_ORIGIN: http://localhost:3100
+          WEB_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
+          ADMIN_DISPLAY_NAME: Bruno
+          PARTNER_EMAIL: parceira@example.com
+          PARTNER_DISPLAY_NAME: Parceira
+          COUPLE_DATING_STARTED_ON: 2020-01-10
+          COUPLE_MARRIED_ON: 2022-05-20
           LOG_LEVEL: info
           SWAGGER_ENABLED: false
           TRUST_PROXY_HOPS: 0
@@ -267,10 +287,10 @@ jobs:
           MAIL_DRIVER: smtp
           SMTP_HOST: localhost
           SMTP_PORT: 1025
-        run: pnpm --filter @starter/scripts keys:generate
+        run: pnpm --filter @vibru/scripts keys:generate
 
       - name: Build de produção
-        run: pnpm turbo run build --filter=@starter/api --filter=@starter/web
+        run: pnpm turbo run build --filter=@vibru/api --filter=@vibru/web
 
       - name: Smoke E2E
         env:
@@ -283,11 +303,16 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_PASSWORD: redis
-          API_PORT: 3001
-          APP_ORIGIN: http://127.0.0.1:3000
-          WEB_ORIGIN: http://127.0.0.1:3000
-          API_ORIGIN: http://127.0.0.1:3001
+          API_PORT: 3101
+          APP_ORIGIN: http://127.0.0.1:3100
+          WEB_ORIGIN: http://127.0.0.1:3100
+          API_ORIGIN: http://127.0.0.1:3101
           ADMIN_EMAIL: admin@example.com
+          ADMIN_DISPLAY_NAME: Bruno
+          PARTNER_EMAIL: parceira@example.com
+          PARTNER_DISPLAY_NAME: Parceira
+          COUPLE_DATING_STARTED_ON: 2020-01-10
+          COUPLE_MARRIED_ON: 2022-05-20
           NODE_ENV: development
           MAIL_DRIVER: smtp
           SMTP_HOST: localhost
@@ -300,6 +325,8 @@ jobs:
             -e CI -e DB_HOST -e DB_PORT -e DB_USER -e DB_PASSWORD -e DB_NAME \
             -e REDIS_HOST -e REDIS_PORT -e REDIS_PASSWORD \
             -e API_PORT -e APP_ORIGIN -e WEB_ORIGIN -e API_ORIGIN -e ADMIN_EMAIL \
+            -e ADMIN_DISPLAY_NAME -e PARTNER_EMAIL -e PARTNER_DISPLAY_NAME \
+            -e COUPLE_DATING_STARTED_ON -e COUPLE_MARRIED_ON \
             -e NODE_ENV -e MAIL_DRIVER -e SMTP_HOST -e SMTP_PORT \
             -e PLAYWRIGHT_BROWSERS_PATH \
             mcr.microsoft.com/playwright:v1.64.1-noble \

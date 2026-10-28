@@ -30,7 +30,14 @@
         "COOKIE_SECRET",
         "ENCRYPTION_KEY",
         "LOG_LEVEL",
-        "NODE_ENV"
+        "NODE_ENV",
+        "ADMIN_EMAIL",
+        "ADMIN_DISPLAY_NAME",
+        "PARTNER_EMAIL",
+        "PARTNER_DISPLAY_NAME",
+        "PARTNER_INITIAL_PASSWORD",
+        "COUPLE_DATING_STARTED_ON",
+        "COUPLE_MARRIED_ON"
       ]
     },
     "test:e2e": {

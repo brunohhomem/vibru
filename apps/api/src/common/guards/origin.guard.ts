@@ -10,7 +10,7 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import type { Env } from '../../config/env.schema';
 import { ENV } from '../../config/app-config.module';
 import { Reflector } from '@nestjs/core';
-import { AUTH_ERROR_CODES } from '@starter/shared/auth';
+import { AUTH_ERROR_CODES } from '@vibru/shared/auth';
 
 @Injectable()
 export class OriginGuard implements CanActivate {

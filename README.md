@@ -20,19 +20,18 @@ pnpm keys:generate
 pnpm infra:up
 pnpm db:migrate
 pnpm db:seed
-pnpm --filter @starter/api start:dev
+pnpm --filter @vibru/api start:dev
 pnpm worker:dev
-pnpm --filter @starter/web dev
+pnpm --filter @vibru/web dev
 ```
 
 - `pnpm keys:generate` cria o `.env` e não sobrescreve valor que já existe.
-- `pnpm infra:up` sobe Postgres, Redis e Mailpit. Os e-mails de desenvolvimento aparecem em `http://localhost:8025`.
+- `pnpm infra:up` sobe Postgres, Redis e Mailpit. Os e-mails de desenvolvimento aparecem em `http://localhost:28025`.
 - `pnpm db:seed` cria o admin de `ADMIN_EMAIL`. Em development a senha inicial é `Admin@12345` e a troca obrigatória fica desligada. Em production a senha é aleatória, aparece uma vez no terminal e a troca é obrigatória.
-- A API fica em `http://localhost:3001` e o web em `http://localhost:3000`. `GET /api/health` responde `200`.
+- A API fica em `http://localhost:3101` e o web em `http://localhost:3100`. `GET /api/health` responde `200`.
 
 ## Checklist pós-fork
 
-- [ ] Renomear os pacotes `@starter/*` e o nome do app na landing e no título.
 - [ ] Definir `ADMIN_EMAIL` e gerar as chaves de novo com `pnpm keys:generate`.
 - [ ] Apagar a landing em `apps/web/src/app/page.tsx` se o produto não for usá-la.
 - [ ] Revisar `registration_enabled`: ligado em development, desligado em production, até um admin mudar em `/app/settings`.
@@ -41,7 +40,7 @@ pnpm --filter @starter/web dev
 
 - `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm build`
 - `pnpm format` e `pnpm format:check`
-- `pnpm --filter @starter/api start:dev`, `pnpm worker:dev`, `pnpm --filter @starter/web dev`
+- `pnpm --filter @vibru/api start:dev`, `pnpm worker:dev`, `pnpm --filter @vibru/web dev`
 - `pnpm infra:up` / `pnpm infra:down` / `pnpm infra:logs` / `pnpm infra:reset`
 - `pnpm keys:generate` [--file <caminho>] / `pnpm keys:rotate <NOME>` [--yes]
 - `pnpm db:generate <nome>` / `pnpm db:migrate` / `pnpm db:seed` / `pnpm db:studio`

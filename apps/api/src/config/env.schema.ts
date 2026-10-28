@@ -1,4 +1,5 @@
-import { z } from '@starter/shared/zod';
+import { z } from '@vibru/shared/zod';
+import { calendarDateSchema } from '@vibru/shared';
 
 const logLevelSchema = z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']);
 const nodeEnvSchema = z.enum(['development', 'production', 'test']);
@@ -34,7 +35,13 @@ const envSchema = z.object({
   // Auth (F2)
   ADMIN_EMAIL: z.string().email(),
   ADMIN_INITIAL_PASSWORD: z.string().optional(),
-  WEB_ORIGIN: z.string().url().default('http://localhost:3000'),
+  ADMIN_DISPLAY_NAME: z.string().min(1).max(40).optional(),
+  PARTNER_EMAIL: z.string().email().optional(),
+  PARTNER_DISPLAY_NAME: z.string().min(1).max(40).optional(),
+  PARTNER_INITIAL_PASSWORD: z.string().optional(),
+  COUPLE_DATING_STARTED_ON: calendarDateSchema.optional(),
+  COUPLE_MARRIED_ON: calendarDateSchema.optional(),
+  WEB_ORIGIN: z.string().url().default('http://localhost:3100'),
   COOKIE_SECURE: z.coerce.boolean().optional(),
   AUTH_ACCESS_TTL_MINUTES: z.coerce.number().int().min(1).max(120).default(15),
   AUTH_REFRESH_TTL_DAYS: z.coerce.number().int().min(1).max(90).default(7),
@@ -43,10 +50,10 @@ const envSchema = z.object({
 
   // Mail (F3)
   MAIL_DRIVER: mailDriverSchema.default('smtp'),
-  MAIL_FROM: z.string().min(1).default('Starter <no-reply@localhost>'),
-  APP_NAME: z.string().min(1).max(60).default('Starter Template'),
+  MAIL_FROM: z.string().min(1).default('Vibru <no-reply@localhost>'),
+  APP_NAME: z.string().min(1).max(60).default('Vibru'),
   SMTP_HOST: z.string().min(1).default('localhost'),
-  SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(1025),
+  SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(21025),
   RESEND_API_KEY: z.string().optional(),
   EMAIL_CONFIRM_TTL_HOURS: z.coerce.number().int().min(1).max(168).default(24),
   PASSWORD_RESET_TTL_MINUTES: z.coerce.number().int().min(5).max(240).default(30),
@@ -55,7 +62,7 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
-import type { ZodIssue } from '@starter/shared/zod';
+import type { ZodIssue } from '@vibru/shared/zod';
 
 export function validateEnv(rawEnv: Record<string, string | undefined>): Env {
   const result = envSchema.safeParse(rawEnv);

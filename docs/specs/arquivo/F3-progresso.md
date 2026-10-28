@@ -34,9 +34,9 @@ Numeração fixa. Retome da primeira tarefa não concluída, sem pedir confirma�
 
 | T   | Comando                                           | Resultado                                                                  |
 | --- | ------------------------------------------------- | -------------------------------------------------------------------------- |
-| T1  | pnpm --filter @starter/api lint                   | 0 errors, 24 warnings                                                      |
-| T1  | pnpm --filter @starter/api typecheck              | verde                                                                      |
-| T1  | pnpm --filter @starter/api test                   | 132/132 passed                                                             |
+| T1  | pnpm --filter @vibru/api lint                     | 0 errors, 24 warnings                                                      |
+| T1  | pnpm --filter @vibru/api typecheck                | verde                                                                      |
+| T1  | pnpm --filter @vibru/api test                     | 132/132 passed                                                             |
 | T2  | pnpm --filter shared test (via vitest.config.mjs) | 74/74 passed                                                               |
 | T2  | pnpm --filter shared build                        | verde                                                                      |
 | T2  | pnpm typecheck                                    | verde                                                                      |

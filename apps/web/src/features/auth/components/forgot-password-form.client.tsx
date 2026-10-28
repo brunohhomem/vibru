@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FORGOT_PASSWORD_RESPONSE_MESSAGE, forgotPasswordRequestSchema } from '@starter/shared';
+import { FORGOT_PASSWORD_RESPONSE_MESSAGE, forgotPasswordRequestSchema } from '@vibru/shared';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Alert } from '@/components/ui/alert';

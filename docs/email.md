@@ -5,7 +5,7 @@
 | Ambiente              | Driver            | Como ver                                   |
 | --------------------- | ----------------- | ------------------------------------------ |
 | `development` / teste | `MemoryTransport` | `startTestWorker` + `memoryTransport.sent` |
-| `development` (infra) | SMTP → Mailpit    | <http://localhost:8025>                    |
+| `development` (infra) | SMTP → Mailpit    | <http://localhost:28025>                   |
 | `production`          | SMTP (externo)    | Variáveis `MAIL_*` em `.env`               |
 
 O transporte é selecionado em `MailModule` via `APP_CONFIG.NODE_ENV`. Em testes de integração o `MailProcessor` roda com `MemoryTransport`; basta chamar `startTestWorker('')` antes do app e aguardar `waitForEmail()` para inspecionar o que foi enviado.
@@ -37,7 +37,7 @@ O token bruto (antes do hash SHA-256) trafega no payload do job BullMQ e no link
 | Variável    | Obrigatório | Padrão      | Descrição                            |
 | ----------- | ----------- | ----------- | ------------------------------------ |
 | `MAIL_HOST` | prod        | `localhost` | Host do servidor SMTP                |
-| `MAIL_PORT` | prod        | `1025`      | Porta SMTP (1025 = Mailpit dev)      |
+| `MAIL_PORT` | prod        | `21025`     | Porta SMTP (21025 = Mailpit dev)     |
 | `MAIL_USER` | não         | —           | Usuário SMTP (deixe vazio sem auth)  |
 | `MAIL_PASS` | não         | —           | Senha SMTP                           |
 | `MAIL_FROM` | não         | `noreply@…` | Endereço remetente padrão            |

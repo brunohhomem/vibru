@@ -1,3 +1,3 @@
-import nestConfig from '@starter/config/eslint/nest';
+import nestConfig from '@vibru/config/eslint/nest';
 
 export default nestConfig;

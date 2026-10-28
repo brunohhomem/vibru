@@ -195,7 +195,7 @@ PR: `feat: F5 people, users and web app` → `chore/f4-testes`.
 ## 5. F6 — pronto para forkar (branch `chore/f6-fechamento`, a partir da F5)
 
 1. **E2E smoke** (Playwright, Chromium, viewport 390×844), um único teste: "admin entra, troca a senha obrigatória e chega à área logada sem scroll horizontal". Novo job `e2e` no CI com Postgres, Redis e Mailpit, rodando contra o build de produção e esperando `/api/health`. Use `@playwright/test` fixado, a imagem `mcr.microsoft.com/playwright` na mesma versão, `workers: 1`, `retries: 2` e o relatório como artifact.
-2. **README:** o que é o template, requisitos (Node, pnpm, Docker), primeiro uso (`pnpm install`, `infra:up`, `keys:generate`, `db:migrate`, `db:seed`, `dev` da API, do worker e do web) e um **checklist pós-fork** (renomear `@starter/*`, nome do app, e-mail do admin, gerar chaves, apagar a landing, revisar `registration_enabled`).
+2. **README:** o que é o template, requisitos (Node, pnpm, Docker), primeiro uso (`pnpm install`, `infra:up`, `keys:generate`, `db:migrate`, `db:seed`, `dev` da API, do worker e do web) e um **checklist pós-fork** (renomear `@vibru/*`, nome do app, e-mail do admin, gerar chaves, apagar a landing, revisar `registration_enabled`).
 3. **Revisão final:**
    1. `AGENTS.md` com os comandos atuais (sem Jest, com `worker:dev`) e índice atualizado.
    2. `docs/` sem referência a OpenCode, a fases antigas ou a itens adiados como se existissem.

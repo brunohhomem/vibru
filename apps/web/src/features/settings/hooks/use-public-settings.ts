@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { PublicSettingsResponse } from '@starter/shared';
+import type { PublicSettingsResponse } from '@vibru/shared';
 import { api } from '@/lib/api';
 
 export const PUBLIC_SETTINGS_QUERY_KEY = ['settings', 'public'] as const;

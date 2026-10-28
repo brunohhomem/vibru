@@ -4,7 +4,7 @@ import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { EmailConfirmationService } from './email-confirmation.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
-import { confirmEmailRequestSchema } from '@starter/shared';
+import { confirmEmailRequestSchema } from '@vibru/shared';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { ERROR_SCHEMA } from './auth-swagger';
 

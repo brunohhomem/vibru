@@ -5,7 +5,7 @@ Você é o executor de uma tarefa num monorepo pnpm. Leia tudo antes de escrever
 Monorepo pnpm. API em `apps/api` com NestJS + Drizzle ORM + PostgreSQL.
 - `pnpm db:generate <nome>` — gera migration SQL a partir do schema
 - `pnpm db:migrate` — aplica migrations pendentes
-- `pnpm --filter @starter/api typecheck` — typecheck da API
+- `pnpm --filter @vibru/api typecheck` — typecheck da API
 
 ## Tarefa T3 — Entities e migrations
 

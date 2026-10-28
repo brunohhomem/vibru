@@ -4,7 +4,7 @@ import path from 'node:path';
 import { readWorkspaceValue, workspaceRoot } from './read-workspace-env.mjs';
 
 const E2E_DATABASE = 'app_e2e';
-const WEB_ORIGIN = 'http://127.0.0.1:3000';
+const WEB_ORIGIN = 'http://127.0.0.1:3100';
 const rootDir = workspaceRoot();
 const apiDir = path.join(rootDir, 'apps/api');
 const requireFromApi = createRequire(path.join(apiDir, 'package.json'));
@@ -41,7 +41,7 @@ function runApiScript(scriptName) {
 async function recreateDatabase() {
   const client = new Client({
     host: readWorkspaceValue('DB_HOST', 'localhost'),
-    port: Number(readWorkspaceValue('DB_PORT', '5432')),
+    port: Number(readWorkspaceValue('DB_PORT', '25432')),
     user: readWorkspaceValue('DB_USER', 'app'),
     password: readWorkspaceValue('DB_PASSWORD'),
     database: 'postgres',
@@ -62,7 +62,7 @@ async function recreateDatabase() {
 async function requirePasswordChange() {
   const client = new Client({
     host: readWorkspaceValue('DB_HOST', 'localhost'),
-    port: Number(readWorkspaceValue('DB_PORT', '5432')),
+    port: Number(readWorkspaceValue('DB_PORT', '25432')),
     user: readWorkspaceValue('DB_USER', 'app'),
     password: readWorkspaceValue('DB_PASSWORD'),
     database: E2E_DATABASE,
