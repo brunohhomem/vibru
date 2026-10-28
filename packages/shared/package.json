@@ -24,6 +24,10 @@
     "./people": {
       "types": "./dist/people.d.ts",
       "default": "./dist/people.js"
+    },
+    "./couple": {
+      "types": "./dist/couple/index.d.ts",
+      "default": "./dist/couple/index.js"
     }
   },
   "scripts": {
