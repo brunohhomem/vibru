@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PeopleRepository } from './people.repository';
-import type { ProfileResponse, UpdateProfileRequest } from '@starter/shared';
-import { PEOPLE_ERROR_CODES } from '@starter/shared';
+import type { ProfileResponse, UpdateProfileRequest } from '@vibru/shared';
+import { PEOPLE_ERROR_CODES } from '@vibru/shared';
 
 @Injectable()
 export class PeopleService {

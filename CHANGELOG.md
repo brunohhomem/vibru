@@ -6,7 +6,7 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
 ### Adicionado
 
-- Fundação do monorepo: normalização LF, Turborepo, presets de TypeScript e ESLint, `@starter/shared`, esqueletos da API e do web, hooks de commit, instruções para agentes e CI.
+- Fundação do monorepo: normalização LF, Turborepo, presets de TypeScript e ESLint, `@vibru/shared`, esqueletos da API e do web, hooks de commit, instruções para agentes e CI.
 - O preset de ESLint aplica as regras da seção 3.2 do ADR. `unicorn/filename-case` ignora segmentos `[...]` do Next e arquivos `.d.ts`.
 - Hooks de commit com `husky` 9.1.7, `lint-staged` 17.6.0, `prettier` 3.9.10 e `@commitlint/cli` / `@commitlint/config-conventional` 21.2.4.
 - Node 24.22.1 e pnpm 12.14.0
@@ -33,7 +33,7 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 - O teste das regras do ESLint grava as fixtures num monorepo isolado em `packages/config/eslint/fixtures`, com `tsconfig` e config que reutilizam os presets. O diretório é `fixtures` porque `unicorn/filename-case` rejeita `__fixtures__`. O Turborepo pode lintar, checar tipos e buildar os apps ao mesmo tempo.
 - O runner do CI é `ubuntu-24.04`, pinado para a imagem não mudar quando o GitHub apontar o rótulo `latest` para o Ubuntu 26. O job `verify` encerra em 15 minutos.
 - O ESLint fica em 9.39.5, com `eslint-plugin-unicorn` 65.0.1, para carregar o `eslint-config-next` 16.4.2 completo. A estável mais recente do ESLint é a 10.13.0 e a do Unicorn é a 78.0.0; os plugins trazidos pelo `eslint-config-next` só declaram suporte até o ESLint 9. Gatilho de revisão: subir para ESLint 10 quando o `eslint-config-next` aceitar.
-- O `@starter/config` depende de `next` 16.4.2, `react` 19.3.1 e `react-dom` 19.3.1 porque o parser do `eslint-config-next` importa `next/dist/compiled/babel/eslint-parser`.
+- O `@vibru/config` depende de `next` 16.4.2, `react` 19.3.1 e `react-dom` 19.3.1 porque o parser do `eslint-config-next` importa `next/dist/compiled/babel/eslint-parser`.
 - O `apps/web` depende de `@types/react` 19.3.0. O `next build` recusa checar o TypeScript sem os tipos do JSX.
 - O TypeScript fica em 6.0.3. A estável mais recente é a 7.0.2, ainda fora do intervalo aceito pelo `typescript-eslint` 8.72.0.
 

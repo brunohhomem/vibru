@@ -64,41 +64,41 @@ Ao retomar, leia este arquivo e continue da primeira tarefa não concluída, sem
 
 ## Evidências de aceite
 
-| T   | Comando ou prova                                  | Resultado                      |
-| --- | ------------------------------------------------- | ------------------------------ |
-| T4  | `pnpm test --filter @starter/shared`              | 23 testes passando             |
-| T4  | `pnpm lint --filter @starter/shared`              | 0 erros                        |
-| T4  | `pnpm typecheck --filter @starter/shared`         | OK                             |
-| T10 | `pnpm test --filter @starter/api`                 | 25 testes passando             |
-| T10 | `pnpm lint --filter @starter/api`                 | 0 erros (2 warns)              |
-| T10 | `pnpm typecheck --filter @starter/api`            | OK                             |
-| T11 | `pnpm test --filter @starter/api`                 | 25 testes passando             |
-| T11 | `pnpm lint --filter @starter/api`                 | 0 erros (2 warns)              |
-| T11 | `pnpm typecheck --filter @starter/api`            | OK                             |
-| T12 | `pnpm test --filter @starter/api`                 | 25 testes passando             |
-| T12 | `pnpm lint --filter @starter/api`                 | 0 erros (2 warns)              |
-| T12 | `pnpm typecheck --filter @starter/api`            | OK                             |
-| T13 | `pnpm test --filter @starter/api`                 | 25 testes passando             |
-| T13 | `pnpm lint --filter @starter/api`                 | 0 erros (2 warns)              |
-| T13 | `pnpm typecheck --filter @starter/api`            | OK                             |
-| T14 | `pnpm --filter @starter/api run test:integration` | 2 testes passando              |
-| T14 | `pnpm lint --filter @starter/api`                 | 0 erros (2 warns)              |
-| T14 | `pnpm typecheck --filter @starter/api`            | OK                             |
-| T5  | `pnpm --filter @starter/api run test:integration` | 5 testes passando              |
-| T5  | `pnpm lint --filter @starter/api`                 | 0 erros (2 warns)              |
-| T5  | `pnpm typecheck --filter @starter/api`            | OK                             |
-| T6  | `pnpm --filter @starter/api run test:integration` | 1 teste passando (atomicidade) |
-| T6  | `pnpm lint --filter @starter/api`                 | 0 erros (2 warns)              |
-| T6  | `pnpm typecheck --filter @starter/api`            | OK                             |
-| T9  | `pnpm test --filter @starter/api`                 | 25 testes passando             |
-| T9  | `pnpm --filter @starter/api run test:integration` | 5 testes passando              |
-| T9  | `pnpm lint --filter @starter/api`                 | 0 erros (2 warns)              |
-| T9  | `pnpm typecheck --filter @starter/api`            | OK                             |
-| T15 | `pnpm turbo run test:integration` (CI)            | Job `integration` verde        |
-| T15 | `pnpm keys:generate` (CI)                         | Exercita script no CI          |
-| T16 | `pnpm format:check`                               | OK                             |
-| T16 | `pnpm lint`                                       | 0 erros                        |
-| T16 | `pnpm typecheck`                                  | OK                             |
-| T16 | `pnpm test`                                       | 25 testes passando             |
-| T16 | `pnpm test:integration`                           | 13 testes passando             |
-| T16 | `pnpm build`                                      | OK                             |
+| T   | Comando ou prova                                | Resultado                      |
+| --- | ----------------------------------------------- | ------------------------------ |
+| T4  | `pnpm test --filter @vibru/shared`              | 23 testes passando             |
+| T4  | `pnpm lint --filter @vibru/shared`              | 0 erros                        |
+| T4  | `pnpm typecheck --filter @vibru/shared`         | OK                             |
+| T10 | `pnpm test --filter @vibru/api`                 | 25 testes passando             |
+| T10 | `pnpm lint --filter @vibru/api`                 | 0 erros (2 warns)              |
+| T10 | `pnpm typecheck --filter @vibru/api`            | OK                             |
+| T11 | `pnpm test --filter @vibru/api`                 | 25 testes passando             |
+| T11 | `pnpm lint --filter @vibru/api`                 | 0 erros (2 warns)              |
+| T11 | `pnpm typecheck --filter @vibru/api`            | OK                             |
+| T12 | `pnpm test --filter @vibru/api`                 | 25 testes passando             |
+| T12 | `pnpm lint --filter @vibru/api`                 | 0 erros (2 warns)              |
+| T12 | `pnpm typecheck --filter @vibru/api`            | OK                             |
+| T13 | `pnpm test --filter @vibru/api`                 | 25 testes passando             |
+| T13 | `pnpm lint --filter @vibru/api`                 | 0 erros (2 warns)              |
+| T13 | `pnpm typecheck --filter @vibru/api`            | OK                             |
+| T14 | `pnpm --filter @vibru/api run test:integration` | 2 testes passando              |
+| T14 | `pnpm lint --filter @vibru/api`                 | 0 erros (2 warns)              |
+| T14 | `pnpm typecheck --filter @vibru/api`            | OK                             |
+| T5  | `pnpm --filter @vibru/api run test:integration` | 5 testes passando              |
+| T5  | `pnpm lint --filter @vibru/api`                 | 0 erros (2 warns)              |
+| T5  | `pnpm typecheck --filter @vibru/api`            | OK                             |
+| T6  | `pnpm --filter @vibru/api run test:integration` | 1 teste passando (atomicidade) |
+| T6  | `pnpm lint --filter @vibru/api`                 | 0 erros (2 warns)              |
+| T6  | `pnpm typecheck --filter @vibru/api`            | OK                             |
+| T9  | `pnpm test --filter @vibru/api`                 | 25 testes passando             |
+| T9  | `pnpm --filter @vibru/api run test:integration` | 5 testes passando              |
+| T9  | `pnpm lint --filter @vibru/api`                 | 0 erros (2 warns)              |
+| T9  | `pnpm typecheck --filter @vibru/api`            | OK                             |
+| T15 | `pnpm turbo run test:integration` (CI)          | Job `integration` verde        |
+| T15 | `pnpm keys:generate` (CI)                       | Exercita script no CI          |
+| T16 | `pnpm format:check`                             | OK                             |
+| T16 | `pnpm lint`                                     | 0 erros                        |
+| T16 | `pnpm typecheck`                                | OK                             |
+| T16 | `pnpm test`                                     | 25 testes passando             |
+| T16 | `pnpm test:integration`                         | 13 testes passando             |
+| T16 | `pnpm build`                                    | OK                             |

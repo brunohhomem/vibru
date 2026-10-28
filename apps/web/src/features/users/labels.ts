@@ -1,4 +1,4 @@
-import type { UserRole } from '@starter/shared';
+import type { UserRole } from '@vibru/shared';
 
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: 'Administrador',

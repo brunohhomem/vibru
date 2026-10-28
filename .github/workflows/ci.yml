@@ -96,7 +96,7 @@ jobs:
           NODE_ENV: development
           MAIL_DRIVER: smtp
         run: |
-          pnpm --filter @starter/scripts keys:generate
+          pnpm --filter @vibru/scripts keys:generate
           pnpm boot:check
 
       - name: Commitlint
@@ -171,7 +171,7 @@ jobs:
           SWAGGER_ENABLED: true
           TRUST_PROXY_HOPS: 0
           NODE_ENV: test
-        run: pnpm --filter @starter/scripts keys:generate
+        run: pnpm --filter @vibru/scripts keys:generate
 
       - name: Rodar testes de integração
         env:
@@ -267,10 +267,10 @@ jobs:
           MAIL_DRIVER: smtp
           SMTP_HOST: localhost
           SMTP_PORT: 1025
-        run: pnpm --filter @starter/scripts keys:generate
+        run: pnpm --filter @vibru/scripts keys:generate
 
       - name: Build de produção
-        run: pnpm turbo run build --filter=@starter/api --filter=@starter/web
+        run: pnpm turbo run build --filter=@vibru/api --filter=@vibru/web
 
       - name: Smoke E2E
         env:

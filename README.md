@@ -20,9 +20,9 @@ pnpm keys:generate
 pnpm infra:up
 pnpm db:migrate
 pnpm db:seed
-pnpm --filter @starter/api start:dev
+pnpm --filter @vibru/api start:dev
 pnpm worker:dev
-pnpm --filter @starter/web dev
+pnpm --filter @vibru/web dev
 ```
 
 - `pnpm keys:generate` cria o `.env` e não sobrescreve valor que já existe.
@@ -32,7 +32,7 @@ pnpm --filter @starter/web dev
 
 ## Checklist pós-fork
 
-- [ ] Renomear os pacotes `@starter/*` e o nome do app na landing e no título.
+- [ ] Renomear os pacotes `@vibru/*` e o nome do app na landing e no título.
 - [ ] Definir `ADMIN_EMAIL` e gerar as chaves de novo com `pnpm keys:generate`.
 - [ ] Apagar a landing em `apps/web/src/app/page.tsx` se o produto não for usá-la.
 - [ ] Revisar `registration_enabled`: ligado em development, desligado em production, até um admin mudar em `/app/settings`.
@@ -41,7 +41,7 @@ pnpm --filter @starter/web dev
 
 - `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm build`
 - `pnpm format` e `pnpm format:check`
-- `pnpm --filter @starter/api start:dev`, `pnpm worker:dev`, `pnpm --filter @starter/web dev`
+- `pnpm --filter @vibru/api start:dev`, `pnpm worker:dev`, `pnpm --filter @vibru/web dev`
 - `pnpm infra:up` / `pnpm infra:down` / `pnpm infra:logs` / `pnpm infra:reset`
 - `pnpm keys:generate` [--file <caminho>] / `pnpm keys:rotate <NOME>` [--yes]
 - `pnpm db:generate <nome>` / `pnpm db:migrate` / `pnpm db:seed` / `pnpm db:studio`

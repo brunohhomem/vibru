@@ -2,7 +2,7 @@ import { Injectable, Inject, Optional, OnModuleInit, OnModuleDestroy } from '@ne
 import { Worker, Job } from 'bullmq';
 import IORedis from 'ioredis';
 import { Logger } from 'nestjs-pino';
-import { z } from '@starter/shared/zod';
+import { z } from '@vibru/shared/zod';
 import type { Env } from '../../config/env.schema';
 import { ENV } from '../../config/app-config.module';
 import { MailService } from './mail.service';

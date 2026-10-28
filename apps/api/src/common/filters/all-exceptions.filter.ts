@@ -9,7 +9,7 @@ import {
 import { Request, Response } from 'express';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodIssue } from 'zod';
-import { errorResponseSchema, type ErrorResponse } from '@starter/shared';
+import { errorResponseSchema, type ErrorResponse } from '@vibru/shared';
 
 /**
  * Filtro global de exceções.

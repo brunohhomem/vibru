@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginRequestSchema, type AuthResponse } from '@starter/shared';
+import { loginRequestSchema, type AuthResponse } from '@vibru/shared';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';

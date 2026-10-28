@@ -1,6 +1,6 @@
 'use client';
 
-import type { UserListItem, UsersListResponse } from '@starter/shared';
+import type { UserListItem, UsersListResponse } from '@vibru/shared';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';

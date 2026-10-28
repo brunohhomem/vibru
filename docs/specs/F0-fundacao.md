@@ -72,7 +72,7 @@ starter-template/
 └─ package.json  pnpm-workspace.yaml  turbo.json
 ```
 
-Escopo dos pacotes: `@starter/api`, `@starter/web`, `@starter/shared`, `@starter/config`. O script `init:project` (F10) renomeará o escopo depois.
+Escopo dos pacotes: `@vibru/api`, `@vibru/web`, `@vibru/shared`, `@vibru/config`. O script `init:project` (F10) renomeará o escopo depois.
 
 ---
 
@@ -162,19 +162,19 @@ O conteúdo é mínimo de propósito: serve para provar a ligação entre pacote
 
 **Decisão delegada ao executor (registrar no relatório):** o mecanismo de consumo do `shared` por `apps/api` (Nest, tipicamente CommonJS) e `apps/web` (Next). Escolha o **mais simples que funcione sem duplicar tipos** (por exemplo, build do `shared` com `tsc` ou `tsup` gerando CJS e ESM com `exports` corretos). Documente a escolha em `docs/conventions/backend.md`.
 
-**Aceite:** `apps/api` e `apps/web` importam `Role` de `@starter/shared` com tipos completos, e `pnpm build` funciona do zero.
+**Aceite:** `apps/api` e `apps/web` importam `Role` de `@vibru/shared` com tipos completos, e `pnpm build` funciona do zero.
 
 ### T6 — `apps/api` (NestJS mínimo)
 
 **Entregáveis**
 
-| Item    | Detalhe                                                                                 |
-| ------- | --------------------------------------------------------------------------------------- |
-| Código  | `AppModule` e `main.ts`. **Sem** controller de exemplo, sem "Hello World".              |
-| Scripts | `start:dev`, `build`, `lint`, `typecheck`, `test`                                       |
-| Testes  | Jest. Um teste de "fiação" que importa `Role` de `@starter/shared` e confere os valores |
+| Item    | Detalhe                                                                               |
+| ------- | ------------------------------------------------------------------------------------- |
+| Código  | `AppModule` e `main.ts`. **Sem** controller de exemplo, sem "Hello World".            |
+| Scripts | `start:dev`, `build`, `lint`, `typecheck`, `test`                                     |
+| Testes  | Jest. Um teste de "fiação" que importa `Role` de `@vibru/shared` e confere os valores |
 
-**Aceite:** `pnpm --filter @starter/api start:dev` sobe sem erro, e `pnpm turbo run test --filter @starter/api` passa.
+**Aceite:** `pnpm --filter @vibru/api start:dev` sobe sem erro, e `pnpm turbo run test --filter @vibru/api` passa.
 
 ### T7 — `apps/web` (Next.js mínimo)
 
@@ -186,7 +186,7 @@ O conteúdo é mínimo de propósito: serve para provar a ligação entre pacote
 | Lint   | Rodar o **ESLint CLI diretamente**, sem depender de `next lint`                                                                           |
 | Testes | Vitest + Testing Library. Um teste de "fiação" que importa `Role` do `shared`                                                             |
 
-**Aceite:** `pnpm --filter @starter/web dev` abre a página, `build` passa, `test` passa.
+**Aceite:** `pnpm --filter @vibru/web dev` abre a página, `build` passa, `test` passa.
 
 ### T8 — ESLint calibrado (a tarefa mais importante da F0)
 

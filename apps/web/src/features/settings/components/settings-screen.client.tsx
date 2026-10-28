@@ -1,6 +1,6 @@
 'use client';
 
-import type { SettingsResponse } from '@starter/shared';
+import type { SettingsResponse } from '@vibru/shared';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { PageHeader } from '@/components/layout/page-header';

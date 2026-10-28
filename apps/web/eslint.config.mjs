@@ -1,4 +1,4 @@
-import nextConfig from '@starter/config/eslint/next';
+import nextConfig from '@vibru/config/eslint/next';
 
 // error.tsx e global-error.tsx são Client Components por exigência do Next.
 // O nome do arquivo é fixo, então a fronteira de *.client.tsx não cabe aqui.

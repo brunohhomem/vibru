@@ -6,7 +6,7 @@ import { InvitationsService } from './invitations.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
-import { createInvitationRequestSchema, acceptInvitationRequestSchema } from '@starter/shared';
+import { createInvitationRequestSchema, acceptInvitationRequestSchema } from '@vibru/shared';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { ERROR_SCHEMA, AUTH_RESPONSE_SCHEMA } from './auth-swagger';
 

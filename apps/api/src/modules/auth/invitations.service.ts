@@ -1,6 +1,6 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { randomBytes, randomUUID } from 'node:crypto';
-import { AUDIT_ACTIONS } from '@starter/shared';
+import { AUDIT_ACTIONS } from '@vibru/shared';
 import type { Response } from 'express';
 import { DATABASE } from '../../database/database.module';
 import type { Database, DatabaseTransaction } from '../../database/database.module';

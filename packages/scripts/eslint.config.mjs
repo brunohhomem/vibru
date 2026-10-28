@@ -1,4 +1,4 @@
-import baseConfig from '@starter/config/eslint/base';
+import baseConfig from '@vibru/config/eslint/base';
 
 export default [
   ...baseConfig,

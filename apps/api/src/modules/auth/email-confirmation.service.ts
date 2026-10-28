@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { AUDIT_ACTIONS } from '@starter/shared';
+import { AUDIT_ACTIONS } from '@vibru/shared';
 import { AuditService } from '../audit/audit.service';
 import { EmailTokensService } from '../email-tokens/email-tokens.service';
 import { MailQueueService } from '../mail/mail-queue.service';

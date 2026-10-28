@@ -5,7 +5,7 @@ import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { registerRequestSchema, loginRequestSchema } from '@starter/shared/auth';
+import { registerRequestSchema, loginRequestSchema } from '@vibru/shared/auth';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { ERROR_SCHEMA, AUTH_RESPONSE_SCHEMA, getRefreshCookie } from './auth-swagger';
 

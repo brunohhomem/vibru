@@ -83,7 +83,7 @@ Ao parar: escreva o motivo, o que já foi feito e a opção recomendada. **Não 
 ├─ compose.dev.yaml
 ├─ .env.example                          (versionado; `.env` nunca)
 ├─ packages/
-│  ├─ scripts/                           @starter/scripts: keys:generate, keys:rotate (+ testes)
+│  ├─ scripts/                           @vibru/scripts: keys:generate, keys:rotate (+ testes)
 │  └─ shared/src/                        + error.ts, pagination.ts
 ├─ apps/api/
 │  ├─ drizzle.config.ts
@@ -124,7 +124,7 @@ Ao parar: escreva o motivo, o que já foi feito e a opção recomendada. **Não 
 
 ### T2 — Registro de chaves, `.env.example`, `keys:generate` e `keys:rotate`
 
-**Pacote:** `packages/scripts` (`@starter/scripts`), TypeScript executado com `tsx`, testes em Vitest, ESLint com o preset base.
+**Pacote:** `packages/scripts` (`@vibru/scripts`), TypeScript executado com `tsx`, testes em Vitest, ESLint com o preset base.
 
 **Registro de chaves geradas**
 
@@ -198,7 +198,7 @@ Usar `node:crypto` (`randomBytes`), nunca `Math.random`.
 
 **Testes:** todas as chaves ausentes aparecem juntas na mensagem; valores inválidos; sucesso devolve objeto tipado; regras extras de produção; **a mensagem de erro não contém valores**; teste cruzado garantindo que **toda chave do registro da T2 existe no `.env.example` e toda variável do schema existe no `.env.example`**.
 
-**Aceite:** apagar `JWT_ACCESS_SECRET` do `.env` e rodar `pnpm --filter @starter/api start:dev` falha com mensagem legível e código 1.
+**Aceite:** apagar `JWT_ACCESS_SECRET` do `.env` e rodar `pnpm --filter @vibru/api start:dev` falha com mensagem legível e código 1.
 
 ### T4 — `packages/shared`: contratos de erro e paginação
 
@@ -365,7 +365,7 @@ Adicionar ao `ci.yml` um job `integration`, **separado** do `verify`.
 | `docs/conventions/backend.md`  | `configureApp` compartilhado, acesso ao ambiente só por `ENV`, erros padronizados, logs e health                                                                                                                                                                                                        |
 | `docs/conventions/testing.md`  | Integração, `createTestApp`, envs do Turbo                                                                                                                                                                                                                                                              |
 | `AGENTS.md`                    | Comandos novos (`infra:up`, `keys:generate`, `db:*`, `test:integration`) e `database.md` no índice, mantendo ~120 linhas                                                                                                                                                                                |
-| `README.md`                    | "Como subir o ambiente de desenvolvimento": `pnpm install` → `pnpm keys:generate` → `pnpm infra:up` → `pnpm db:migrate` → `pnpm --filter @starter/api start:dev`                                                                                                                                        |
+| `README.md`                    | "Como subir o ambiente de desenvolvimento": `pnpm install` → `pnpm keys:generate` → `pnpm infra:up` → `pnpm db:migrate` → `pnpm --filter @vibru/api start:dev`                                                                                                                                          |
 | `CHANGELOG.md`                 | Versões escolhidas e o ajuste de fase (entity `system_settings` movida para a F1)                                                                                                                                                                                                                       |
 
 ---
@@ -426,7 +426,7 @@ Na branch limpa e em um **clone novo**:
 2. `pnpm keys:generate` cria o `.env` completo; a segunda execução não altera nada
 3. `pnpm infra:up` deixa Postgres, Redis e Mailpit `healthy`
 4. `pnpm db:migrate` aplica `create_system_settings`; a segunda execução não aplica nada
-5. `pnpm --filter @starter/api start:dev` sobe; `GET /api/health` devolve 200 com o corpo mínimo; `/api/docs` abre com `SWAGGER_ENABLED=true`
+5. `pnpm --filter @vibru/api start:dev` sobe; `GET /api/health` devolve 200 com o corpo mínimo; `/api/docs` abre com `SWAGGER_ENABLED=true`
 6. Apagar uma chave do `.env` impede o boot com mensagem legível e código 1
 7. `pnpm format:check`, `pnpm lint` (0 erros), `pnpm typecheck`, `pnpm test`, `pnpm test:integration` e `pnpm build` verdes
 8. O teste de atomicidade de migrations passou (ou foi reportado)

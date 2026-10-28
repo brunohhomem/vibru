@@ -30,7 +30,7 @@ Decisões aplicáveis:
 Estado atual dos arquivos relevantes:
 
 --- apps/api/src/config/env.schema.ts (arquivo completo) ---
-import { z } from '@starter/shared/zod';
+import { z } from '@vibru/shared/zod';
 
 const logLevelSchema = z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']);
 const nodeEnvSchema = z.enum(['development', 'production', 'test']);
@@ -69,7 +69,7 @@ const envSchema = z.object({
 });
 
 export type Env = z.infer<typeof envSchema>;
-import type { ZodIssue } from '@starter/shared/zod';
+import type { ZodIssue } from '@vibru/shared/zod';
 
 export function validateEnv(rawEnv: Record<string, string | undefined>): Env {
   const result = envSchema.safeParse(rawEnv);
@@ -97,7 +97,7 @@ export function buildTestDbName(env: Env): string {
 
 --- apps/api/tsconfig.json (arquivo completo) ---
 {
-  "extends": "@starter/config/tsconfig/node.json",
+  "extends": "@vibru/config/tsconfig/node.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
@@ -198,8 +198,8 @@ Específicas da tarefa:
 
 ACEITE
 Ao terminar, rode e cole o resultado (últimas 30 linhas) de:
-1. pnpm --filter @starter/api lint
-2. pnpm --filter @starter/api typecheck
+1. pnpm --filter @vibru/api lint
+2. pnpm --filter @vibru/api typecheck
 
 Comportamentos que precisam estar provados por teste (testes unitários com Jest da API, em apps/api/src/modules/mail/):
 - seleção correta do driver (smtp → SmtpTransport, resend → ResendTransport, memory → MemoryTransport)

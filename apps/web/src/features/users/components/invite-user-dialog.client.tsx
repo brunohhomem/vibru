@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createInvitationRequestSchema, type UserRole } from '@starter/shared';
+import { createInvitationRequestSchema, type UserRole } from '@vibru/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';

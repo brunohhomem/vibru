@@ -4,9 +4,9 @@ Você é o executor de uma tarefa num monorepo pnpm. Leia tudo antes de escrever
 
 Monorepo pnpm. API em `apps/api` com NestJS + BullMQ + Redis.
 - BullMQ instalado: v6.4.0 (verifique a API de `upsertJobScheduler` em node_modules/bullmq antes de usar)
-- `pnpm --filter @starter/api typecheck` — typecheck
-- `pnpm --filter @starter/api test` — testes unitários (Jest)
-- `pnpm --filter @starter/api lint` — lint
+- `pnpm --filter @vibru/api typecheck` — typecheck
+- `pnpm --filter @vibru/api test` — testes unitários (Jest)
+- `pnpm --filter @vibru/api lint` — lint
 - `pnpm test:integration` — testes de integração (requer Redis e Postgres reais)
 
 ## Contexto existente importante
@@ -260,9 +260,9 @@ Nenhum outro arquivo.
 
 ### Critérios de aceite
 
-1. `pnpm --filter @starter/api lint` — sem erros
-2. `pnpm --filter @starter/api typecheck` — sem erros
-3. `pnpm --filter @starter/api test` — todos os testes existentes passam (os novos de integração não contam aqui — estão em `mail-queue.int-spec.ts`)
+1. `pnpm --filter @vibru/api lint` — sem erros
+2. `pnpm --filter @vibru/api typecheck` — sem erros
+3. `pnpm --filter @vibru/api test` — todos os testes existentes passam (os novos de integração não contam aqui — estão em `mail-queue.int-spec.ts`)
 4. `pnpm test:integration` — **todos** os testes de integração passam (incluindo os novos)
 
 ### Commit

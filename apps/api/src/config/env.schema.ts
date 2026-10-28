@@ -1,4 +1,4 @@
-import { z } from '@starter/shared/zod';
+import { z } from '@vibru/shared/zod';
 
 const logLevelSchema = z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']);
 const nodeEnvSchema = z.enum(['development', 'production', 'test']);
@@ -55,7 +55,7 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
-import type { ZodIssue } from '@starter/shared/zod';
+import type { ZodIssue } from '@vibru/shared/zod';
 
 export function validateEnv(rawEnv: Record<string, string | undefined>): Env {
   const result = envSchema.safeParse(rawEnv);

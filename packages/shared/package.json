@@ -1,5 +1,5 @@
 {
-  "name": "@starter/shared",
+  "name": "@vibru/shared",
   "version": "0.0.0",
   "private": true,
   "main": "./dist/index.js",
@@ -36,7 +36,7 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
-    "@starter/config": "workspace:*",
+    "@vibru/config": "workspace:*",
     "@types/node": "^26.6.5",
     "eslint": "9.39.5",
     "typescript": "6.0.3",

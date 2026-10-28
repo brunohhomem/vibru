@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import { AUTH_ERROR_CODES } from '@starter/shared/auth';
+import { AUTH_ERROR_CODES } from '@vibru/shared/auth';
 
 /**
  * Guard que bloqueia rotas protegidas quando o usuário tem must_change_password=true.

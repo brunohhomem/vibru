@@ -49,7 +49,7 @@ Aceite da seção: com o starter-template rodando, `pnpm infra:up` e os dois `de
 
 ## 3. Nome do projeto
 
-1. Renomear os pacotes `@starter/*` para `@vibru/*` (package.json, imports, tsconfig, eslint, filtros de scripts). Commit próprio, primeiro da fase.
+1. Renomear os pacotes `@vibru/*` para `@vibru/*` (package.json, imports, tsconfig, eslint, filtros de scripts). Commit próprio, primeiro da fase.
 2. `APP_NAME=Vibru` e `MAIL_FROM=Vibru <no-reply@localhost>` no `.env.example`; título `Vibru` no `layout.tsx` e no shell.
 3. `AUTH_REFRESH_TTL_DAYS=90` no `.env.example` (o schema já aceita). O cookie de refresh já usa esse valor como `maxAge`.
 
@@ -219,7 +219,7 @@ Tarefas, listas, agenda, ICS, desejos, presentes e `og:image` (F2 a F6) · deplo
 
 - [ ] Gate da seção 0.3 verde e CI verde
 - [ ] Vibru e starter-template sobem lado a lado na mesma máquina
-- [ ] Nenhum `@starter/` restante (`git grep @starter/` vazio)
+- [ ] Nenhum `@vibru/` restante (`git grep @vibru/` vazio)
 - [ ] Casos de uso e garantia técnica da seção 8 passando, com o texto do caso no `it`
 - [ ] Home, navegação e `/app/couple` corretas em claro e escuro, em 390px e em `lg`
 - [ ] App instalável ("Adicionar à tela inicial") mostrando nome e ícone do Vibru
