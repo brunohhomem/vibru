@@ -86,9 +86,9 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_PASSWORD: redis
-          API_PORT: 3001
-          APP_ORIGIN: http://localhost:3000
-          WEB_ORIGIN: http://localhost:3000
+          API_PORT: 3101
+          APP_ORIGIN: http://localhost:3100
+          WEB_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
           LOG_LEVEL: info
           SWAGGER_ENABLED: true
@@ -164,8 +164,8 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_PASSWORD: redis
-          API_PORT: 3001
-          APP_ORIGIN: http://localhost:3000
+          API_PORT: 3101
+          APP_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
           LOG_LEVEL: info
           SWAGGER_ENABLED: true
@@ -184,8 +184,8 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_PASSWORD: redis
-          API_PORT: 3001
-          APP_ORIGIN: http://localhost:3000
+          API_PORT: 3101
+          APP_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
           LOG_LEVEL: info
           SWAGGER_ENABLED: true
@@ -256,9 +256,9 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_PASSWORD: redis
-          API_PORT: 3001
-          APP_ORIGIN: http://localhost:3000
-          WEB_ORIGIN: http://localhost:3000
+          API_PORT: 3101
+          APP_ORIGIN: http://localhost:3100
+          WEB_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
           LOG_LEVEL: info
           SWAGGER_ENABLED: false
@@ -283,10 +283,10 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_PASSWORD: redis
-          API_PORT: 3001
-          APP_ORIGIN: http://127.0.0.1:3000
-          WEB_ORIGIN: http://127.0.0.1:3000
-          API_ORIGIN: http://127.0.0.1:3001
+          API_PORT: 3101
+          APP_ORIGIN: http://127.0.0.1:3100
+          WEB_ORIGIN: http://127.0.0.1:3100
+          API_ORIGIN: http://127.0.0.1:3101
           ADMIN_EMAIL: admin@example.com
           NODE_ENV: development
           MAIL_DRIVER: smtp

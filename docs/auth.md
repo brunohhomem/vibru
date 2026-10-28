@@ -64,7 +64,7 @@ Comportamento idempotente:
 | ---------------------------------- | ----------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `JWT_ACCESS_SECRET`                | sim         | —                       | Segredo HS256 ≥ 32 chars. `pnpm keys:generate` cria se ausente. **Rotacionar invalida todas as sessões ativas.** |
 | `ADMIN_EMAIL`                      | sim         | —                       | E-mail do administrador inicial                                                                                  |
-| `WEB_ORIGIN`                       | sim         | `http://localhost:3000` | Origin permitida para verificação CSRF. Sem barra final.                                                         |
+| `WEB_ORIGIN`                       | sim         | `http://localhost:3100` | Origin permitida para verificação CSRF. Sem barra final.                                                         |
 | `ADMIN_INITIAL_PASSWORD`           | não         | —                       | Senha inicial do admin em produção                                                                               |
 | `COOKIE_SECURE`                    | não         | `true` em prod          | Ativa flag `Secure` nos cookies                                                                                  |
 | `TRUST_PROXY_HOPS`                 | não         | `0`                     | Número de proxies reversos confiáveis (1 atrás do Nginx)                                                         |

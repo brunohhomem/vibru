@@ -26,9 +26,9 @@ pnpm --filter @vibru/web dev
 ```
 
 - `pnpm keys:generate` cria o `.env` e não sobrescreve valor que já existe.
-- `pnpm infra:up` sobe Postgres, Redis e Mailpit. Os e-mails de desenvolvimento aparecem em `http://localhost:8025`.
+- `pnpm infra:up` sobe Postgres, Redis e Mailpit. Os e-mails de desenvolvimento aparecem em `http://localhost:28025`.
 - `pnpm db:seed` cria o admin de `ADMIN_EMAIL`. Em development a senha inicial é `Admin@12345` e a troca obrigatória fica desligada. Em production a senha é aleatória, aparece uma vez no terminal e a troca é obrigatória.
-- A API fica em `http://localhost:3001` e o web em `http://localhost:3000`. `GET /api/health` responde `200`.
+- A API fica em `http://localhost:3101` e o web em `http://localhost:3100`. `GET /api/health` responde `200`.
 
 ## Checklist pós-fork
 
