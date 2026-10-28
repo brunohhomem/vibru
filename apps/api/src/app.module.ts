@@ -11,6 +11,7 @@ import { HealthModule } from './health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MailModule } from './modules/mail/mail.module';
 import { PeopleModule } from './modules/people/people.module';
+import { CoupleModule } from './modules/couple/couple.module';
 import { UsersModule } from './modules/users/users.module';
 import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -35,6 +36,7 @@ import Redis from 'ioredis';
     AuthModule,
     MailModule,
     PeopleModule,
+    CoupleModule,
     UsersModule,
     ThrottlerModule.forRootAsync({
       imports: [RedisModule.forRoot()],

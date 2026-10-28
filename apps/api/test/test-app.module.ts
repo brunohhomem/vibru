@@ -10,6 +10,7 @@ import { AppConfigModule } from '../src/config/app-config.module';
 import { AuthModule } from '../src/modules/auth/auth.module';
 import { MailModule } from '../src/modules/mail/mail.module';
 import { PeopleModule } from '../src/modules/people/people.module';
+import { CoupleModule } from '../src/modules/couple/couple.module';
 import { UsersModule } from '../src/modules/users/users.module';
 import { TestThrottlerController } from './test-throttler.controller';
 import { ZodValidationPipe } from '../src/common/pipes/zod-validation.pipe';
@@ -34,6 +35,7 @@ import Redis from 'ioredis';
     AuthModule,
     MailModule,
     PeopleModule,
+    CoupleModule,
     UsersModule,
     ThrottlerModule.forRootAsync({
       imports: [RedisModule.forRoot()],

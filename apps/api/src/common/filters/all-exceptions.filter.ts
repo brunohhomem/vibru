@@ -55,6 +55,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
           ? exceptionResponse
           : (responseObj.message?.toString() ?? exception.message);
       code = responseObj.code as string | undefined;
+      // Erros de domínio podem trazer `details` por campo; o contrato final
+      // valida o formato antes de responder.
+      if (Array.isArray(responseObj.details)) {
+        details = responseObj.details as ErrorResponse['details'];
+      }
     } else {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       error = 'Internal Server Error';

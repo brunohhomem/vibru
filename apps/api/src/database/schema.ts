@@ -21,3 +21,9 @@ export type { AuditLog, NewAuditLog } from '../modules/audit/audit-log.entity';
 
 export { people } from '../modules/people/person.entity';
 export type { Person, NewPerson } from '../modules/people/person.entity';
+
+export { couples } from '../modules/couple/couple.entity';
+export type { Couple, NewCouple } from '../modules/couple/couple.entity';
+
+export { coupleMembers, memberColorEnum } from '../modules/couple/couple-member.entity';
+export type { CoupleMemberRow, NewCoupleMember } from '../modules/couple/couple-member.entity';
