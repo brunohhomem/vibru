@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SkipThrottle } from '@nestjs/throttler';
 import {
   updateCoupleRequestSchema,
   updateMyMemberRequestSchema,
@@ -15,6 +16,16 @@ import { RequiresCouple } from './decorators/requires-couple.decorator';
 @ApiTags('couple')
 @ApiCookieAuth('access_token')
 @Controller('couple')
+@SkipThrottle({
+  login: true,
+  register: true,
+  refresh: true,
+  ['change-password']: true,
+  forgot: true,
+  ['token-submit']: true,
+  resend: true,
+  invite: true,
+})
 @RequiresCouple()
 @UseGuards(CoupleMemberGuard)
 export class CoupleController {
