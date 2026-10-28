@@ -4,8 +4,8 @@ import './globals.css';
 
 export const metadata = {
   title: {
-    default: 'Starter template',
-    template: '%s · Starter template',
+    default: 'Vibru',
+    template: '%s · Vibru',
   },
 };
 

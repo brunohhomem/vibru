@@ -32,7 +32,6 @@ pnpm --filter @vibru/web dev
 
 ## Checklist pós-fork
 
-- [ ] Renomear os pacotes `@vibru/*` e o nome do app na landing e no título.
 - [ ] Definir `ADMIN_EMAIL` e gerar as chaves de novo com `pnpm keys:generate`.
 - [ ] Apagar a landing em `apps/web/src/app/page.tsx` se o produto não for usá-la.
 - [ ] Revisar `registration_enabled`: ligado em development, desligado em production, até um admin mudar em `/app/settings`.

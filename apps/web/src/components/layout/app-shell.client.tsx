@@ -106,7 +106,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-dvh w-full bg-background">
       <aside className="hidden w-60 shrink-0 flex-col gap-6 border-r border-border p-4 md:flex">
         <Link href="/app" className="inline-flex h-11 items-center text-sm font-semibold">
-          Starter template
+          Vibru
         </Link>
         <NavLinks pathname={pathname} isAdmin={isAdmin} />
       </aside>

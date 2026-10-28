@@ -43,8 +43,8 @@ const envSchema = z.object({
 
   // Mail (F3)
   MAIL_DRIVER: mailDriverSchema.default('smtp'),
-  MAIL_FROM: z.string().min(1).default('Starter <no-reply@localhost>'),
-  APP_NAME: z.string().min(1).max(60).default('Starter Template'),
+  MAIL_FROM: z.string().min(1).default('Vibru <no-reply@localhost>'),
+  APP_NAME: z.string().min(1).max(60).default('Vibru'),
   SMTP_HOST: z.string().min(1).default('localhost'),
   SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(21025),
   RESEND_API_KEY: z.string().optional(),

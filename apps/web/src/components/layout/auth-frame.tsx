@@ -15,7 +15,7 @@ export function AuthFrame({ title, description, children }: AuthFrameProps) {
       <div className="mx-auto flex w-full flex-col gap-6 py-8 md:w-[28rem] md:py-16">
         <div className="flex items-center justify-between gap-3">
           <Link href="/" className="inline-flex h-11 items-center text-sm font-medium">
-            Starter template
+            Vibru
           </Link>
           <ThemeMenu />
         </div>
