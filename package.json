@@ -1,0 +1,42 @@
+{
+  "private": true,
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": ">=22.0.0 <25",
+    "pnpm": ">=12.14.0 <13"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint -- --fix",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky",
+    "infra:up": "docker compose -f compose.dev.yaml up -d",
+    "infra:down": "docker compose -f compose.dev.yaml down",
+    "infra:logs": "docker compose -f compose.dev.yaml logs -f",
+    "infra:reset": "docker compose -f compose.dev.yaml down -v",
+    "keys:generate": "pnpm --filter @starter/scripts keys:generate",
+    "keys:rotate": "pnpm --filter @starter/scripts keys:rotate",
+    "db:generate": "pnpm --filter @starter/api db:generate",
+    "db:migrate": "pnpm --filter @starter/api db:migrate",
+    "db:seed": "pnpm --filter @starter/api db:seed",
+    "db:studio": "pnpm --filter @starter/api db:studio",
+    "test:integration": "pnpm turbo run test:integration",
+    "worker:dev": "pnpm --filter @starter/api worker:dev",
+    "boot:check": "pnpm --filter @starter/scripts boot:check",
+    "e2e": "pnpm --filter @starter/web e2e"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.2.4",
+    "@commitlint/config-conventional": "21.2.4",
+    "eslint": "9.39.5",
+    "husky": "9.1.7",
+    "lint-staged": "17.6.0",
+    "prettier": "3.9.10",
+    "turbo": "2.11.10",
+    "typescript": "6.0.3"
+  }
+}

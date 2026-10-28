@@ -1,0 +1,25 @@
+{
+  "name": "@starter/scripts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "keys:generate": "tsx src/keys-generate.ts",
+    "keys:rotate": "tsx src/keys-rotate.ts",
+    "boot:check": "node boot-production.mjs"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@starter/config": "workspace:*",
+    "tsx": "^4.19.0",
+    "vitest": "^2.1.0"
+  }
+}

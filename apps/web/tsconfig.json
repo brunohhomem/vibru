@@ -1,0 +1,16 @@
+{
+  "extends": "@starter/config/tsconfig/next.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "next.config.ts",
+    "playwright.config.ts",
+    "e2e/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

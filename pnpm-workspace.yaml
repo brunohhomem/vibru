@@ -1,0 +1,32 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+engineStrict: true
+
+allowBuilds:
+  unrs-resolver: true
+  '@parcel/watcher': true
+  esbuild: true
+  nestjs-pino: true
+  ioredis: true
+  '@nestjs/terminus': true
+  '@nestjs/swagger': true
+  nestjs-zod: true
+  helmet: true
+  supertest: true
+  '@scarf/scarf': true
+  '@swc/core': true
+  bcrypt@6.0.0: true
+  bcrypt: true
+  msgpackr-extract: true
+
+minimumReleaseAgeExclude:
+  - '@turbo/darwin-64@2.11.10'
+  - '@turbo/darwin-arm64@2.11.10'
+  - '@turbo/linux-64@2.11.10'
+  - '@turbo/linux-arm64@2.11.10'
+  - '@turbo/windows-64@2.11.10'
+  - '@turbo/windows-arm64@2.11.10'
+  - turbo@2.11.10
+  - '@nestjs/cli@12.0.10'
