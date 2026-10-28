@@ -1,4 +1,5 @@
 import { z } from '@vibru/shared/zod';
+import { calendarDateSchema } from '@vibru/shared';
 
 const logLevelSchema = z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']);
 const nodeEnvSchema = z.enum(['development', 'production', 'test']);
@@ -34,6 +35,12 @@ const envSchema = z.object({
   // Auth (F2)
   ADMIN_EMAIL: z.string().email(),
   ADMIN_INITIAL_PASSWORD: z.string().optional(),
+  ADMIN_DISPLAY_NAME: z.string().min(1).max(40).optional(),
+  PARTNER_EMAIL: z.string().email().optional(),
+  PARTNER_DISPLAY_NAME: z.string().min(1).max(40).optional(),
+  PARTNER_INITIAL_PASSWORD: z.string().optional(),
+  COUPLE_DATING_STARTED_ON: calendarDateSchema.optional(),
+  COUPLE_MARRIED_ON: calendarDateSchema.optional(),
   WEB_ORIGIN: z.string().url().default('http://localhost:3100'),
   COOKIE_SECURE: z.coerce.boolean().optional(),
   AUTH_ACCESS_TTL_MINUTES: z.coerce.number().int().min(1).max(120).default(15),

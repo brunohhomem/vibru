@@ -90,6 +90,11 @@ jobs:
           APP_ORIGIN: http://localhost:3100
           WEB_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
+          ADMIN_DISPLAY_NAME: Bruno
+          PARTNER_EMAIL: parceira@example.com
+          PARTNER_DISPLAY_NAME: Parceira
+          COUPLE_DATING_STARTED_ON: 2020-01-10
+          COUPLE_MARRIED_ON: 2022-05-20
           LOG_LEVEL: info
           SWAGGER_ENABLED: true
           TRUST_PROXY_HOPS: 0
@@ -167,6 +172,11 @@ jobs:
           API_PORT: 3101
           APP_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
+          ADMIN_DISPLAY_NAME: Bruno
+          PARTNER_EMAIL: parceira@example.com
+          PARTNER_DISPLAY_NAME: Parceira
+          COUPLE_DATING_STARTED_ON: 2020-01-10
+          COUPLE_MARRIED_ON: 2022-05-20
           LOG_LEVEL: info
           SWAGGER_ENABLED: true
           TRUST_PROXY_HOPS: 0
@@ -187,6 +197,11 @@ jobs:
           API_PORT: 3101
           APP_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
+          ADMIN_DISPLAY_NAME: Bruno
+          PARTNER_EMAIL: parceira@example.com
+          PARTNER_DISPLAY_NAME: Parceira
+          COUPLE_DATING_STARTED_ON: 2020-01-10
+          COUPLE_MARRIED_ON: 2022-05-20
           LOG_LEVEL: info
           SWAGGER_ENABLED: true
           TRUST_PROXY_HOPS: 0
@@ -260,6 +275,11 @@ jobs:
           APP_ORIGIN: http://localhost:3100
           WEB_ORIGIN: http://localhost:3100
           ADMIN_EMAIL: admin@example.com
+          ADMIN_DISPLAY_NAME: Bruno
+          PARTNER_EMAIL: parceira@example.com
+          PARTNER_DISPLAY_NAME: Parceira
+          COUPLE_DATING_STARTED_ON: 2020-01-10
+          COUPLE_MARRIED_ON: 2022-05-20
           LOG_LEVEL: info
           SWAGGER_ENABLED: false
           TRUST_PROXY_HOPS: 0
@@ -288,6 +308,11 @@ jobs:
           WEB_ORIGIN: http://127.0.0.1:3100
           API_ORIGIN: http://127.0.0.1:3101
           ADMIN_EMAIL: admin@example.com
+          ADMIN_DISPLAY_NAME: Bruno
+          PARTNER_EMAIL: parceira@example.com
+          PARTNER_DISPLAY_NAME: Parceira
+          COUPLE_DATING_STARTED_ON: 2020-01-10
+          COUPLE_MARRIED_ON: 2022-05-20
           NODE_ENV: development
           MAIL_DRIVER: smtp
           SMTP_HOST: localhost
@@ -300,6 +325,8 @@ jobs:
             -e CI -e DB_HOST -e DB_PORT -e DB_USER -e DB_PASSWORD -e DB_NAME \
             -e REDIS_HOST -e REDIS_PORT -e REDIS_PASSWORD \
             -e API_PORT -e APP_ORIGIN -e WEB_ORIGIN -e API_ORIGIN -e ADMIN_EMAIL \
+            -e ADMIN_DISPLAY_NAME -e PARTNER_EMAIL -e PARTNER_DISPLAY_NAME \
+            -e COUPLE_DATING_STARTED_ON -e COUPLE_MARRIED_ON \
             -e NODE_ENV -e MAIL_DRIVER -e SMTP_HOST -e SMTP_PORT \
             -e PLAYWRIGHT_BROWSERS_PATH \
             mcr.microsoft.com/playwright:v1.64.1-noble \

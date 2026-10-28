@@ -1,8 +1,15 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import request from 'supertest';
 import type { INestApplication } from '@nestjs/common';
 import type { CoupleResponse, ErrorResponse } from '@vibru/shared';
+import { seedAdmin } from '../src/database/seed/admin.seed';
 import { closeTestApp, createTestApp, resetDatabase, resetThrottle } from './integration-utils';
-import { setupTestDatabase, teardownTestDatabase } from './integration-setup';
+import {
+  getTestDb,
+  getTestPool,
+  setupTestDatabase,
+  teardownTestDatabase,
+} from './integration-setup';
 import { makeScenario } from './scenario';
 
 describe('Casal', () => {
@@ -120,5 +127,41 @@ describe('Casal', () => {
     expect(body.members.find((member) => member.id === couple.purple.memberId)?.displayName).toBe(
       'Parceira',
     );
+  });
+
+  it('Visitante tenta se cadastrar depois do seed', async () => {
+    const pool = getTestPool();
+    await pool.query(`DELETE FROM system_settings WHERE key = 'registration_enabled'`);
+    await seedAdmin(getTestDb());
+
+    const res = await request(app.getHttpServer())
+      .post('/api/auth/register')
+      .send({ email: 'visitante@teste.com', password: 'SenhaForte123', fullName: 'Visitante' })
+      .expect(403);
+
+    expect((res.body as ErrorResponse).code).toBe('AUTH_REGISTRATION_DISABLED');
+  });
+
+  it('Rodar o seed duas vezes resulta em 1 casal, 2 membros e nenhuma senha sobrescrita', async () => {
+    const db = getTestDb();
+    const pool = getTestPool();
+
+    await seedAdmin(db);
+    const firstPasswords = await pool.query<{ email: string; passwordHash: string }>(
+      `SELECT email, password_hash AS "passwordHash" FROM users ORDER BY email`,
+    );
+
+    await seedAdmin(db);
+
+    const counts = await pool.query<{ couples: number; members: number }>(
+      `SELECT (SELECT count(*)::int FROM couples) AS couples,
+              (SELECT count(*)::int FROM couple_members) AS members`,
+    );
+    const secondPasswords = await pool.query<{ email: string; passwordHash: string }>(
+      `SELECT email, password_hash AS "passwordHash" FROM users ORDER BY email`,
+    );
+
+    expect(counts.rows[0]).toEqual({ couples: 1, members: 2 });
+    expect(secondPasswords.rows).toEqual(firstPasswords.rows);
   });
 });
