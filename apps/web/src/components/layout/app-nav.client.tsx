@@ -48,7 +48,7 @@ export function SideNav() {
       <Link href="/app" className="px-2 font-display text-2xl font-semibold tracking-tight">
         Vibru
       </Link>
-      <nav aria-label="Navegação principal">
+      <nav aria-label="Navegação lateral">
         <ul className="flex flex-col gap-1">
           {APP_NAV_ITEMS.map((item) => {
             const active = isNavItemActive(pathname, item.href);
