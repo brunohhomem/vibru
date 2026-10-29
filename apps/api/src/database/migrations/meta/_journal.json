@@ -43,6 +43,13 @@
       "when": 1793228156687,
       "tag": "0005_create_couple_members",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793272804968,
+      "tag": "0006_create_tasks",
+      "breakpoints": true
     }
   ]
 }
