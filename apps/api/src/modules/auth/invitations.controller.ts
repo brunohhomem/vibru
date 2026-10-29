@@ -17,16 +17,7 @@ export class InvitationsController {
 
   @Post('invitations')
   @Roles('admin')
-  @SkipThrottle({
-    default: true,
-    login: true,
-    register: true,
-    refresh: true,
-    ['change-password']: true,
-    forgot: true,
-    ['token-submit']: true,
-    resend: true,
-  })
+  @SkipThrottle({ default: true })
   @Throttle({ invite: {} })
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Convidar usuário (admin)' })
@@ -55,16 +46,7 @@ export class InvitationsController {
 
   @Post('invitations/accept')
   @Public()
-  @SkipThrottle({
-    default: true,
-    login: true,
-    register: true,
-    refresh: true,
-    ['change-password']: true,
-    forgot: true,
-    resend: true,
-    invite: true,
-  })
+  @SkipThrottle({ default: true })
   @Throttle({ ['token-submit']: {} })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Aceitar convite' })

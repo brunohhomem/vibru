@@ -129,6 +129,16 @@ describe('Casal', () => {
     );
   });
 
+  it('Membro abre o casal 30 vezes seguidas', async () => {
+    const scenario = makeScenario(app);
+    const couple = await scenario.createCouple({});
+
+    for (let visit = 0; visit < 30; visit += 1) {
+      const response = await couple.blue.agent.get('/api/couple');
+      expect(response.status).toBe(200);
+    }
+  });
+
   it('Visitante tenta se cadastrar depois do seed', async () => {
     const pool = getTestPool();
     await pool.query(`DELETE FROM system_settings WHERE key = 'registration_enabled'`);

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Patch } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Throttle, SkipThrottle } from '@nestjs/throttler';
+
 import { AUDIT_ACTIONS, updateSettingsRequestSchema } from '@vibru/shared';
 import type { UpdateSettingsRequest } from '@vibru/shared';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -12,16 +12,6 @@ import { SettingsService } from './settings.service';
 
 @ApiTags('settings')
 @Controller('settings')
-@SkipThrottle({
-  login: true,
-  register: true,
-  refresh: true,
-  ['change-password']: true,
-  forgot: true,
-  ['token-submit']: true,
-  resend: true,
-  invite: true,
-})
 export class SettingsController {
   constructor(
     private readonly settingsService: SettingsService,
