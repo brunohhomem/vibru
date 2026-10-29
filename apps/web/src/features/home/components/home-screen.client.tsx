@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import type { CoupleMember, CoupleResponse } from '@vibru/shared';
+import type { CoupleMember, CoupleResponse, TasksResponse } from '@vibru/shared';
 import { ErrorState } from '@/components/ui/screen-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
 import { useCouple } from '@/features/couple/hooks/use-couple';
+import { tasksTodayLabel } from '@/features/tasks/lib/task-format';
+import { useTasks } from '@/features/tasks/hooks/use-tasks';
 import {
   countLabel,
   daysUntilLabel,
@@ -54,20 +56,33 @@ function MarriedTile({ couple }: { couple: CoupleResponse }) {
   );
 }
 
-function MemberTile({ member }: { member: CoupleMember }) {
+/** Regra 3.11: abertas do membro com prazo até hoje. Tarefas "nós" ficam de fora. */
+function countTasksDueToday(tasks: TasksResponse['open'], memberId: string, today: string): number {
+  return tasks.filter(
+    (task) => task.assigneeMemberId === memberId && task.dueOn !== null && task.dueOn <= today,
+  ).length;
+}
+
+function MemberTile({ member, taskCount }: { member: CoupleMember; taskCount: number | null }) {
   const classes = memberColorClasses(member.color);
 
   return (
-    <section
+    <Link
+      href={`/app/tasks?de=${member.id}`}
       className={cn(
-        'flex flex-col justify-between gap-3 rounded-xl p-4',
+        'flex flex-col justify-between gap-3 rounded-xl p-4 transition-opacity hover:opacity-90',
         classes.tile,
         classes.onTile,
       )}
     >
       <span className={cn('size-2.5 rounded-full', classes.strong)} aria-hidden />
-      <p className="text-lg font-medium break-words">{member.displayName}</p>
-    </section>
+      <span className="flex flex-col gap-1">
+        <span className="text-lg font-medium break-words">{member.displayName}</span>
+        <span className="text-sm">
+          {taskCount === null ? '\u00a0' : tasksTodayLabel(taskCount)}
+        </span>
+      </span>
+    </Link>
   );
 }
 
@@ -121,6 +136,7 @@ function HomeSkeleton() {
 
 export function HomeScreen() {
   const couple = useCouple();
+  const tasks = useTasks();
 
   if (couple.isPending) return <HomeSkeleton />;
 
@@ -150,7 +166,13 @@ export function HomeScreen() {
       <div className="grid auto-rows-[minmax(9rem,auto)] grid-cols-2 gap-2 lg:grid-cols-4">
         <MarriedTile couple={data} />
         {data.members.map((member) => (
-          <MemberTile key={member.id} member={member} />
+          <MemberTile
+            key={member.id}
+            member={member}
+            taskCount={
+              tasks.data ? countTasksDueToday(tasks.data.open, member.id, data.today) : null
+            }
+          />
         ))}
         {data.nextWeddingAnniversary ? (
           <WeddingTile anniversary={data.nextWeddingAnniversary} />

@@ -86,6 +86,22 @@ describe('Casal', () => {
     expect(body.nextWeddingAnniversary?.date).not.toBe(beforeBody.nextWeddingAnniversary?.date);
   });
 
+  it('Membro apaga a data do casamento', async () => {
+    const scenario = makeScenario(app);
+    const couple = await scenario.createCouple({
+      datingStartedOn: '2020-01-10',
+      marriedOn: '2022-05-20',
+    });
+
+    const res = await couple.blue.agent.patch('/api/couple').send({ marriedOn: null }).expect(200);
+    const body = res.body as CoupleResponse;
+
+    expect(body.marriedOn).toBeNull();
+    expect(body.married).toBeNull();
+    expect(body.nextWeddingAnniversary).toBeNull();
+    expect(body.datingStartedOn).toBe('2020-01-10');
+  });
+
   it('Membro informa casamento antes do início do namoro', async () => {
     const scenario = makeScenario(app);
     const couple = await scenario.createCouple({ datingStartedOn: '2020-01-10' });
@@ -127,6 +143,16 @@ describe('Casal', () => {
     expect(body.members.find((member) => member.id === couple.purple.memberId)?.displayName).toBe(
       'Parceira',
     );
+  });
+
+  it('Membro abre o casal 30 vezes seguidas', async () => {
+    const scenario = makeScenario(app);
+    const couple = await scenario.createCouple({});
+
+    for (let visit = 0; visit < 30; visit += 1) {
+      const response = await couple.blue.agent.get('/api/couple');
+      expect(response.status).toBe(200);
+    }
   });
 
   it('Visitante tenta se cadastrar depois do seed', async () => {

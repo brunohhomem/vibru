@@ -16,16 +16,7 @@ export class PasswordController {
   constructor(private readonly passwordService: PasswordService) {}
 
   @Post('change-password')
-  @SkipThrottle({
-    default: true,
-    login: true,
-    register: true,
-    refresh: true,
-    forgot: true,
-    ['token-submit']: true,
-    resend: true,
-    invite: true,
-  })
+  @SkipThrottle({ default: true })
   @Throttle({ ['change-password']: {} })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Trocar senha (revoga outras sessões)' })
@@ -79,16 +70,7 @@ export class PasswordController {
 
   @Post('password/forgot')
   @Public()
-  @SkipThrottle({
-    default: true,
-    login: true,
-    register: true,
-    refresh: true,
-    ['change-password']: true,
-    ['token-submit']: true,
-    resend: true,
-    invite: true,
-  })
+  @SkipThrottle({ default: true })
   @Throttle({ forgot: {} })
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiOperation({ summary: 'Solicitar recuperação de senha' })
@@ -107,16 +89,7 @@ export class PasswordController {
 
   @Post('password/reset')
   @Public()
-  @SkipThrottle({
-    default: true,
-    login: true,
-    register: true,
-    refresh: true,
-    ['change-password']: true,
-    forgot: true,
-    resend: true,
-    invite: true,
-  })
+  @SkipThrottle({ default: true })
   @Throttle({ ['token-submit']: {} })
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Redefinir senha' })

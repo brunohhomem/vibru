@@ -10,12 +10,20 @@ import {
   ThrottlerGuard,
   ThrottlerLimitDetail,
   type ThrottlerModuleOptions,
+  type ThrottlerRequest,
 } from '@nestjs/throttler';
 import { Reflector } from '@nestjs/core';
 import { REDIS } from '../../redis/redis.module';
 import type Redis from 'ioredis';
 import { AUTH_ERROR_CODES } from '@vibru/shared/auth';
 import { ThrottlerStorage } from '@nestjs/throttler/dist/throttler-storage.interface';
+
+/**
+ * Chave de metadata do `@nestjs/throttler` que o decorator `@Throttle` grava.
+ * O pacote não a exporta publicamente, por isso a cópia do valor instalado
+ * (6.x) fica aqui, num único lugar.
+ */
+const THROTTLER_LIMIT_METADATA_PREFIX = 'THROTTLER:LIMIT';
 
 interface RequestWithBody {
   ip?: string;
@@ -36,6 +44,30 @@ export class AppThrottlerGuard extends ThrottlerGuard {
     @Inject(REDIS) private readonly redis: Redis,
   ) {
     super(options, storageService, reflector);
+  }
+
+  /**
+   * Um throttler nomeado só conta quando a rota ou o controller declara
+   * `@Throttle({ <nome>: … })`. Sem isso, toda rota entraria em todos os baldes
+   * (o de login, por exemplo) e consumiria o limite de outro fluxo.
+   */
+  protected override async handleRequest(requestProps: ThrottlerRequest): Promise<boolean> {
+    const throttlerName = requestProps.throttler.name ?? 'default';
+    if (throttlerName === 'default') {
+      return super.handleRequest(requestProps);
+    }
+
+    if (!this.isThrottlerDeclared(requestProps.context, throttlerName)) return true;
+
+    return super.handleRequest(requestProps);
+  }
+
+  private isThrottlerDeclared(context: ExecutionContext, name: string): boolean {
+    const metadataKey = `${THROTTLER_LIMIT_METADATA_PREFIX}${name}`;
+    return (
+      Reflect.hasMetadata(metadataKey, context.getHandler()) ||
+      Reflect.hasMetadata(metadataKey, context.getClass())
+    );
   }
 
   protected override generateKey(context: ExecutionContext, suffix: string, name: string): string {

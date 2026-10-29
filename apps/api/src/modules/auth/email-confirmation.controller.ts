@@ -15,16 +15,7 @@ export class EmailConfirmationController {
 
   @Post('email/confirm')
   @Public()
-  @SkipThrottle({
-    default: true,
-    login: true,
-    register: true,
-    refresh: true,
-    ['change-password']: true,
-    forgot: true,
-    resend: true,
-    invite: true,
-  })
+  @SkipThrottle({ default: true })
   @Throttle({ ['token-submit']: {} })
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Confirmar e-mail' })
@@ -47,16 +38,7 @@ export class EmailConfirmationController {
   }
 
   @Post('email/resend')
-  @SkipThrottle({
-    default: true,
-    login: true,
-    register: true,
-    refresh: true,
-    ['change-password']: true,
-    forgot: true,
-    ['token-submit']: true,
-    invite: true,
-  })
+  @SkipThrottle({ default: true })
   @Throttle({ resend: {} })
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiOperation({ summary: 'Reenviar e-mail de confirmação' })

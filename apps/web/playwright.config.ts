@@ -2,31 +2,35 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { defineConfig } from '@playwright/test';
 
-function readAdminEmail(): string {
-  const fromProcess = process.env.ADMIN_EMAIL?.trim();
+function readWorkspaceEmail(key: string, fallback: string): string {
+  const fromProcess = process.env[key]?.trim();
   if (fromProcess) return fromProcess;
 
   const envPath = path.resolve(__dirname, '../../.env');
-  if (!existsSync(envPath)) return 'admin@example.com';
+  if (!existsSync(envPath)) return fallback;
 
+  const prefix = `${key}=`;
   for (const line of readFileSync(envPath, 'utf8').split('\n')) {
     const trimmed = line.trim();
-    if (!trimmed.startsWith('ADMIN_EMAIL=')) continue;
-    const value = trimmed.slice('ADMIN_EMAIL='.length).trim();
+    if (!trimmed.startsWith(prefix)) continue;
+    const value = trimmed.slice(prefix.length).trim();
     if (value) return value;
   }
 
-  return 'admin@example.com';
+  return fallback;
 }
 
-const adminEmail = readAdminEmail();
+const adminEmail = readWorkspaceEmail('ADMIN_EMAIL', 'admin@example.com');
+const partnerEmail = readWorkspaceEmail('PARTNER_EMAIL', 'parceira@example.com');
 process.env.E2E_ADMIN_EMAIL = adminEmail;
+process.env.E2E_PARTNER_EMAIL = partnerEmail;
 
 const sharedEnv = {
   ...process.env,
   DB_NAME: 'app_e2e',
   NODE_ENV: 'development',
   E2E_ADMIN_EMAIL: adminEmail,
+  E2E_PARTNER_EMAIL: partnerEmail,
 };
 
 export default defineConfig({

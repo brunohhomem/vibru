@@ -16,16 +16,7 @@ export class AuthController {
 
   @Post('register')
   @Public()
-  @SkipThrottle({
-    default: true,
-    login: true,
-    refresh: true,
-    ['change-password']: true,
-    forgot: true,
-    ['token-submit']: true,
-    resend: true,
-    invite: true,
-  })
+  @SkipThrottle({ default: true })
   @Throttle({ register: {} })
   @ApiOperation({ summary: 'Registrar novo usuário' })
   @ApiBody({
@@ -78,16 +69,7 @@ export class AuthController {
 
   @Post('login')
   @Public()
-  @SkipThrottle({
-    default: true,
-    register: true,
-    refresh: true,
-    ['change-password']: true,
-    forgot: true,
-    ['token-submit']: true,
-    resend: true,
-    invite: true,
-  })
+  @SkipThrottle({ default: true })
   @Throttle({ login: {} })
   @ApiOperation({ summary: 'Login de usuário' })
   @ApiBody({
@@ -127,16 +109,7 @@ export class AuthController {
 
   @Post('refresh')
   @Public()
-  @SkipThrottle({
-    default: true,
-    login: true,
-    register: true,
-    ['change-password']: true,
-    forgot: true,
-    ['token-submit']: true,
-    resend: true,
-    invite: true,
-  })
+  @SkipThrottle({ default: true })
   @Throttle({ refresh: {} })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Renovar access token usando refresh token' })
@@ -158,16 +131,6 @@ export class AuthController {
 
   @Post('logout')
   @Public()
-  @SkipThrottle({
-    login: true,
-    register: true,
-    refresh: true,
-    ['change-password']: true,
-    forgot: true,
-    ['token-submit']: true,
-    resend: true,
-    invite: true,
-  })
   @ApiOperation({ summary: 'Logout (revoga sessão atual)' })
   @ApiCookieAuth('refresh_token')
   @ApiResponse({
@@ -180,16 +143,6 @@ export class AuthController {
   }
 
   @Get('me')
-  @SkipThrottle({
-    login: true,
-    register: true,
-    refresh: true,
-    ['change-password']: true,
-    forgot: true,
-    ['token-submit']: true,
-    resend: true,
-    invite: true,
-  })
   @ApiOperation({ summary: 'Obter usuário autenticado' })
   @ApiCookieAuth('access_token')
   @ApiResponse({

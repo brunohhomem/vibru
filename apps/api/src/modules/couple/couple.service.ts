@@ -36,9 +36,12 @@ export class CoupleService {
     const couple = await this.coupleRepository.findById(member.coupleId);
     if (!couple) throw new Error('Couple not found for the current member');
 
+    // `null` é uma instrução para apagar a data; só `undefined` significa
+    // "não mexi nesse campo".
     const combined: CoupleDates = {
-      datingStartedOn: data.datingStartedOn ?? couple.datingStartedOn,
-      marriedOn: data.marriedOn ?? couple.marriedOn,
+      datingStartedOn:
+        data.datingStartedOn !== undefined ? data.datingStartedOn : couple.datingStartedOn,
+      marriedOn: data.marriedOn !== undefined ? data.marriedOn : couple.marriedOn,
     };
 
     this.assertDatesAreValid(combined);
