@@ -86,6 +86,22 @@ describe('Casal', () => {
     expect(body.nextWeddingAnniversary?.date).not.toBe(beforeBody.nextWeddingAnniversary?.date);
   });
 
+  it('Membro apaga a data do casamento', async () => {
+    const scenario = makeScenario(app);
+    const couple = await scenario.createCouple({
+      datingStartedOn: '2020-01-10',
+      marriedOn: '2022-05-20',
+    });
+
+    const res = await couple.blue.agent.patch('/api/couple').send({ marriedOn: null }).expect(200);
+    const body = res.body as CoupleResponse;
+
+    expect(body.marriedOn).toBeNull();
+    expect(body.married).toBeNull();
+    expect(body.nextWeddingAnniversary).toBeNull();
+    expect(body.datingStartedOn).toBe('2020-01-10');
+  });
+
   it('Membro informa casamento antes do início do namoro', async () => {
     const scenario = makeScenario(app);
     const couple = await scenario.createCouple({ datingStartedOn: '2020-01-10' });
