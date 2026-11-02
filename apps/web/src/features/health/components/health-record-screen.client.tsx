@@ -1,7 +1,7 @@
 'use client';
 
 import type { Allergy, Doctor, EmergencyContact, HealthCondition, Medication } from '@vibru/shared';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Siren } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { ErrorState } from '@/components/ui/screen-state';
@@ -75,7 +75,16 @@ export function HealthRecordScreen({ memberId }: { memberId: string }) {
           <ArrowLeft className="size-4" aria-hidden />
           Saúde
         </Link>
-        <h1 className="text-2xl font-semibold tracking-tight">Ficha de {data.memberName}</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">Ficha de {data.memberName}</h1>
+          <Link
+            href={`/app/health/${memberId}/emergency`}
+            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-destructive px-4 text-sm font-medium text-primary-foreground"
+          >
+            <Siren className="size-4" aria-hidden />
+            Modo emergência
+          </Link>
+        </div>
       </header>
 
       <ProfileSection profile={data.profile} onEdit={() => edit({ kind: 'profile' })} />

@@ -1,7 +1,7 @@
 'use client';
 
 import type { CoupleMember } from '@vibru/shared';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Siren } from 'lucide-react';
 import Link from 'next/link';
 import { PageHeader } from '@/components/layout/page-header';
 import { ErrorState } from '@/components/ui/screen-state';
@@ -45,6 +45,14 @@ function MemberCard({ memberId, name, medicationCount, member }: MemberCardProps
           </span>
         </span>
         <ChevronRight className="size-5 text-muted-foreground" aria-hidden />
+      </Link>
+      <Link
+        href={`/app/health/${memberId}/emergency`}
+        aria-label={`Emergência de ${name}`}
+        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-destructive text-sm font-medium text-destructive"
+      >
+        <Siren className="size-4" aria-hidden />
+        Emergência
       </Link>
     </li>
   );
