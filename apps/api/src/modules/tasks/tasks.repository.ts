@@ -32,7 +32,7 @@ export class TasksRepository {
       .select()
       .from(tasks)
       .where(and(eq(tasks.coupleId, coupleId), eq(tasks.isActive, true), isNull(tasks.completedAt)))
-      .orderBy(asc(tasks.dueOn), asc(tasks.createdAt));
+      .orderBy(asc(tasks.dueOn), asc(tasks.dueTime), asc(tasks.createdAt));
   }
 
   /**

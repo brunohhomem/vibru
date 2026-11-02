@@ -64,6 +64,13 @@
       "when": 1793277787334,
       "tag": "0008_create_list_items",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793633746320,
+      "tag": "0009_add_task_category_and_due_time",
+      "breakpoints": true
     }
   ]
 }

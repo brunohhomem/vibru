@@ -59,6 +59,7 @@ export class TasksService {
   async create(member: CurrentMemberContext, data: CreateTaskRequest): Promise<Task> {
     const recurrence = data.recurrence ?? { kind: 'none' as const, interval: 1 };
     if (recurrence.kind !== 'none' && !data.dueOn) throw this.recurrenceWithoutDueDate();
+    if (data.dueTime && !data.dueOn) throw this.dueTimeWithoutDueDate();
 
     await this.assertAssigneeBelongsToCouple(member.coupleId, data.assigneeMemberId);
 
@@ -68,6 +69,8 @@ export class TasksService {
       notes: data.notes ?? null,
       assigneeMemberId: data.assigneeMemberId,
       dueOn: data.dueOn ?? null,
+      dueTime: data.dueTime ?? null,
+      category: data.category ?? 'other',
       recurrenceKind: recurrence.kind,
       recurrenceInterval: recurrence.interval,
       recurrenceAnchorOn: recurrence.kind === 'none' ? null : (data.dueOn ?? null),
@@ -95,10 +98,13 @@ export class TasksService {
 
     if (recurrence.kind !== 'none' && !dueOn) throw this.recurrenceWithoutDueDate();
 
+    const dueTime = resolveDueTime(existing, data, dueOn);
+    if (dueTime && !dueOn) throw this.dueTimeWithoutDueDate();
+
     const updated = await this.tasksRepository.update(
       member.coupleId,
       taskId,
-      this.buildUpdatePatch(existing, data, recurrence, dueOn),
+      this.buildUpdatePatch(existing, data, recurrence, { dueOn, dueTime }),
     );
 
     return toTask(updated);
@@ -181,6 +187,8 @@ export class TasksService {
         notes: completed.notes,
         assigneeMemberId: completed.assigneeMemberId,
         dueOn: nextDue,
+        dueTime: completed.dueTime,
+        category: completed.category,
         recurrenceKind: completed.recurrenceKind,
         recurrenceInterval: completed.recurrenceInterval,
         recurrenceAnchorOn: anchor,
@@ -194,14 +202,16 @@ export class TasksService {
     existing: TaskRow,
     data: UpdateTaskRequest,
     recurrence: { kind: TaskRecurrence; interval: number },
-    dueOn: string | null,
+    due: { dueOn: string | null; dueTime: string | null },
   ): Partial<NewTaskRow> {
     const patch: Partial<NewTaskRow> = {
       recurrenceKind: recurrence.kind,
       recurrenceInterval: recurrence.interval,
-      recurrenceAnchorOn: resolveAnchor(existing, data, recurrence, dueOn),
+      recurrenceAnchorOn: resolveAnchor(existing, data, recurrence, due.dueOn),
+      dueTime: due.dueTime,
     };
 
+    if (data.category !== undefined) patch.category = data.category;
     if (data.title !== undefined) patch.title = data.title;
     if (data.notes !== undefined) patch.notes = data.notes;
     if (data.assigneeMemberId !== undefined) patch.assigneeMemberId = data.assigneeMemberId;
@@ -248,6 +258,19 @@ export class TasksService {
       message: 'Responsável não é membro deste casal',
       code: TASK_ERROR_CODES.TASK_ASSIGNEE_INVALID,
       details: [{ path: ['assigneeMemberId'], message: 'Escolha um membro deste casal' }],
+      requestId: '',
+      path: '/api/tasks',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  private dueTimeWithoutDueDate(): BadRequestException {
+    return new BadRequestException({
+      statusCode: 400,
+      error: 'Bad Request',
+      message: 'Horário precisa de prazo',
+      code: TASK_ERROR_CODES.TASK_DUE_TIME_INVALID,
+      details: [{ path: ['dueTime'], message: 'Informe o prazo antes do horário' }],
       requestId: '',
       path: '/api/tasks',
       timestamp: new Date().toISOString(),
@@ -305,6 +328,21 @@ function resolveAnchor(
   return existing.recurrenceAnchorOn ?? dueOn;
 }
 
+/**
+ * Horário efetivo após a edição. Limpar o prazo limpa o horário junto, para
+ * que a tarefa não fique com horário órfão.
+ */
+function resolveDueTime(
+  existing: TaskRow,
+  data: UpdateTaskRequest,
+  dueOn: string | null,
+): string | null {
+  if (data.dueTime !== undefined) return data.dueTime;
+  if (dueOn === null) return null;
+
+  return existing.dueTime;
+}
+
 function isUntouched(task: TaskRow): boolean {
   return task.updatedAt.getTime() === task.createdAt.getTime();
 }
@@ -316,6 +354,9 @@ function toTask(row: TaskRow): Task {
     notes: row.notes,
     assigneeMemberId: row.assigneeMemberId,
     dueOn: row.dueOn,
+    dueTime: row.dueTime ? row.dueTime.slice(0, 5) : null,
+    category: row.category,
+    medicationId: null,
     recurrence: { kind: row.recurrenceKind, interval: row.recurrenceInterval },
     completedAt: row.completedAt ? row.completedAt.toISOString() : null,
     completedByMemberId: row.completedByMemberId,

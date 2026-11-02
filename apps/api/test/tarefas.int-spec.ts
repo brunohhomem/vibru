@@ -271,6 +271,54 @@ describe('Tarefas', () => {
     const list = await listTasks(couple);
     expect(list.completedThisWeek.map((item) => item.id)).not.toContain(task.id);
   });
+
+  it('Membro cria tarefa com categoria e horário', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const dueOn = todayInSaoPaulo(new Date());
+    const evening = await createTask(couple, {
+      title: 'Pagar a luz',
+      dueOn,
+      dueTime: '20:00',
+      category: 'bills',
+    });
+    const morning = await createTask(couple, {
+      title: 'Passear com o cachorro',
+      dueOn,
+      dueTime: '08:00',
+      category: 'home',
+    });
+    const noTime = await createTask(couple, { title: 'Sem horário', dueOn });
+
+    expect(evening).toMatchObject({ category: 'bills', dueTime: '20:00' });
+
+    const list = await listTasks(couple);
+    expect(list.open.map((item) => item.id)).toEqual([morning.id, evening.id, noTime.id]);
+  });
+
+  it('Membro cria tarefa com horário e sem prazo', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const res = await couple.blue.agent
+      .post('/api/tasks')
+      .send({ title: 'Horário solto', assigneeMemberId: null, dueTime: '09:00' })
+      .expect(400);
+
+    const body = res.body as ErrorResponse;
+    expect(body.code).toBe('TASK_DUE_TIME_INVALID');
+    expect(body.details?.[0]?.path).toEqual(['dueTime']);
+  });
+
+  it('Tarefas antigas continuam funcionando', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const task = await createTask(couple, { title: 'Sem categoria' });
+
+    expect(task).toMatchObject({ category: 'other', dueTime: null, medicationId: null });
+
+    const edited = await couple.blue.agent
+      .patch(`/api/tasks/${task.id}`)
+      .send({ category: 'shopping' })
+      .expect(200);
+    expect((edited.body as Task).category).toBe('shopping');
+  });
 });
 
 /**
