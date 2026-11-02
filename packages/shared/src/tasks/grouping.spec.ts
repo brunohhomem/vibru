@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupTasks } from './grouping';
+import { compareTasksByDue, groupTasks } from './grouping';
 
 type Row = { id: string; dueOn: string | null; createdAt: string };
 
@@ -50,5 +50,21 @@ describe('groupTasks', () => {
     );
 
     expect(groups.noDueDate.map((task) => task.id)).toEqual(['antes', 'depois']);
+  });
+});
+
+describe('compareTasksByDue', () => {
+  it('ordena pelo horário dentro do dia, com horário antes de sem horário', () => {
+    const tasks = [
+      { id: 'sem-hora', dueOn: '2026-11-02', dueTime: null, createdAt: '2026-10-01T10:00:00.000Z' },
+      { id: 'noite', dueOn: '2026-11-02', dueTime: '20:00', createdAt: '2026-10-01T10:00:00.000Z' },
+      { id: 'manha', dueOn: '2026-11-02', dueTime: '08:00', createdAt: '2026-10-01T10:00:00.000Z' },
+    ];
+
+    expect(tasks.sort(compareTasksByDue).map((task) => task.id)).toEqual([
+      'manha',
+      'noite',
+      'sem-hora',
+    ]);
   });
 });
