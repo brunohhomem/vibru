@@ -35,20 +35,20 @@ Entregar as listas do casal: criar, renomear e excluir listas; adicionar, editar
 
 ## 2. Decisões fechadas
 
-| #    | Decisão                                                                                                                                                                                                                                                 |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2.1  | **Lista é do casal.** `lists` e `list_items` guardam `couple_id`; toda query recebe o casal do membro logado. Recurso de outro casal responde 404, nunca 403 (ADR 0003, seção 4)                                                                         |
-| 2.2  | **Ordem das listas:** `updated_at` desc, `created_at` desc como desempate. Qualquer mudança na lista ou nos itens atualiza `lists.updated_at`, então a lista mexida por último sobe                                                                     |
-| 2.3  | **Ordem dos itens:** abertos primeiro, por `created_at` asc; marcados depois, por `checked_at` desc. O marcado desce para o fim e sai do caminho                                                                                                        |
-| 2.4  | **Sem ordenação manual, categoria, quantidade, cor ou emoji.** A lista é título + itens marcáveis. Arrastar, ícone e "quantidade" ficam para quando um projeto pedir                                                                                    |
-| 2.5  | **Títulos duplicados são permitidos.** "Mercado" pode existir de novo na semana seguinte; a lista antiga é excluída ou limpa quando não servir mais                                                                                                      |
-| 2.6  | **Marcar e desmarcar são idempotentes.** Marcar um item já marcado devolve 200 com o item como está (mantém quem marcou primeiro). Desmarcar um item aberto devolve 200 com o item aberto. Dois celulares tocando o mesmo item não geram erro         |
-| 2.7  | **Quem marcou é registrado** em `checked_by_member_id`; desmarcar limpa o campo. O item marcado continua existindo até ser desmarcado, excluído ou removido por "Limpar marcados"                                                                        |
-| 2.8  | **Limpar marcados** exclui logicamente (`is_active = false`) todos os itens marcados da lista. Os abertos ficam                                                                                                                                         |
-| 2.9  | **Exclusão é lógica nas duas tabelas.** Excluir a lista marca só a lista como inativa; os itens continuam no banco, mas inacessíveis porque toda rota de item resolve a lista ativa antes. Não há restauração no v1                                                  |
-| 2.10 | **Bloco "Lista em andamento" na home:** a primeira lista da ordem 2.2 que ainda tem item aberto. Mostra título, "N de M" e uma barra de progresso. Se não houver lista com item aberto, o bloco não aparece (ADR 0003, 6.6). Tocar abre a lista           |
-| 2.11 | **Sem throttler novo.** As rotas usam o `default` (120/min). O `AppThrottlerGuard` corrigido na F2 só aplica throttler nomeado onde a rota declara `@Throttle`                                                                            |
-| 2.12 | **Sem limite de itens por lista nem de listas por casal.** São dois usuários; um limite só criaria erro sem uso real. Título da lista: 1–60; título do item: 1–200                                                        |
+| #    | Decisão                                                                                                                                                                                                                                         |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.1  | **Lista é do casal.** `lists` e `list_items` guardam `couple_id`; toda query recebe o casal do membro logado. Recurso de outro casal responde 404, nunca 403 (ADR 0003, seção 4)                                                                |
+| 2.2  | **Ordem das listas:** `updated_at` desc, `created_at` desc como desempate. Qualquer mudança na lista ou nos itens atualiza `lists.updated_at`, então a lista mexida por último sobe                                                             |
+| 2.3  | **Ordem dos itens:** abertos primeiro, por `created_at` asc; marcados depois, por `checked_at` desc. O marcado desce para o fim e sai do caminho                                                                                                |
+| 2.4  | **Sem ordenação manual, categoria, quantidade, cor ou emoji.** A lista é título + itens marcáveis. Arrastar, ícone e "quantidade" ficam para quando um projeto pedir                                                                            |
+| 2.5  | **Títulos duplicados são permitidos.** "Mercado" pode existir de novo na semana seguinte; a lista antiga é excluída ou limpa quando não servir mais                                                                                             |
+| 2.6  | **Marcar e desmarcar são idempotentes.** Marcar um item já marcado devolve 200 com o item como está (mantém quem marcou primeiro). Desmarcar um item aberto devolve 200 com o item aberto. Dois celulares tocando o mesmo item não geram erro   |
+| 2.7  | **Quem marcou é registrado** em `checked_by_member_id`; desmarcar limpa o campo. O item marcado continua existindo até ser desmarcado, excluído ou removido por "Limpar marcados"                                                               |
+| 2.8  | **Limpar marcados** exclui logicamente (`is_active = false`) todos os itens marcados da lista. Os abertos ficam                                                                                                                                 |
+| 2.9  | **Exclusão é lógica nas duas tabelas.** Excluir a lista marca só a lista como inativa; os itens continuam no banco, mas inacessíveis porque toda rota de item resolve a lista ativa antes. Não há restauração no v1                             |
+| 2.10 | **Bloco "Lista em andamento" na home:** a primeira lista da ordem 2.2 que ainda tem item aberto. Mostra título, "N de M" e uma barra de progresso. Se não houver lista com item aberto, o bloco não aparece (ADR 0003, 6.6). Tocar abre a lista |
+| 2.11 | **Sem throttler novo.** As rotas usam o `default` (120/min). O `AppThrottlerGuard` corrigido na F2 só aplica throttler nomeado onde a rota declara `@Throttle`                                                                                  |
+| 2.12 | **Sem limite de itens por lista nem de listas por casal.** São dois usuários; um limite só criaria erro sem uso real. Título da lista: 1–60; título do item: 1–200                                                                              |
 
 ## 3. Banco
 
@@ -56,22 +56,22 @@ Migrations `create_lists` e `create_list_items`, geradas em sequência para saí
 
 **`lists`**
 
-| Coluna      | Tipo | Regras                                                       |
-| ----------- | ---- | ------------------------------------------------------------ |
-| `couple_id` | uuid | FK `couples.id` **on delete cascade**, not null, índice      |
-| `title`     | text | not null (1–60, validado na API)                             |
+| Coluna      | Tipo | Regras                                                  |
+| ----------- | ---- | ------------------------------------------------------- |
+| `couple_id` | uuid | FK `couples.id` **on delete cascade**, not null, índice |
+| `title`     | text | not null (1–60, validado na API)                        |
 
 Índice: (`couple_id`, `updated_at`).
 
 **`list_items`**
 
-| Coluna                  | Tipo        | Regras                                                     |
-| ----------------------- | ----------- | ---------------------------------------------------------- |
-| `couple_id`             | uuid        | FK `couples.id` **on delete cascade**, not null, índice    |
-| `list_id`               | uuid        | FK `lists.id` **on delete cascade**, not null, índice      |
-| `title`                 | text        | not null (1–200, validado na API)                          |
-| `checked_at`            | timestamptz | null                                                       |
-| `checked_by_member_id`  | uuid        | FK `couple_members.id` **on delete set null**, null         |
+| Coluna                 | Tipo        | Regras                                                  |
+| ---------------------- | ----------- | ------------------------------------------------------- |
+| `couple_id`            | uuid        | FK `couples.id` **on delete cascade**, not null, índice |
+| `list_id`              | uuid        | FK `lists.id` **on delete cascade**, not null, índice   |
+| `title`                | text        | not null (1–200, validado na API)                       |
+| `checked_at`           | timestamptz | null                                                    |
+| `checked_by_member_id` | uuid        | FK `couple_members.id` **on delete set null**, null     |
 
 Índice: (`list_id`, `checked_at`).
 
@@ -81,27 +81,27 @@ Exportar as duas entities em `apps/api/src/database/schema.ts`. As colunas de da
 
 Nenhuma função pura nesta fase; a ordenação e a contagem acontecem na API e o bloco da home só filtra a resposta pronta.
 
-| Export                           | Definição                                                                                                                             |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `listTitleSchema`                | string `trim`, 1–60; mensagens "Informe o nome da lista" e "Use até 60 caracteres"                                                     |
-| `listItemTitleSchema`            | string `trim`, 1–200; mensagens "Informe o item" e "Use até 200 caracteres"                                                            |
-| `listItemSchema`                 | `{ id: uuid, title: string, checkedAt: string \| null, checkedByMemberId: uuid \| null, createdAt: string }`                          |
-| `listResponseSchema`             | `{ id: uuid, title: string, items: listItem[], createdAt: string, updatedAt: string }`                                                |
-| `listSummarySchema`              | `{ id: uuid, title: string, totalItems: number (int ≥ 0), checkedItems: number (int ≥ 0), updatedAt: string }`                        |
-| `listsResponseSchema`            | `{ lists: listSummary[] }`                                                                                                           |
-| `createListRequestSchema`        | `{ title: listTitleSchema }`                                                                                                         |
-| `updateListRequestSchema`        | `{ title: listTitleSchema }`                                                                                                         |
-| `createListItemRequestSchema`    | `{ title: listItemTitleSchema }`                                                                                                     |
-| `updateListItemRequestSchema`    | `{ title: listItemTitleSchema }`                                                                                                     |
+| Export                        | Definição                                                                                                      |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `listTitleSchema`             | string `trim`, 1–60; mensagens "Informe o nome da lista" e "Use até 60 caracteres"                             |
+| `listItemTitleSchema`         | string `trim`, 1–200; mensagens "Informe o item" e "Use até 200 caracteres"                                    |
+| `listItemSchema`              | `{ id: uuid, title: string, checkedAt: string \| null, checkedByMemberId: uuid \| null, createdAt: string }`   |
+| `listResponseSchema`          | `{ id: uuid, title: string, items: listItem[], createdAt: string, updatedAt: string }`                         |
+| `listSummarySchema`           | `{ id: uuid, title: string, totalItems: number (int ≥ 0), checkedItems: number (int ≥ 0), updatedAt: string }` |
+| `listsResponseSchema`         | `{ lists: listSummary[] }`                                                                                     |
+| `createListRequestSchema`     | `{ title: listTitleSchema }`                                                                                   |
+| `updateListRequestSchema`     | `{ title: listTitleSchema }`                                                                                   |
+| `createListItemRequestSchema` | `{ title: listItemTitleSchema }`                                                                               |
+| `updateListItemRequestSchema` | `{ title: listItemTitleSchema }`                                                                               |
 
 Tipos exportados: `List`, `ListItem`, `ListSummary`, `ListsResponse`, `CreateListRequest`, `UpdateListRequest`, `CreateListItemRequest`, `UpdateListItemRequest`, `ListErrorCode`.
 
 **Códigos de erro** (`LIST_ERROR_CODES`):
 
-| `code`                 | HTTP | Quando                                                                 |
-| ---------------------- | ---- | ---------------------------------------------------------------------- |
-| `LIST_NOT_FOUND`       | 404  | Lista inexistente, excluída, de outro casal ou uuid malformado         |
-| `LIST_ITEM_NOT_FOUND`  | 404  | Item inexistente, excluído, de outra lista/casal ou uuid malformado    |
+| `code`                | HTTP | Quando                                                              |
+| --------------------- | ---- | ------------------------------------------------------------------- |
+| `LIST_NOT_FOUND`      | 404  | Lista inexistente, excluída, de outro casal ou uuid malformado      |
+| `LIST_ITEM_NOT_FOUND` | 404  | Item inexistente, excluído, de outra lista/casal ou uuid malformado |
 
 Exportar tudo em `packages/shared/src/index.ts`.
 
@@ -109,19 +109,19 @@ Exportar tudo em `packages/shared/src/index.ts`.
 
 Módulo `lists` no padrão `entity`/`repository`/`service`/`controller`, registrado no `AppModule`. Controller com `@RequiresCouple()` + `CoupleMemberGuard` (padrão da F1), sem `@SkipThrottle`. O repositório recebe `coupleId` em todo método.
 
-| Método e rota                        | Corpo                      | Sucesso              | Efeito                                                     |
-| ------------------------------------ | -------------------------- | -------------------- | ---------------------------------------------------------- |
-| `GET /lists`                         | —                          | 200 `listsResponse`  | Resumos na ordem 2.2                                       |
-| `POST /lists`                        | `createListRequest`        | 201 `listResponse`   | `items: []`; `updatedAt = createdAt`                       |
-| `GET /lists/:id`                     | —                          | 200 `listResponse`   | Itens na ordem 2.3                                         |
-| `PATCH /lists/:id`                   | `updateListRequest`        | 200 `listResponse`   | Renomeia e atualiza a atividade                            |
-| `DELETE /lists/:id`                  | —                          | 204                  | Exclusão lógica 2.9                                        |
-| `POST /lists/:id/items`              | `createListItemRequest`    | 201 `listItem`       | Atualiza a atividade da lista                              |
-| `PATCH /lists/:id/items/:itemId`     | `updateListItemRequest`    | 200 `listItem`       | Edita o título e atualiza a atividade                      |
-| `POST /lists/:id/items/:itemId/check`   | —                       | 200 `listItem`       | Marca com o membro atual; idempotente (2.6)                |
-| `POST /lists/:id/items/:itemId/uncheck` | —                       | 200 `listItem`       | Desmarca e limpa quem marcou; idempotente (2.6)            |
-| `DELETE /lists/:id/items/:itemId`    | —                          | 204                  | Exclusão lógica do item e atualização da atividade         |
-| `DELETE /lists/:id/items/checked`    | —                          | 204                  | Exclusão lógica dos marcados (2.8)                         |
+| Método e rota                           | Corpo                   | Sucesso             | Efeito                                             |
+| --------------------------------------- | ----------------------- | ------------------- | -------------------------------------------------- |
+| `GET /lists`                            | —                       | 200 `listsResponse` | Resumos na ordem 2.2                               |
+| `POST /lists`                           | `createListRequest`     | 201 `listResponse`  | `items: []`; `updatedAt = createdAt`               |
+| `GET /lists/:id`                        | —                       | 200 `listResponse`  | Itens na ordem 2.3                                 |
+| `PATCH /lists/:id`                      | `updateListRequest`     | 200 `listResponse`  | Renomeia e atualiza a atividade                    |
+| `DELETE /lists/:id`                     | —                       | 204                 | Exclusão lógica 2.9                                |
+| `POST /lists/:id/items`                 | `createListItemRequest` | 201 `listItem`      | Atualiza a atividade da lista                      |
+| `PATCH /lists/:id/items/:itemId`        | `updateListItemRequest` | 200 `listItem`      | Edita o título e atualiza a atividade              |
+| `POST /lists/:id/items/:itemId/check`   | —                       | 200 `listItem`      | Marca com o membro atual; idempotente (2.6)        |
+| `POST /lists/:id/items/:itemId/uncheck` | —                       | 200 `listItem`      | Desmarca e limpa quem marcou; idempotente (2.6)    |
+| `DELETE /lists/:id/items/:itemId`       | —                       | 204                 | Exclusão lógica do item e atualização da atividade |
+| `DELETE /lists/:id/items/checked`       | —                       | 204                 | Exclusão lógica dos marcados (2.8)                 |
 
 Regras de implementação:
 
@@ -137,25 +137,25 @@ Regras de implementação:
 
 **`/app/lists`** (substitui o estado vazio da F1)
 
-| Parte       | Comportamento                                                                                                                                                                                                 |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Resumo      | Cards das listas na ordem da API: título, "N de M" e barra de progresso fina (`bg-muted` com preenchimento `bg-primary`). Tocar abre `/app/lists/:id`                                                        |
-| Criar       | Botão flutuante "Nova lista" acima da barra de navegação, no mesmo lugar do "Nova tarefa". Abre um `Sheet` com o campo nome; salva e fecha, com toast "Lista criada"                                          |
-| Estados     | Loading em skeleton de cards, vazio ("Nenhuma lista ainda" + "Crie a primeira no botão Nova lista"), erro com retry                                                                                          |
+| Parte   | Comportamento                                                                                                                                                        |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Resumo  | Cards das listas na ordem da API: título, "N de M" e barra de progresso fina (`bg-muted` com preenchimento `bg-primary`). Tocar abre `/app/lists/:id`                |
+| Criar   | Botão flutuante "Nova lista" acima da barra de navegação, no mesmo lugar do "Nova tarefa". Abre um `Sheet` com o campo nome; salva e fecha, com toast "Lista criada" |
+| Estados | Loading em skeleton de cards, vazio ("Nenhuma lista ainda" + "Crie a primeira no botão Nova lista"), erro com retry                                                  |
 
 **`/app/lists/:id`**
 
-| Parte            | Comportamento                                                                                                                                                                                                                                                                                                                 |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cabeçalho        | Link "Listas" de volta, título da lista e menu de ações (`DropdownMenu`, `aria-label="Ações da lista"`): Renomear e Excluir. Renomear abre `Sheet` com o nome atual; Excluir pede confirmação em `Dialog` e, ao concluir, volta para `/app/lists` com toast "Lista excluída" |
-| Progresso        | "N de M marcados" abaixo do título, com barra de progresso                                                                                                                                                                                                                                                                    |
-| Adicionar item   | Formulário logo abaixo do progresso: `Input` "Novo item" (fonte ≥ 16px) + botão "Adicionar". Envia, limpa o campo, mantém o foco e mostra toast "Item adicionado". Erro da API vai para o campo                                                                                                                              |
-| Item aberto      | Círculo de marcar (alvo ≥ 44px, na cor forte de quem está logado), título (tocar abre o `Sheet` de edição) e nada mais à direita. Marcar mostra toast "Marcado" com ação "Desfazer"                                                                                                                                             |
-| Item marcado     | Mesma linha, com círculo preenchido, título riscado em `text-muted-foreground` e "marcado por {nome}". Tocar no círculo desmarca; tocar no título abre a edição                                                                                                                                                                 |
-| Seção marcados   | `<details>` "Marcados (N)" no fim, fechada por padrão, com o botão "Limpar marcados" (confirmação em `Dialog`)                                                                                                                                                                                                                |
-| Edição do item   | `Sheet` com o título e o botão destrutivo "Remover item" (confirmação em `Dialog`). Salvar mostra toast "Item atualizado"; remover mostra "Item removido" e fecha                                                                                                                                                              |
-| Estados          | Loading em skeleton de linhas, lista vazia ("Lista vazia" + "Adicione o primeiro item acima"), lista inexistente com `ErrorState` e retry, erro de rede com retry                                                                                                                                                             |
-| Otimismo         | Marcar/desmarcar são otimistas: o item muda de seção na hora e volta ao estado anterior se a API falhar. As mutações invalidam a query `['lists']`                                                                                                                                                                            |
+| Parte          | Comportamento                                                                                                                                                                                                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cabeçalho      | Link "Listas" de volta, título da lista e menu de ações (`DropdownMenu`, `aria-label="Ações da lista"`): Renomear e Excluir. Renomear abre `Sheet` com o nome atual; Excluir pede confirmação em `Dialog` e, ao concluir, volta para `/app/lists` com toast "Lista excluída" |
+| Progresso      | "N de M marcados" abaixo do título, com barra de progresso                                                                                                                                                                                                                   |
+| Adicionar item | Formulário logo abaixo do progresso: `Input` "Novo item" (fonte ≥ 16px) + botão "Adicionar". Envia, limpa o campo, mantém o foco e mostra toast "Item adicionado". Erro da API vai para o campo                                                                              |
+| Item aberto    | Círculo de marcar (alvo ≥ 44px, na cor forte de quem está logado), título (tocar abre o `Sheet` de edição) e nada mais à direita. Marcar mostra toast "Marcado" com ação "Desfazer"                                                                                          |
+| Item marcado   | Mesma linha, com círculo preenchido, título riscado em `text-muted-foreground` e "marcado por {nome}". Tocar no círculo desmarca; tocar no título abre a edição                                                                                                              |
+| Seção marcados | `<details>` "Marcados (N)" no fim, fechada por padrão, com o botão "Limpar marcados" (confirmação em `Dialog`)                                                                                                                                                               |
+| Edição do item | `Sheet` com o título e o botão destrutivo "Remover item" (confirmação em `Dialog`). Salvar mostra toast "Item atualizado"; remover mostra "Item removido" e fecha                                                                                                            |
+| Estados        | Loading em skeleton de linhas, lista vazia ("Lista vazia" + "Adicione o primeiro item acima"), lista inexistente com `ErrorState` e retry, erro de rede com retry                                                                                                            |
+| Otimismo       | Marcar/desmarcar são otimistas: o item muda de seção na hora e volta ao estado anterior se a API falhar. As mutações invalidam a query `['lists']`                                                                                                                           |
 
 **Hooks** (`features/lists/hooks/use-lists.ts`): `useLists` (`['lists']`), `useList` (`['lists', id]`), `useCreateList`, `useRenameList`, `useDeleteList`, `useAddListItem`, `useUpdateListItem`, `useCheckListItem`, `useUncheckListItem`, `useDeleteListItem`, `useClearCheckedItems`. Toda mutação invalida `['lists']`, que também atualiza o bloco da home.
 
@@ -167,26 +167,26 @@ Regras de sempre: mobile-first (base 390px e só cresce com `min-width`), sem `m
 
 Arquivo `test/listas.int-spec.ts`, usando `createCouple` do helper de cenário. O texto do `it` é o texto da tabela.
 
-| Caso de uso                                                          | Esperado                                                             |
-| -------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Membro cria uma lista                                                | 201; a lista aparece para os dois membros, vazia                     |
-| Membro cria lista sem nome                                           | 400, erro no campo `title`                                           |
-| Membro adiciona um item                                              | 201; o outro membro vê o item                                        |
-| Membro adiciona item sem nome                                        | 400, erro no campo `title`                                           |
-| Membro marca um item                                                 | 200; o outro vê o item marcado e `checkedByMemberId` de quem marcou   |
-| Membro marca o mesmo item de novo                                    | 200; o item continua marcado uma vez, sem erro                       |
-| Membro desmarca um item                                              | 200; o item volta para os abertos e `checkedByMemberId` fica nulo     |
-| Membro desmarca um item já aberto                                    | 200; o item continua aberto, sem erro                                |
-| Membro edita o título de um item                                     | O outro membro vê o título novo                                      |
-| Membro exclui um item                                                | O item some para os dois                                             |
-| Membro limpa os marcados                                             | Só os marcados somem; os abertos ficam                                |
-| Membro renomeia a lista                                              | O outro membro vê o nome novo                                        |
-| Membro exclui a lista                                                | A lista some para os dois e o item dela não aparece em lugar nenhum |
-| A lista com atividade mais recente aparece primeiro                  | A ordem muda depois de adicionar ou marcar item na outra lista       |
-| Itens marcados aparecem depois dos abertos                           | A resposta lista todos os abertos antes dos marcados                 |
+| Caso de uso                                                            | Esperado                                                            |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Membro cria uma lista                                                  | 201; a lista aparece para os dois membros, vazia                    |
+| Membro cria lista sem nome                                             | 400, erro no campo `title`                                          |
+| Membro adiciona um item                                                | 201; o outro membro vê o item                                       |
+| Membro adiciona item sem nome                                          | 400, erro no campo `title`                                          |
+| Membro marca um item                                                   | 200; o outro vê o item marcado e `checkedByMemberId` de quem marcou |
+| Membro marca o mesmo item de novo                                      | 200; o item continua marcado uma vez, sem erro                      |
+| Membro desmarca um item                                                | 200; o item volta para os abertos e `checkedByMemberId` fica nulo   |
+| Membro desmarca um item já aberto                                      | 200; o item continua aberto, sem erro                               |
+| Membro edita o título de um item                                       | O outro membro vê o título novo                                     |
+| Membro exclui um item                                                  | O item some para os dois                                            |
+| Membro limpa os marcados                                               | Só os marcados somem; os abertos ficam                              |
+| Membro renomeia a lista                                                | O outro membro vê o nome novo                                       |
+| Membro exclui a lista                                                  | A lista some para os dois e o item dela não aparece em lugar nenhum |
+| A lista com atividade mais recente aparece primeiro                    | A ordem muda depois de adicionar ou marcar item na outra lista      |
+| Itens marcados aparecem depois dos abertos                             | A resposta lista todos os abertos antes dos marcados                |
 | Membro de outro casal acessa, edita ou exclui lista e item deste casal | 404 `LIST_NOT_FOUND` / `LIST_ITEM_NOT_FOUND` em todas as rotas      |
-| Usuário sem casal acessa as listas                                   | 403 `COUPLE_REQUIRED`                                                |
-| Visitante acessa as listas                                           | 401                                                                  |
+| Usuário sem casal acessa as listas                                     | 403 `COUPLE_REQUIRED`                                               |
+| Visitante acessa as listas                                             | 401                                                                 |
 
 **E2E** (acrescentar ao `vibru-smoke`): o admin entra, abre Listas, cria "Mercado da semana", adiciona "Café" e "Pão", marca "Café" e vê "1 de 2". Volta para a home e o bloco "Lista em andamento" mostra a lista e "1 de 2". Abre pelo bloco, marca "Pão", volta para a home e o bloco não aparece mais. Em 390×844, sem scroll horizontal na home, no índice e no detalhe.
 
