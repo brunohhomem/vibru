@@ -1,7 +1,7 @@
 'use client';
 
-import type { CoupleMember, MemberColor, Task, TaskGroups } from '@vibru/shared';
-import { groupTasks } from '@vibru/shared';
+import type { CoupleMember, Task, TaskCategory, TaskGroups, TaskLowStock } from '@vibru/shared';
+import { TASK_CATEGORIES, groupTasks } from '@vibru/shared';
 import { Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -11,12 +11,14 @@ import { Button } from '@/components/ui/button';
 import { ErrorState } from '@/components/ui/screen-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCouple } from '@/features/couple/hooks/use-couple';
-import { memberColorClasses } from '@/features/couple/lib/member-color';
+import { FilterChip } from './filter-chip';
+import { LowStockDialog } from './low-stock-dialog.client';
+import { CATEGORY_ALL, TaskCategoryFilters } from './task-category-filters';
 import { TaskFormSheet } from './task-form-sheet.client';
+import { TaskNotesSheet } from './task-notes-sheet.client';
 import { CompletedTaskItem, TaskItem } from './task-item';
 import { useCompleteTask, useReopenTask, useTasks } from '../hooks/use-tasks';
 import { applyApiError } from '@/lib/api-error';
-import { cn } from '@/lib/cn';
 
 const FILTER_NONE = 'nos';
 const FILTER_ALL = 'all';
@@ -28,32 +30,6 @@ const GROUP_ORDER: { key: keyof TaskGroups<Task>; label: string }[] = [
   { key: 'later', label: 'Mais pra frente' },
   { key: 'noDueDate', label: 'Sem prazo' },
 ];
-
-type FilterChipProps = {
-  active: boolean;
-  onClick: () => void;
-  color?: MemberColor;
-  children: string;
-};
-
-function FilterChip({ active, onClick, color, children }: FilterChipProps) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={cn(
-        'inline-flex min-h-11 max-w-40 items-center truncate rounded-full border px-3 text-sm font-medium transition-colors',
-        active
-          ? 'border-primary bg-primary text-primary-foreground'
-          : 'border-border bg-card hover:bg-accent',
-        !active && (color ? memberColorClasses(color).onTile : 'text-muted-foreground'),
-      )}
-    >
-      {children}
-    </button>
-  );
-}
 
 function Summary({ openCount, completedCount }: { openCount: number; completedCount: number }) {
   return (
@@ -92,15 +68,23 @@ function TasksSkeleton() {
   );
 }
 
-type MatchesFilterProps = {
-  task: Task;
-  filter: string;
+type TaskFilters = {
+  assignee: string;
+  category: TaskCategory | typeof CATEGORY_ALL;
+  showMedications: boolean;
 };
 
-function matchesFilter({ task, filter }: MatchesFilterProps): boolean {
-  if (filter === FILTER_ALL) return true;
-  if (filter === FILTER_NONE) return task.assigneeMemberId === null;
-  return task.assigneeMemberId === filter;
+function matchesFilter(task: Task, filters: TaskFilters): boolean {
+  if (task.medicationId !== null && !filters.showMedications) return false;
+  if (filters.category !== CATEGORY_ALL && task.category !== filters.category) return false;
+  if (filters.assignee === FILTER_ALL) return true;
+  if (filters.assignee === FILTER_NONE) return task.assigneeMemberId === null;
+  return task.assigneeMemberId === filters.assignee;
+}
+
+function resolveCategory(param: string | null): TaskFilters['category'] {
+  const category = TASK_CATEGORIES.find((item) => item === param);
+  return category ?? CATEGORY_ALL;
 }
 
 function resolveFilter(param: string | null, members: CoupleMember[]): string {
@@ -119,6 +103,8 @@ export function TasksScreen() {
   const pathname = usePathname();
   const [formOpen, setFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [notesTask, setNotesTask] = useState<Task | null>(null);
+  const [lowStock, setLowStock] = useState<TaskLowStock | null>(null);
 
   if (tasks.isPending || couple.isPending) return <TasksSkeleton />;
 
@@ -136,19 +122,28 @@ export function TasksScreen() {
   const data = tasks.data;
   const me = members.find((member) => member.isMe);
   const filter = resolveFilter(searchParams.get('de'), members);
-  const openTasks = data.open.filter((task) => matchesFilter({ task, filter }));
-  const completedTasks = data.completedThisWeek.filter((task) => matchesFilter({ task, filter }));
+  const filters: TaskFilters = {
+    assignee: filter,
+    category: resolveCategory(searchParams.get('cat')),
+    showMedications: searchParams.get('remedios') === '1',
+  };
+  const openTasks = data.open.filter((task) => matchesFilter(task, filters));
+  const completedTasks = data.completedThisWeek.filter((task) => matchesFilter(task, filters));
   const groups = groupTasks(openTasks, data.today);
 
-  function setFilter(nextFilter: string) {
+  function updateSearchParam(key: string, value: string | null) {
     const params = new URLSearchParams(searchParams.toString());
-    if (nextFilter === FILTER_ALL) {
-      params.delete('de');
+    if (value === null) {
+      params.delete(key);
     } else {
-      params.set('de', nextFilter);
+      params.set(key, value);
     }
     const query = params.toString();
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }
+
+  function setFilter(nextFilter: string) {
+    updateSearchParam('de', nextFilter === FILTER_ALL ? null : nextFilter);
   }
 
   function openCreate() {
@@ -157,6 +152,11 @@ export function TasksScreen() {
   }
 
   function openEdit(task: Task) {
+    if (task.medicationId !== null) {
+      setNotesTask(task);
+      return;
+    }
+
     setEditingTask(task);
     setFormOpen(true);
   }
@@ -167,7 +167,8 @@ export function TasksScreen() {
     completeTask.mutate(
       { id: task.id, completedByMemberId: me.id },
       {
-        onSuccess: () => {
+        onSuccess: (result) => {
+          if (result.lowStock) setLowStock(result.lowStock);
           const message =
             task.assigneeMemberId === null ? `Concluída por ${me.displayName}` : 'Concluída';
           toast.success(message, {
@@ -212,6 +213,15 @@ export function TasksScreen() {
           Nós
         </FilterChip>
       </div>
+
+      <TaskCategoryFilters
+        category={filters.category}
+        showMedications={filters.showMedications}
+        onCategoryChange={(category) =>
+          updateSearchParam('cat', category === CATEGORY_ALL ? null : category)
+        }
+        onShowMedicationsChange={(show) => updateSearchParam('remedios', show ? '1' : null)}
+      />
 
       <Summary openCount={openTasks.length} completedCount={completedTasks.length} />
 
@@ -288,6 +298,13 @@ export function TasksScreen() {
         members={members}
         today={data.today}
       />
+
+      <TaskNotesSheet
+        task={notesTask}
+        onOpenChange={(open) => (open ? undefined : setNotesTask(null))}
+      />
+
+      <LowStockDialog lowStock={lowStock} onClose={() => setLowStock(null)} />
     </div>
   );
 }

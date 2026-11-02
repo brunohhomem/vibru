@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { TaskRecurrenceKind, Task, TasksResponse } from '@vibru/shared';
+import type {
+  CompleteTaskResponse,
+  Task,
+  TaskCategory,
+  TaskRecurrenceKind,
+  TasksResponse,
+} from '@vibru/shared';
+import { HEALTH_QUERY_KEY } from '@/features/health/lib/query-keys';
 import { api } from '@/lib/api';
 
 export const TASKS_QUERY_KEY = ['tasks'] as const;
@@ -9,13 +16,13 @@ export type TaskPayload = {
   notes: string | null;
   assigneeMemberId: string | null;
   dueOn: string | null;
+  dueTime: string | null;
+  category: TaskCategory;
   recurrence: { kind: TaskRecurrenceKind; interval: number };
 };
 
-export type CompleteTaskResult = {
-  completed: Task;
-  next: Task | null;
-};
+/** Tarefa de remédio só aceita observações; o resto muda pelo remédio. */
+export type TaskUpdatePayload = Partial<TaskPayload>;
 
 export type CompleteTaskVariables = {
   id: string;
@@ -48,7 +55,7 @@ export function useUpdateTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, payload }: { id: string; payload: TaskPayload }) => {
+    mutationFn: async ({ id, payload }: { id: string; payload: TaskUpdatePayload }) => {
       const response = await api.patch<Task>(`/tasks/${id}`, payload);
       return response.data;
     },
@@ -75,7 +82,11 @@ export function useReopenTask() {
       const response = await api.post<Task>(`/tasks/${id}/reopen`);
       return response.data;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY }),
+    onSuccess: () => {
+      // Reabrir tarefa de remédio devolve estoque.
+      void queryClient.invalidateQueries({ queryKey: HEALTH_QUERY_KEY });
+      return queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });
+    },
   });
 }
 
@@ -84,7 +95,7 @@ export function useCompleteTask() {
 
   return useMutation({
     mutationFn: async ({ id }: CompleteTaskVariables) => {
-      const response = await api.post<CompleteTaskResult>(`/tasks/${id}/complete`);
+      const response = await api.post<CompleteTaskResponse>(`/tasks/${id}/complete`);
       return response.data;
     },
     onMutate: async ({ id, completedByMemberId }: CompleteTaskVariables) => {
@@ -115,6 +126,9 @@ export function useCompleteTask() {
       if (!context?.previous) return;
       queryClient.setQueryData(TASKS_QUERY_KEY, context.previous);
     },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY }),
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: HEALTH_QUERY_KEY });
+      return queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY });
+    },
   });
 }
