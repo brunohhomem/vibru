@@ -30,3 +30,9 @@ export type { CoupleMemberRow, NewCoupleMember } from '../modules/couple/couple-
 
 export { tasks, taskRecurrenceEnum } from '../modules/tasks/task.entity';
 export type { TaskRow, NewTaskRow } from '../modules/tasks/task.entity';
+
+export { lists } from '../modules/lists/list.entity';
+export type { ListRow, NewListRow } from '../modules/lists/list.entity';
+
+export { listItems } from '../modules/lists/list-item.entity';
+export type { ListItemRow, NewListItemRow } from '../modules/lists/list-item.entity';
