@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Palette, Settings, User, Users } from 'lucide-react';
+import { Check, HeartPulse, Palette, Settings, User, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import type { CoupleMember } from '@vibru/shared';
@@ -83,6 +83,12 @@ export function CoupleMenu({ members, isAdmin, onLogout }: CoupleMenuProps) {
           <Link href="/app/profile">
             <User className={MENU_ICON_CLASSES} aria-hidden />
             Perfil
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/app/health">
+            <HeartPulse className={MENU_ICON_CLASSES} aria-hidden />
+            Saúde
           </Link>
         </DropdownMenuItem>
         {isAdmin ? (
