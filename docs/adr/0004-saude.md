@@ -2,7 +2,7 @@
 
 | Campo   | Valor                                             |
 | ------- | ------------------------------------------------- |
-| Status  | Proposto                                          |
+| Status  | Aceito em 2026-11-02, com os padrões da seção 7   |
 | Data    | 2026-10-29                                        |
 | Base    | ADR 0003. Substitui a seção 8 (fases) do ADR 0003 |
 | Decisor | Bruno                                             |
