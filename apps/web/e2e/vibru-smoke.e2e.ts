@@ -7,6 +7,9 @@ const TASK_TITLE = 'Comprar pão';
 const LIST_TITLE = 'Mercado da semana';
 const FIRST_ITEM = 'Café';
 const SECOND_ITEM = 'Pão';
+const MEDICATION_NAME = 'Losartana';
+const MEDICATION_TASK = 'Tomar Losartana 50 mg';
+const ALLERGY_SUBSTANCE = 'Amendoim';
 
 async function expectNoHorizontalScroll(page: Page): Promise<void> {
   const overflow = await page.evaluate(
@@ -156,5 +159,87 @@ test('admin cria lista, marca itens e acompanha o progresso na home', async ({ p
   await page.waitForURL(/\/app$/);
   await expect(page.getByText('Casados há')).toBeVisible();
   await expect(page.getByText('Lista em andamento')).toHaveCount(0);
+  await expectNoHorizontalScroll(page);
+});
+
+test('admin monta a ficha, cria remédio, conclui a tomada e usa a Farmácia', async ({ page }) => {
+  test.setTimeout(150_000);
+  const adminEmail = process.env.E2E_ADMIN_EMAIL ?? 'admin@example.com';
+
+  await page.goto('/login');
+  await page.getByLabel('E-mail').fill(adminEmail);
+  await page.getByLabel('Senha').fill(NEXT_PASSWORD);
+  await page.getByRole('button', { name: 'Entrar' }).click();
+  await page.waitForURL(/\/app$/);
+
+  await page.getByRole('button', { name: 'Abrir menu do casal' }).click();
+  await page.getByRole('menuitem', { name: 'Saúde' }).click();
+  await page.waitForURL(/\/app\/health$/);
+  await expectNoHorizontalScroll(page);
+
+  await page
+    .getByRole('link', { name: new RegExp(NEW_DISPLAY_NAME) })
+    .first()
+    .click();
+  await page.waitForURL(/\/app\/health\/[0-9a-f-]+$/);
+
+  await page.getByRole('button', { name: 'Editar dados' }).click();
+  await page.getByLabel('Tipo sanguíneo').selectOption('O+');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Ficha atualizada')).toBeVisible();
+
+  await page
+    .getByRole('region', { name: 'Alergias' })
+    .getByRole('button', { name: 'Adicionar' })
+    .click();
+  await page.getByLabel('Substância').fill(ALLERGY_SUBSTANCE);
+  await page.getByLabel('Gravidade').selectOption('severe');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Alergia adicionada')).toBeVisible();
+
+  await page
+    .getByRole('region', { name: 'Remédios' })
+    .getByRole('button', { name: 'Adicionar' })
+    .click();
+  await page.getByLabel('Nome', { exact: true }).fill(MEDICATION_NAME);
+  await page.getByLabel('Dosagem').fill('50 mg');
+  await page.getByRole('button', { name: 'Adicionar horário' }).click();
+  await page.getByLabel('Horário 1', { exact: true }).fill('08:00');
+  await page.getByRole('switch', { name: 'Controlar estoque' }).click();
+  await page.getByLabel('Unidades em estoque').fill('2');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Remédio adicionado')).toBeVisible();
+  await expectNoHorizontalScroll(page);
+
+  const bottomNav = page.getByRole('navigation', { name: 'Navegação principal' });
+  await bottomNav.getByRole('link', { name: 'Tarefas' }).click();
+  await expect(page.getByRole('heading', { name: 'Tarefas' })).toBeVisible();
+  await expect(page.getByText(MEDICATION_TASK)).toHaveCount(0);
+
+  await page.getByRole('switch', { name: 'Mostrar remédios' }).click();
+  await expect(page.getByText(MEDICATION_TASK)).toBeVisible();
+
+  await page.getByRole('button', { name: `Concluir ${MEDICATION_TASK}` }).click();
+  const lowStockDialog = page.getByRole('dialog', { name: 'Estoque acabando' });
+  await expect(lowStockDialog).toContainText(/Losartana acaba em \d+ dias?/);
+  await lowStockDialog.getByRole('button', { name: 'Adicionar' }).click();
+  await expect(page.getByText('Adicionado à Farmácia')).toBeVisible();
+
+  await bottomNav.getByRole('link', { name: 'Listas' }).click();
+  await page.getByRole('link', { name: /Farmácia/ }).click();
+  await page.waitForURL(/\/app\/lists\/[0-9a-f-]+$/);
+  await expect(page.getByText(MEDICATION_NAME)).toBeVisible();
+
+  await bottomNav.getByRole('link', { name: 'Início' }).click();
+  await page.waitForURL(/\/app$/);
+  await expect(page.getByRole('link', { name: /Remédios de hoje: 1 de 1/ })).toBeVisible();
+  await expectNoHorizontalScroll(page);
+
+  await page.getByRole('link', { name: /Remédios de hoje/ }).click();
+  await page.waitForURL(/\/app\/health$/);
+  await page.getByRole('link', { name: `Emergência de ${NEW_DISPLAY_NAME}` }).click();
+  await page.waitForURL(/\/app\/health\/[0-9a-f-]+\/emergency$/);
+  await expect(page.getByText('O+')).toBeVisible();
+  await expect(page.getByText(ALLERGY_SUBSTANCE)).toBeVisible();
   await expectNoHorizontalScroll(page);
 });
