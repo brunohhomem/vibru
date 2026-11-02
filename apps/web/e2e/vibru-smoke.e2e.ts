@@ -4,6 +4,9 @@ const INITIAL_PASSWORD = 'Admin@12345';
 const NEXT_PASSWORD = 'NovaSenha456';
 const NEW_DISPLAY_NAME = 'Bruno E2E';
 const TASK_TITLE = 'Comprar pão';
+const LIST_TITLE = 'Mercado da semana';
+const FIRST_ITEM = 'Café';
+const SECOND_ITEM = 'Pão';
 
 async function expectNoHorizontalScroll(page: Page): Promise<void> {
   const overflow = await page.evaluate(
@@ -99,5 +102,59 @@ test('parceira cria tarefa para hoje, conclui, desfaz e a home conta para o Brun
   await page.waitForURL(/\/app\/tasks\?de=/);
   await expect(page.getByRole('button', { name: NEW_DISPLAY_NAME, pressed: true })).toBeVisible();
   await expect(page.getByText(TASK_TITLE)).toBeVisible();
+  await expectNoHorizontalScroll(page);
+});
+
+test('admin cria lista, marca itens e acompanha o progresso na home', async ({ page }) => {
+  test.setTimeout(120_000);
+  const adminEmail = process.env.E2E_ADMIN_EMAIL ?? 'admin@example.com';
+
+  await page.goto('/login');
+  await page.getByLabel('E-mail').fill(adminEmail);
+  await page.getByLabel('Senha').fill(NEXT_PASSWORD);
+  await page.getByRole('button', { name: 'Entrar' }).click();
+  await page.waitForURL(/\/app$/);
+
+  const bottomNav = page.getByRole('navigation', { name: 'Navegação principal' });
+  await bottomNav.getByRole('link', { name: 'Listas' }).click();
+  await expect(page.getByRole('heading', { name: 'Listas' })).toBeVisible();
+  await expect(page.getByText('Nenhuma lista ainda')).toBeVisible();
+  await expectNoHorizontalScroll(page);
+
+  await page.getByRole('button', { name: 'Nova lista' }).click();
+  await page.getByLabel('Nome').fill(LIST_TITLE);
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Lista criada')).toBeVisible();
+
+  await page.getByRole('link', { name: new RegExp(LIST_TITLE) }).click();
+  await page.waitForURL(/\/app\/lists\/[0-9a-f-]+$/);
+  await expect(page.getByRole('heading', { name: LIST_TITLE })).toBeVisible();
+
+  for (const itemTitle of [FIRST_ITEM, SECOND_ITEM]) {
+    await page.getByLabel('Novo item').fill(itemTitle);
+    await page.getByRole('button', { name: 'Adicionar' }).click();
+    await expect(page.getByRole('button', { name: `Marcar ${itemTitle}` })).toBeVisible();
+  }
+
+  await page.getByRole('button', { name: `Marcar ${FIRST_ITEM}` }).click();
+  await expect(page.getByText('1 de 2 marcados')).toBeVisible();
+  await expectNoHorizontalScroll(page);
+
+  await bottomNav.getByRole('link', { name: 'Início' }).click();
+  await page.waitForURL(/\/app$/);
+  const progressTile = page.getByRole('link', { name: /Lista em andamento/ });
+  await expect(progressTile).toContainText(LIST_TITLE);
+  await expect(progressTile).toContainText('1 de 2');
+  await expectNoHorizontalScroll(page);
+
+  await progressTile.click();
+  await page.waitForURL(/\/app\/lists\/[0-9a-f-]+$/);
+  await page.getByRole('button', { name: `Marcar ${SECOND_ITEM}` }).click();
+  await expect(page.getByText('2 de 2 marcados')).toBeVisible();
+
+  await bottomNav.getByRole('link', { name: 'Início' }).click();
+  await page.waitForURL(/\/app$/);
+  await expect(page.getByText('Casados há')).toBeVisible();
+  await expect(page.getByText('Lista em andamento')).toHaveCount(0);
   await expectNoHorizontalScroll(page);
 });

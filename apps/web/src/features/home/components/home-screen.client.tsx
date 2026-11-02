@@ -1,12 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import type { CoupleMember, CoupleResponse, TasksResponse } from '@vibru/shared';
+import type { CoupleMember, CoupleResponse, ListSummary, TasksResponse } from '@vibru/shared';
 import { ErrorState } from '@/components/ui/screen-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
 import { useCouple } from '@/features/couple/hooks/use-couple';
 import { tasksTodayLabel } from '@/features/tasks/lib/task-format';
+import { ListProgress } from '@/features/lists/components/list-progress';
+import { useLists } from '@/features/lists/hooks/use-lists';
 import { useTasks } from '@/features/tasks/hooks/use-tasks';
 import {
   countLabel,
@@ -116,6 +118,31 @@ function DatingTile({ anniversary }: { anniversary: DatingAnniversary }) {
   );
 }
 
+/** Primeira lista (a de atividade mais recente) que ainda tem item aberto. */
+function findListInProgress(lists: ListSummary[]): ListSummary | undefined {
+  return lists.find((list) => list.totalItems > list.checkedItems);
+}
+
+function ListInProgressTile({ list }: { list: ListSummary }) {
+  return (
+    <Link
+      href={`/app/lists/${list.id}`}
+      className="flex flex-col justify-between gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-accent"
+    >
+      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+        Lista em andamento
+      </p>
+      <div className="flex flex-col gap-2">
+        <p className="line-clamp-2 font-display text-lg font-semibold">{list.title}</p>
+        <p className="text-sm text-muted-foreground">
+          {list.checkedItems} de {list.totalItems}
+        </p>
+        <ListProgress total={list.totalItems} checked={list.checkedItems} />
+      </div>
+    </Link>
+  );
+}
+
 function HomeSkeleton() {
   return (
     <div className="flex flex-col gap-6">
@@ -137,6 +164,7 @@ function HomeSkeleton() {
 export function HomeScreen() {
   const couple = useCouple();
   const tasks = useTasks();
+  const lists = useLists();
 
   if (couple.isPending) return <HomeSkeleton />;
 
@@ -152,6 +180,7 @@ export function HomeScreen() {
 
   const data = couple.data;
   const me = data.members.find((member) => member.isMe);
+  const listInProgress = lists.data ? findListInProgress(lists.data.lists) : undefined;
 
   return (
     <div className="flex flex-col gap-6">
@@ -174,6 +203,7 @@ export function HomeScreen() {
             }
           />
         ))}
+        {listInProgress ? <ListInProgressTile list={listInProgress} /> : null}
         {data.nextWeddingAnniversary ? (
           <WeddingTile anniversary={data.nextWeddingAnniversary} />
         ) : null}

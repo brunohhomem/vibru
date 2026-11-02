@@ -13,6 +13,7 @@ import { MailModule } from './modules/mail/mail.module';
 import { PeopleModule } from './modules/people/people.module';
 import { CoupleModule } from './modules/couple/couple.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { ListsModule } from './modules/lists/lists.module';
 import { UsersModule } from './modules/users/users.module';
 import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -39,6 +40,7 @@ import Redis from 'ioredis';
     PeopleModule,
     CoupleModule,
     TasksModule,
+    ListsModule,
     UsersModule,
     ThrottlerModule.forRootAsync({
       imports: [RedisModule.forRoot()],

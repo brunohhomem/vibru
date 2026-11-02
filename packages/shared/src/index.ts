@@ -6,3 +6,4 @@ export * from './email';
 export * from './people';
 export * from './couple';
 export * from './tasks';
+export * from './lists';

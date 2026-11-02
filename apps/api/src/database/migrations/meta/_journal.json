@@ -50,6 +50,20 @@
       "when": 1793272804968,
       "tag": "0006_create_tasks",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793277776908,
+      "tag": "0007_create_lists",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793277787334,
+      "tag": "0008_create_list_items",
+      "breakpoints": true
     }
   ]
 }
