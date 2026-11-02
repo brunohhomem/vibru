@@ -36,3 +36,27 @@ export type { ListRow, NewListRow } from '../modules/lists/list.entity';
 
 export { listItems } from '../modules/lists/list-item.entity';
 export type { ListItemRow, NewListItemRow } from '../modules/lists/list-item.entity';
+
+export { healthProfiles, bloodTypeEnum } from '../modules/health/health-profile.entity';
+export type {
+  HealthProfileRow,
+  NewHealthProfileRow,
+} from '../modules/health/health-profile.entity';
+
+export {
+  allergies,
+  allergySeverityEnum,
+  healthConditions,
+  emergencyContacts,
+  doctors,
+} from '../modules/health/health-records.entity';
+export type {
+  AllergyRow,
+  NewAllergyRow,
+  HealthConditionRow,
+  NewHealthConditionRow,
+  EmergencyContactRow,
+  NewEmergencyContactRow,
+  DoctorRow,
+  NewDoctorRow,
+} from '../modules/health/health-records.entity';

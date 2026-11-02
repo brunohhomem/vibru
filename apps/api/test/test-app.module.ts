@@ -13,6 +13,7 @@ import { PeopleModule } from '../src/modules/people/people.module';
 import { CoupleModule } from '../src/modules/couple/couple.module';
 import { TasksModule } from '../src/modules/tasks/tasks.module';
 import { ListsModule } from '../src/modules/lists/lists.module';
+import { HealthRecordsModule } from '../src/modules/health/health-records.module';
 import { UsersModule } from '../src/modules/users/users.module';
 import { TestThrottlerController } from './test-throttler.controller';
 import { ZodValidationPipe } from '../src/common/pipes/zod-validation.pipe';
@@ -40,6 +41,7 @@ import Redis from 'ioredis';
     CoupleModule,
     TasksModule,
     ListsModule,
+    HealthRecordsModule,
     UsersModule,
     ThrottlerModule.forRootAsync({
       imports: [RedisModule.forRoot()],
