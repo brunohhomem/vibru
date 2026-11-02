@@ -60,3 +60,6 @@ export type {
   DoctorRow,
   NewDoctorRow,
 } from '../modules/health/health-records.entity';
+
+export { medications } from '../modules/medications/medication.entity';
+export type { MedicationRow, NewMedicationRow } from '../modules/medications/medication.entity';

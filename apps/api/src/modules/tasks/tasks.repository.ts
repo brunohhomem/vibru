@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, desc, eq, isNull, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import type { CalendarDate } from '@vibru/shared';
 import { DATABASE, type Database, type DatabaseTransaction } from '../../database/database.module';
 import { tasks, type NewTaskRow, type TaskRow } from './task.entity';
@@ -156,5 +156,37 @@ export class TasksRepository {
       .returning();
 
     return result[0] ?? null;
+  }
+
+  async listOpenByMedication(
+    coupleId: string,
+    medicationId: string,
+    tx: DatabaseTransaction,
+  ): Promise<TaskRow[]> {
+    return tx
+      .select()
+      .from(tasks)
+      .where(
+        and(
+          eq(tasks.coupleId, coupleId),
+          eq(tasks.medicationId, medicationId),
+          eq(tasks.isActive, true),
+          isNull(tasks.completedAt),
+        ),
+      )
+      .orderBy(asc(tasks.dueTime), asc(tasks.createdAt));
+  }
+
+  async softDeleteMany(
+    coupleId: string,
+    taskIds: string[],
+    tx: DatabaseTransaction,
+  ): Promise<void> {
+    if (taskIds.length === 0) return;
+
+    await tx
+      .update(tasks)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(and(eq(tasks.coupleId, coupleId), inArray(tasks.id, taskIds)));
   }
 }

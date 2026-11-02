@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import type { HealthRecord } from '@vibru/shared';
 import type { CurrentMemberContext } from '../couple/decorators/current-member.decorator';
+import { MedicationsService } from '../medications/medications.service';
+import { toMedication } from '../medications/medication.mapper';
 import { AllergiesRepository } from './allergies.repository';
 import { DoctorsRepository } from './doctors.repository';
 import { EmergencyContactsRepository } from './emergency-contacts.repository';
@@ -26,18 +28,20 @@ export class HealthRecordService {
     private readonly conditionsRepository: HealthConditionsRepository,
     private readonly contactsRepository: EmergencyContactsRepository,
     private readonly doctorsRepository: DoctorsRepository,
+    private readonly medicationsService: MedicationsService,
   ) {}
 
   async get(member: CurrentMemberContext, memberId: string): Promise<HealthRecord> {
     const target = await this.memberAccess.requireMember(member.coupleId, memberId);
     const { coupleId } = member;
 
-    const [profile, allergies, conditions, contacts, doctors] = await Promise.all([
+    const [profile, allergies, conditions, contacts, doctors, medications] = await Promise.all([
       this.profileRepository.findByMember(coupleId, memberId),
       this.allergiesRepository.listByMember(coupleId, memberId),
       this.conditionsRepository.listByMember(coupleId, memberId),
       this.contactsRepository.listByMember(coupleId, memberId),
       this.doctorsRepository.listByMember(coupleId, memberId),
+      this.medicationsService.listByMember(coupleId, memberId),
     ]);
 
     return {
@@ -48,7 +52,7 @@ export class HealthRecordService {
       conditions: conditions.map(toHealthCondition),
       contacts: contacts.map(toEmergencyContact),
       doctors: doctors.map(toDoctor),
-      medications: [],
+      medications: medications.map(toMedication),
     };
   }
 }

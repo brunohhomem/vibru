@@ -1,7 +1,18 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import type { ErrorResponse, HealthRecord } from '@vibru/shared';
+import type {
+  CompleteTaskResponse,
+  ErrorResponse,
+  HealthMembersResponse,
+  HealthRecord,
+  ListsResponse,
+  Medication,
+  PharmacyResult,
+  Task,
+  TasksResponse,
+} from '@vibru/shared';
+import { todayInSaoPaulo } from '@vibru/shared';
 import { closeTestApp, createTestApp, resetDatabase, resetThrottle } from './integration-utils';
 import { setupTestDatabase, teardownTestDatabase } from './integration-setup';
 import { makeScenario, type CoupleScenario } from './scenario';
@@ -208,5 +219,298 @@ describe('Saúde', () => {
     await request(app.getHttpServer())
       .get('/api/health/members/00000000-0000-4000-8000-000000000000')
       .expect(401);
+  });
+
+  async function createMedication(
+    couple: CoupleScenario,
+    data: Record<string, unknown> = {},
+  ): Promise<Medication> {
+    const res = await couple.blue.agent
+      .post(`/api/health/members/${couple.blue.memberId}/medications`)
+      .send({ name: 'Losartana', dosage: '50 mg', times: ['08:00'], ...data })
+      .expect(201);
+
+    return res.body as Medication;
+  }
+
+  async function listTasks(couple: CoupleScenario): Promise<TasksResponse> {
+    const res = await couple.blue.agent.get('/api/tasks').expect(200);
+    return res.body as TasksResponse;
+  }
+
+  async function medicationTasks(couple: CoupleScenario, medicationId: string): Promise<Task[]> {
+    const tasks = await listTasks(couple);
+    return tasks.open.filter((task) => task.medicationId === medicationId);
+  }
+
+  async function completeTask(
+    couple: CoupleScenario,
+    taskId: string,
+  ): Promise<CompleteTaskResponse> {
+    const res = await couple.blue.agent.post(`/api/tasks/${taskId}/complete`).expect(200);
+    return res.body as CompleteTaskResponse;
+  }
+
+  async function stockOf(couple: CoupleScenario, medicationId: string): Promise<number | null> {
+    const record = await getRecord(couple, couple.blue.memberId, 'blue');
+    return record.medications.find((item) => item.id === medicationId)?.stockUnits ?? null;
+  }
+
+  it('Membro cria remédio com dois horários', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple, { times: ['20:00', '08:00'] });
+
+    expect(medication.times).toEqual(['08:00', '20:00']);
+
+    const tasks = await medicationTasks(couple, medication.id);
+    expect(tasks.map((task) => task.dueTime)).toEqual(['08:00', '20:00']);
+    for (const task of tasks) {
+      expect(task).toMatchObject({
+        title: 'Tomar Losartana 50 mg',
+        category: 'health',
+        assigneeMemberId: couple.blue.memberId,
+        dueOn: todayInSaoPaulo(new Date()),
+        recurrence: { kind: 'daily', interval: 1 },
+      });
+    }
+  });
+
+  it('Membro cria remédio "quando precisar"', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple, { times: [] });
+
+    expect(await medicationTasks(couple, medication.id)).toEqual([]);
+    const record = await getRecord(couple, couple.blue.memberId);
+    expect(record.medications.map((item) => item.id)).toEqual([medication.id]);
+  });
+
+  it('Membro muda os horários do remédio', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple, { times: ['08:00', '20:00'] });
+    const before = await medicationTasks(couple, medication.id);
+    const morningTask = before.find((task) => task.dueTime === '08:00');
+
+    await couple.blue.agent
+      .patch(`/api/health/medications/${medication.id}`)
+      .send({ times: ['08:00', '12:00'] })
+      .expect(200);
+
+    const after = await medicationTasks(couple, medication.id);
+    expect(after.map((task) => task.dueTime)).toEqual(['08:00', '12:00']);
+    expect(after.find((task) => task.dueTime === '08:00')?.id).toBe(morningTask?.id);
+  });
+
+  it('Membro renomeia o remédio', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple);
+
+    await couple.blue.agent
+      .patch(`/api/health/medications/${medication.id}`)
+      .send({ name: 'Enalapril', dosage: '10 mg' })
+      .expect(200);
+
+    const tasks = await medicationTasks(couple, medication.id);
+    expect(tasks.map((task) => task.title)).toEqual(['Tomar Enalapril 10 mg']);
+  });
+
+  it('Membro desativa o remédio', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple, { times: ['08:00', '20:00'] });
+    const [first] = await medicationTasks(couple, medication.id);
+    await completeTask(couple, first?.id ?? '');
+
+    await couple.blue.agent.delete(`/api/health/medications/${medication.id}`).expect(204);
+
+    expect(await medicationTasks(couple, medication.id)).toEqual([]);
+    const tasks = await listTasks(couple);
+    expect(tasks.completedThisWeek.map((task) => task.id)).toContain(first?.id);
+    const record = await getRecord(couple, couple.blue.memberId);
+    expect(record.medications).toEqual([]);
+  });
+
+  it('Membro edita título, responsável, prazo ou exclui tarefa de remédio', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple);
+    const [task] = await medicationTasks(couple, medication.id);
+    const path = `/api/tasks/${task?.id}`;
+
+    const attempts = [
+      await couple.blue.agent.patch(path).send({ title: 'Outro título' }),
+      await couple.blue.agent.patch(path).send({ assigneeMemberId: null }),
+      await couple.blue.agent.patch(path).send({ dueOn: '2030-01-01' }),
+      await couple.blue.agent.patch(path).send({ category: 'home' }),
+      await couple.blue.agent.delete(path),
+    ];
+    for (const res of attempts) {
+      expect(res.status).toBe(400);
+      expect((res.body as ErrorResponse).code).toBe('TASK_MEDICATION_LOCKED');
+    }
+  });
+
+  it('Membro edita só as notas da tarefa de remédio', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple);
+    const [task] = await medicationTasks(couple, medication.id);
+
+    const res = await couple.blue.agent
+      .patch(`/api/tasks/${task?.id}`)
+      .send({ notes: 'Depois do café' })
+      .expect(200);
+
+    expect(res.body).toMatchObject({ notes: 'Depois do café', title: 'Tomar Losartana 50 mg' });
+  });
+
+  it('Membro conclui tarefa de remédio com estoque', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple, { stockUnits: 10, unitsPerDose: 2 });
+    const [task] = await medicationTasks(couple, medication.id);
+
+    const result = await completeTask(couple, task?.id ?? '');
+
+    expect(await stockOf(couple, medication.id)).toBe(8);
+    expect(result.next?.medicationId).toBe(medication.id);
+    expect((result.next?.dueOn ?? '') > todayInSaoPaulo(new Date())).toBe(true);
+  });
+
+  it('Membro desfaz a conclusão da tarefa de remédio', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple, { stockUnits: 10, unitsPerDose: 2 });
+    const [task] = await medicationTasks(couple, medication.id);
+    await completeTask(couple, task?.id ?? '');
+
+    await couple.blue.agent.post(`/api/tasks/${task?.id}/reopen`).expect(200);
+
+    expect(await stockOf(couple, medication.id)).toBe(10);
+    expect(await medicationTasks(couple, medication.id)).toHaveLength(1);
+  });
+
+  it('Estoque chega a 0 e a conclusão continua', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple, { stockUnits: 1, unitsPerDose: 1 });
+    const [task] = await medicationTasks(couple, medication.id);
+
+    const first = await completeTask(couple, task?.id ?? '');
+    expect(await stockOf(couple, medication.id)).toBe(0);
+
+    await completeTask(couple, first.next?.id ?? '');
+    expect(await stockOf(couple, medication.id)).toBe(0);
+  });
+
+  it('Conclusão deixa o estoque abaixo do limite', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple, {
+      times: ['08:00', '20:00'],
+      stockUnits: 15,
+      lowStockDays: 7,
+    });
+    const [morning, evening] = await medicationTasks(couple, medication.id);
+
+    const first = await completeTask(couple, morning?.id ?? '');
+    const second = await completeTask(couple, evening?.id ?? '');
+
+    expect(first.lowStock).toEqual({
+      medicationId: medication.id,
+      name: 'Losartana',
+      daysLeft: 7,
+    });
+    expect(second.lowStock).toBeNull();
+  });
+
+  it('Membro repõe o estoque e volta a ficar baixo', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple, {
+      times: ['08:00', '20:00'],
+      stockUnits: 15,
+      lowStockDays: 7,
+    });
+    const [morning, evening] = await medicationTasks(couple, medication.id);
+    const first = await completeTask(couple, morning?.id ?? '');
+    await completeTask(couple, evening?.id ?? '');
+    expect(first.lowStock).not.toBeNull();
+
+    await couple.blue.agent
+      .patch(`/api/health/medications/${medication.id}`)
+      .send({ stockUnits: 15 })
+      .expect(200);
+    const third = await completeTask(couple, first.next?.id ?? '');
+
+    expect(third.lowStock).toMatchObject({ medicationId: medication.id, daysLeft: 7 });
+  });
+
+  it('Membro adiciona o remédio à Farmácia', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple);
+
+    const first = await couple.blue.agent
+      .post(`/api/health/medications/${medication.id}/pharmacy`)
+      .expect(200);
+    const again = await couple.purple.agent
+      .post(`/api/health/medications/${medication.id}/pharmacy`)
+      .expect(200);
+
+    expect((first.body as PharmacyResult).alreadyListed).toBe(false);
+    expect((again.body as PharmacyResult).alreadyListed).toBe(true);
+    const lists = (await couple.blue.agent.get('/api/lists').expect(200)).body as ListsResponse;
+    expect(lists.lists).toEqual([
+      expect.objectContaining({ title: 'Farmácia', totalItems: 1, checkedItems: 0 }),
+    ]);
+  });
+
+  it('Membro usa a Farmácia que já existe com outro caixa ("farmácia")', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const medication = await createMedication(couple);
+    const existing = await couple.blue.agent
+      .post('/api/lists')
+      .send({ title: 'farmacia' })
+      .expect(201);
+
+    const res = await couple.blue.agent
+      .post(`/api/health/medications/${medication.id}/pharmacy`)
+      .expect(200);
+
+    expect((res.body as PharmacyResult).list.id).toBe((existing.body as { id: string }).id);
+    const lists = (await couple.blue.agent.get('/api/lists').expect(200)).body as ListsResponse;
+    expect(lists.lists).toHaveLength(1);
+  });
+
+  it('Membro lista os membros do casal com a contagem de remédios', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    await createMedication(couple);
+
+    const res = await couple.purple.agent.get('/api/health/members').expect(200);
+    const body = res.body as HealthMembersResponse;
+
+    expect(body.members).toHaveLength(2);
+    expect(body.members.find((item) => item.memberId === couple.blue.memberId)).toMatchObject({
+      medicationCount: 1,
+    });
+    expect(body.members.find((item) => item.memberId === couple.purple.memberId)).toMatchObject({
+      medicationCount: 0,
+    });
+  });
+
+  it('Membro de outro casal acessa, edita ou exclui remédio deste casal', async () => {
+    const scenario = makeScenario(app);
+    const couple = await scenario.createCouple({});
+    const otherCouple = await scenario.createCouple({});
+    const medication = await createMedication(couple);
+    const intruder = otherCouple.blue.agent;
+
+    const attempts = [
+      await intruder.patch(`/api/health/medications/${medication.id}`).send({ name: 'Invadido' }),
+      await intruder.delete(`/api/health/medications/${medication.id}`),
+      await intruder.post(`/api/health/medications/${medication.id}/pharmacy`),
+    ];
+    for (const res of attempts) {
+      expect(res.status).toBe(404);
+      expect((res.body as ErrorResponse).code).toBe('MEDICATION_NOT_FOUND');
+    }
+
+    const create = await intruder
+      .post(`/api/health/members/${couple.blue.memberId}/medications`)
+      .send({ name: 'Invadido' })
+      .expect(404);
+    expect((create.body as ErrorResponse).code).toBe('HEALTH_MEMBER_NOT_FOUND');
+    expect(await medicationTasks(couple, medication.id)).toHaveLength(1);
   });
 });

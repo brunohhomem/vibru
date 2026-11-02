@@ -85,6 +85,20 @@
       "when": 1793633916651,
       "tag": "0011_create_health_records",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793634219725,
+      "tag": "0012_create_medications",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1793634222506,
+      "tag": "0013_add_task_medication_id",
+      "breakpoints": true
     }
   ]
 }
