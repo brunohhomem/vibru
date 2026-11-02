@@ -1,7 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import type { CoupleMember, CoupleResponse, ListSummary, TasksResponse } from '@vibru/shared';
+import {
+  medicationProgressToday,
+  type CoupleMember,
+  type CoupleResponse,
+  type ListSummary,
+  type MedicationProgress,
+  type TasksResponse,
+} from '@vibru/shared';
+import { ChevronRight, Pill } from 'lucide-react';
 import { ErrorState } from '@/components/ui/screen-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
@@ -58,10 +66,17 @@ function MarriedTile({ couple }: { couple: CoupleResponse }) {
   );
 }
 
-/** Regra 3.11: abertas do membro com prazo até hoje. Tarefas "nós" ficam de fora. */
+/**
+ * Regra 3.11: abertas do membro com prazo até hoje. Tarefas "nós" ficam de fora,
+ * e as de remédio também: elas têm a própria linha "Remédios de hoje" (ADR 0004).
+ */
 function countTasksDueToday(tasks: TasksResponse['open'], memberId: string, today: string): number {
   return tasks.filter(
-    (task) => task.assigneeMemberId === memberId && task.dueOn !== null && task.dueOn <= today,
+    (task) =>
+      task.assigneeMemberId === memberId &&
+      task.medicationId === null &&
+      task.dueOn !== null &&
+      task.dueOn <= today,
   ).length;
 }
 
@@ -143,6 +158,21 @@ function ListInProgressTile({ list }: { list: ListSummary }) {
   );
 }
 
+function MedicationsTodayRow({ progress }: { progress: MedicationProgress }) {
+  return (
+    <Link
+      href="/app/health"
+      className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:bg-accent"
+    >
+      <span className="flex items-center gap-2 text-base font-medium">
+        <Pill className="size-4 text-muted-foreground" aria-hidden />
+        Remédios de hoje: {progress.done} de {progress.total}
+      </span>
+      <ChevronRight className="size-5 text-muted-foreground" aria-hidden />
+    </Link>
+  );
+}
+
 function HomeSkeleton() {
   return (
     <div className="flex flex-col gap-6">
@@ -181,6 +211,7 @@ export function HomeScreen() {
   const data = couple.data;
   const me = data.members.find((member) => member.isMe);
   const listInProgress = lists.data ? findListInProgress(lists.data.lists) : undefined;
+  const medicationProgress = tasks.data ? medicationProgressToday(tasks.data, data.today) : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -211,6 +242,9 @@ export function HomeScreen() {
           <DatingTile anniversary={data.nextDatingAnniversary} />
         ) : null}
       </div>
+      {medicationProgress && medicationProgress.total > 0 ? (
+        <MedicationsTodayRow progress={medicationProgress} />
+      ) : null}
     </div>
   );
 }

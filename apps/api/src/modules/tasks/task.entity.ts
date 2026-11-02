@@ -7,6 +7,7 @@ import {
   pgEnum,
   pgTable,
   text,
+  time,
   timestamp,
   uuid,
   type AnyPgColumn,
@@ -14,6 +15,7 @@ import {
 import { coreColumns } from '../../database/columns/core-columns';
 import { coupleMembers } from '../couple/couple-member.entity';
 import { couples } from '../couple/couple.entity';
+import { medications } from '../medications/medication.entity';
 
 export const taskRecurrenceEnum = pgEnum('task_recurrence', [
   'none',
@@ -21,6 +23,14 @@ export const taskRecurrenceEnum = pgEnum('task_recurrence', [
   'weekly',
   'monthly',
   'yearly',
+]);
+
+export const taskCategoryEnum = pgEnum('task_category', [
+  'home',
+  'health',
+  'shopping',
+  'bills',
+  'other',
 ]);
 
 /**
@@ -41,6 +51,11 @@ export const tasks = pgTable(
       onDelete: 'set null',
     }),
     dueOn: date('due_on', { mode: 'string' }),
+    dueTime: time('due_time'),
+    category: taskCategoryEnum('category').notNull().default('other'),
+    medicationId: uuid('medication_id').references(() => medications.id, {
+      onDelete: 'set null',
+    }),
     recurrenceKind: taskRecurrenceEnum('recurrence_kind').notNull().default('none'),
     recurrenceInterval: integer('recurrence_interval').notNull().default(1),
     recurrenceAnchorOn: date('recurrence_anchor_on', { mode: 'string' }),
@@ -58,7 +73,12 @@ export const tasks = pgTable(
       table.completedAt,
     ),
     coupleDueIdx: index('tasks_couple_id_due_on_idx').on(table.coupleId, table.dueOn),
+    medicationIdx: index('tasks_medication_id_idx').on(table.medicationId),
     generatedFromIdx: index('tasks_generated_from_task_id_idx').on(table.generatedFromTaskId),
+    dueTimeCheck: check(
+      'tasks_due_time_check',
+      sql`${table.dueTime} IS NULL OR ${table.dueOn} IS NOT NULL`,
+    ),
     recurrenceCheck: check(
       'tasks_recurrence_check',
       sql`${table.recurrenceKind} = 'none' OR (${table.dueOn} IS NOT NULL AND ${table.recurrenceAnchorOn} IS NOT NULL)`,

@@ -1,5 +1,5 @@
 import { z } from '@vibru/shared/zod';
-import { TASK_RECURRENCE_KINDS } from '@vibru/shared';
+import { TASK_CATEGORIES, TASK_RECURRENCE_KINDS } from '@vibru/shared';
 
 export const taskFormSchema = z
   .object({
@@ -9,7 +9,9 @@ export const taskFormSchema = z
       .min(1, { message: 'Informe o título' })
       .max(200, { message: 'Use até 200 caracteres' }),
     assignee: z.string(),
+    category: z.enum(TASK_CATEGORIES),
     dueOn: z.string(),
+    dueTime: z.string(),
     recurrenceKind: z.enum(TASK_RECURRENCE_KINDS),
     interval: z
       .string()
@@ -21,6 +23,14 @@ export const taskFormSchema = z
     notes: z.string().max(2000, { message: 'Use até 2000 caracteres' }),
   })
   .superRefine((data, ctx) => {
+    if (data.dueTime && !data.dueOn) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['dueTime'],
+        message: 'Informe o prazo para usar um horário',
+      });
+    }
+
     if (data.recurrenceKind === 'none' || data.dueOn) return;
 
     ctx.addIssue({
@@ -30,4 +40,9 @@ export const taskFormSchema = z
     });
   });
 
+export const taskNotesFormSchema = z.object({
+  notes: z.string().max(2000, { message: 'Use até 2000 caracteres' }),
+});
+
 export type TaskFormValues = z.infer<typeof taskFormSchema>;
+export type TaskNotesFormValues = z.infer<typeof taskNotesFormSchema>;

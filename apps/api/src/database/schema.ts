@@ -28,7 +28,7 @@ export type { Couple, NewCouple } from '../modules/couple/couple.entity';
 export { coupleMembers, memberColorEnum } from '../modules/couple/couple-member.entity';
 export type { CoupleMemberRow, NewCoupleMember } from '../modules/couple/couple-member.entity';
 
-export { tasks, taskRecurrenceEnum } from '../modules/tasks/task.entity';
+export { tasks, taskRecurrenceEnum, taskCategoryEnum } from '../modules/tasks/task.entity';
 export type { TaskRow, NewTaskRow } from '../modules/tasks/task.entity';
 
 export { lists } from '../modules/lists/list.entity';
@@ -36,3 +36,30 @@ export type { ListRow, NewListRow } from '../modules/lists/list.entity';
 
 export { listItems } from '../modules/lists/list-item.entity';
 export type { ListItemRow, NewListItemRow } from '../modules/lists/list-item.entity';
+
+export { healthProfiles, bloodTypeEnum } from '../modules/health/health-profile.entity';
+export type {
+  HealthProfileRow,
+  NewHealthProfileRow,
+} from '../modules/health/health-profile.entity';
+
+export {
+  allergies,
+  allergySeverityEnum,
+  healthConditions,
+  emergencyContacts,
+  doctors,
+} from '../modules/health/health-records.entity';
+export type {
+  AllergyRow,
+  NewAllergyRow,
+  HealthConditionRow,
+  NewHealthConditionRow,
+  EmergencyContactRow,
+  NewEmergencyContactRow,
+  DoctorRow,
+  NewDoctorRow,
+} from '../modules/health/health-records.entity';
+
+export { medications } from '../modules/medications/medication.entity';
+export type { MedicationRow, NewMedicationRow } from '../modules/medications/medication.entity';

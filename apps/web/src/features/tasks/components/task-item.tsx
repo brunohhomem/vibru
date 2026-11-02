@@ -1,4 +1,4 @@
-import type { CoupleMember, Task } from '@vibru/shared';
+import { TASK_CATEGORY_LABELS, type CoupleMember, type Task } from '@vibru/shared';
 import type { CalendarDate } from '@vibru/shared';
 import { Check, Repeat } from 'lucide-react';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
@@ -71,7 +71,9 @@ export function TaskItem({ task, members, today, onOpen, onComplete }: TaskItemP
         <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
           <span className={cn(overdue && 'font-semibold text-destructive')}>
             {overdue ? `Atrasada · ${dueLabel(task.dueOn, today)}` : dueLabel(task.dueOn, today)}
+            {task.dueTime ? ` · ${task.dueTime}` : ''}
           </span>
+          {task.category !== 'other' ? <span>{TASK_CATEGORY_LABELS[task.category]}</span> : null}
           {task.recurrence.kind !== 'none' ? (
             <span className="inline-flex items-center gap-1">
               <Repeat className="size-3.5" aria-hidden />

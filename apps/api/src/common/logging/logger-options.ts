@@ -7,8 +7,8 @@ export const REQUEST_ID_HEADER = 'x-request-id';
 export const REDACTED_FIELDS = '[REDACTED]';
 
 /**
- * Caminhos redigidos em toda linha de log de HTTP: headers de credencial e
- * campos de corpo que carregam segredos.
+ * Caminhos redigidos em toda linha de log de HTTP: headers de credencial,
+ * campos de corpo que carregam segredos e os corpos de requisição e resposta.
  */
 export const redactPaths = [
   'req.headers.authorization',
@@ -18,6 +18,11 @@ export const redactPaths = [
   'req.body.token',
   'req.body.refreshToken',
   'req.body.secret',
+  // Saúde (ADR 0004, regra 5.1): corpos e respostas de /health/* e das tarefas
+  // de remédio nunca vão para o log. O pino redige por caminho, não por rota,
+  // então o corpo inteiro sai de toda requisição.
+  'req.body',
+  'res.body',
 ];
 
 /**

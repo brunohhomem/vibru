@@ -2,7 +2,13 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { CoupleMember, Task } from '@vibru/shared';
-import { addCalendarDays, type CalendarDate } from '@vibru/shared';
+import {
+  DEFAULT_TASK_CATEGORY,
+  TASK_CATEGORIES,
+  TASK_CATEGORY_LABELS,
+  addCalendarDays,
+  type CalendarDate,
+} from '@vibru/shared';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -36,7 +42,9 @@ function valuesFromTask(task: Task | null): TaskFormValues {
     return {
       title: '',
       assignee: ASSIGNEE_NONE,
+      category: DEFAULT_TASK_CATEGORY,
       dueOn: '',
+      dueTime: '',
       recurrenceKind: 'none',
       interval: '1',
       notes: '',
@@ -46,7 +54,9 @@ function valuesFromTask(task: Task | null): TaskFormValues {
   return {
     title: task.title,
     assignee: task.assigneeMemberId ?? ASSIGNEE_NONE,
+    category: task.category,
     dueOn: task.dueOn ?? '',
+    dueTime: task.dueTime ?? '',
     recurrenceKind: task.recurrence.kind,
     interval: String(task.recurrence.interval),
     notes: task.notes ?? '',
@@ -59,6 +69,8 @@ function toPayload(values: TaskFormValues): TaskPayload {
     notes: values.notes.trim() ? values.notes.trim() : null,
     assigneeMemberId: values.assignee === ASSIGNEE_NONE ? null : values.assignee,
     dueOn: values.dueOn ? values.dueOn : null,
+    dueTime: values.dueOn && values.dueTime ? values.dueTime : null,
+    category: values.category,
     recurrence: {
       kind: values.recurrenceKind,
       interval: Number(values.interval),
@@ -131,6 +143,7 @@ export function TaskFormSheet({ open, onOpenChange, task, members, today }: Task
   });
   const recurrenceKind = form.watch('recurrenceKind');
   const assignee = form.watch('assignee');
+  const dueOn = form.watch('dueOn');
   const pending = createTask.isPending || updateTask.isPending;
   const assigneeOptions = buildAssigneeOptions(members);
 
@@ -202,6 +215,20 @@ export function TaskFormSheet({ open, onOpenChange, task, members, today }: Task
               />
             </Field>
 
+            <Field
+              id="task-category"
+              label="Categoria"
+              error={form.formState.errors.category?.message}
+            >
+              <NativeSelect id="task-category" {...form.register('category')}>
+                {TASK_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {TASK_CATEGORY_LABELS[category]}
+                  </option>
+                ))}
+              </NativeSelect>
+            </Field>
+
             <Field id="task-due" label="Prazo" error={form.formState.errors.dueOn?.message}>
               <div className="flex flex-col gap-2">
                 <Input id="task-due" type="date" {...form.register('dueOn')} />
@@ -224,6 +251,20 @@ export function TaskFormSheet({ open, onOpenChange, task, members, today }: Task
                   </Button>
                 </div>
               </div>
+            </Field>
+
+            <Field
+              id="task-due-time"
+              label="Horário"
+              hint="Só vale com prazo."
+              error={form.formState.errors.dueTime?.message}
+            >
+              <Input
+                id="task-due-time"
+                type="time"
+                disabled={!dueOn}
+                {...form.register('dueTime')}
+              />
             </Field>
 
             <Field
