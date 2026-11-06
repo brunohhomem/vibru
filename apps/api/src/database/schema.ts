@@ -49,8 +49,12 @@ export {
   healthConditions,
   emergencyContacts,
   doctors,
+  healthEventKindEnum,
+  healthEvents,
 } from '../modules/health/health-records.entity';
 export type {
+  HealthEventRow,
+  NewHealthEventRow,
   AllergyRow,
   NewAllergyRow,
   HealthConditionRow,

@@ -5,10 +5,12 @@ import type {
   CreateDoctorRequest,
   CreateEmergencyContactRequest,
   CreateHealthConditionRequest,
+  CreateHealthEventRequest,
   CreateMedicationRequest,
   Doctor,
   EmergencyContact,
   HealthCondition,
+  HealthEvent,
   HealthMembersResponse,
   HealthProfile,
   HealthRecord,
@@ -18,6 +20,7 @@ import type {
   UpdateDoctorRequest,
   UpdateEmergencyContactRequest,
   UpdateHealthConditionRequest,
+  UpdateHealthEventRequest,
   UpdateHealthProfileRequest,
   UpdateMedicationRequest,
 } from '@vibru/shared';
@@ -27,7 +30,7 @@ import { api } from '@/lib/api';
 import { HEALTH_QUERY_KEY } from '../lib/query-keys';
 
 /** Itens da ficha que seguem o mesmo contrato: criar, editar e excluir por membro. */
-export type HealthItemKind = 'allergies' | 'conditions' | 'contacts' | 'doctors';
+export type HealthItemKind = 'allergies' | 'conditions' | 'contacts' | 'doctors' | 'events';
 
 type HealthItemTypes = {
   allergies: { item: Allergy; create: CreateAllergyRequest; update: UpdateAllergyRequest };
@@ -42,6 +45,11 @@ type HealthItemTypes = {
     update: UpdateEmergencyContactRequest;
   };
   doctors: { item: Doctor; create: CreateDoctorRequest; update: UpdateDoctorRequest };
+  events: {
+    item: HealthEvent;
+    create: CreateHealthEventRequest;
+    update: UpdateHealthEventRequest;
+  };
 };
 
 export function healthMembersQueryKey() {

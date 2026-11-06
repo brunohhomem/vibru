@@ -1,6 +1,13 @@
 'use client';
 
-import type { Allergy, Doctor, EmergencyContact, HealthCondition, Medication } from '@vibru/shared';
+import type {
+  Allergy,
+  Doctor,
+  EmergencyContact,
+  HealthCondition,
+  HealthEvent,
+  Medication,
+} from '@vibru/shared';
 import { ArrowLeft, Siren } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -11,11 +18,13 @@ import { AllergySheet } from './allergy-sheet.client';
 import { ConditionSheet } from './condition-sheet.client';
 import { ContactSheet } from './contact-sheet.client';
 import { DoctorSheet } from './doctor-sheet.client';
+import { HealthEventSheet } from './health-event-sheet.client';
 import {
   AllergiesSection,
   ConditionsSection,
   ContactsSection,
   DoctorsSection,
+  HistorySection,
   MedicationsSection,
   ProfileSection,
 } from './health-sections';
@@ -28,7 +37,8 @@ type Editor =
   | { kind: 'condition'; item: HealthCondition | null }
   | { kind: 'contact'; item: EmergencyContact | null }
   | { kind: 'doctor'; item: Doctor | null }
-  | { kind: 'medication'; item: Medication | null };
+  | { kind: 'medication'; item: Medication | null }
+  | { kind: 'event'; item: HealthEvent | null };
 
 function RecordSkeleton() {
   return (
@@ -113,6 +123,12 @@ export function HealthRecordScreen({ memberId }: { memberId: string }) {
         onAdd={() => edit({ kind: 'medication', item: null })}
         onEdit={(item) => edit({ kind: 'medication', item })}
       />
+      <HistorySection
+        items={data.events}
+        doctors={data.doctors}
+        onAdd={() => edit({ kind: 'event', item: null })}
+        onEdit={(item) => edit({ kind: 'event', item })}
+      />
 
       <ProfileSheet
         memberId={memberId}
@@ -148,6 +164,13 @@ export function HealthRecordScreen({ memberId }: { memberId: string }) {
         memberId={memberId}
         open={open && editor.kind === 'medication'}
         medication={editor.kind === 'medication' ? editor.item : null}
+        onOpenChange={setOpen}
+      />
+      <HealthEventSheet
+        memberId={memberId}
+        open={open && editor.kind === 'event'}
+        event={editor.kind === 'event' ? editor.item : null}
+        doctors={data.doctors}
         onOpenChange={setOpen}
       />
     </div>

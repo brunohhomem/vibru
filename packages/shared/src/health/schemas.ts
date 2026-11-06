@@ -6,6 +6,7 @@ import {
   ALLERGY_SEVERITIES,
   BLOOD_TYPES,
   DEFAULT_LOW_STOCK_DAYS,
+  HEALTH_EVENT_KINDS,
   MAX_MEDICATION_TIMES,
 } from './constants';
 
@@ -132,6 +133,34 @@ export const doctorSchema = z.object({
   createdAt: z.string(),
 });
 
+export const healthEventKindSchema = z.enum(HEALTH_EVENT_KINDS, {
+  message: 'Tipo de evento inválido',
+});
+
+const healthEventFields = {
+  kind: healthEventKindSchema,
+  occurredOn: calendarDateSchema,
+  title: requiredText(120, 'Informe o título'),
+  doctorId: z.string().uuid({ message: 'Médico inválido' }).nullable().optional(),
+  notes: optionalText(1000),
+};
+
+export const createHealthEventRequestSchema = z.object(healthEventFields);
+export const updateHealthEventRequestSchema = z
+  .object(healthEventFields)
+  .partial()
+  .refine(hasAtLeastOneField, AT_LEAST_ONE_FIELD);
+
+export const healthEventSchema = z.object({
+  id: z.string().uuid(),
+  kind: healthEventKindSchema,
+  occurredOn: calendarDateSchema,
+  title: z.string(),
+  doctorId: z.string().uuid().nullable(),
+  notes: z.string().nullable(),
+  createdAt: z.string(),
+});
+
 const medicationTimesSchema = z
   .array(taskDueTimeSchema)
   .max(MAX_MEDICATION_TIMES, { message: `Use até ${MAX_MEDICATION_TIMES} horários` })
@@ -202,6 +231,7 @@ export const healthRecordSchema = z.object({
   contacts: z.array(emergencyContactSchema),
   doctors: z.array(doctorSchema),
   medications: z.array(medicationSchema),
+  events: z.array(healthEventSchema),
 });
 
 export const healthMembersResponseSchema = z.object({
@@ -234,6 +264,9 @@ export type UpdateEmergencyContactRequest = z.infer<typeof updateEmergencyContac
 export type Doctor = z.infer<typeof doctorSchema>;
 export type CreateDoctorRequest = z.infer<typeof createDoctorRequestSchema>;
 export type UpdateDoctorRequest = z.infer<typeof updateDoctorRequestSchema>;
+export type HealthEvent = z.infer<typeof healthEventSchema>;
+export type CreateHealthEventRequest = z.infer<typeof createHealthEventRequestSchema>;
+export type UpdateHealthEventRequest = z.infer<typeof updateHealthEventRequestSchema>;
 export type Medication = z.infer<typeof medicationSchema>;
 export type CreateMedicationRequest = z.infer<typeof createMedicationRequestSchema>;
 export type UpdateMedicationRequest = z.infer<typeof updateMedicationRequestSchema>;

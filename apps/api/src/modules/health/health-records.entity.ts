@@ -4,6 +4,13 @@ import { coupleMembers } from '../couple/couple-member.entity';
 import { couples } from '../couple/couple.entity';
 
 export const allergySeverityEnum = pgEnum('allergy_severity', ['mild', 'moderate', 'severe']);
+export const healthEventKindEnum = pgEnum('health_event_kind', [
+  'appointment',
+  'exam',
+  'vaccine',
+  'surgery',
+  'hospitalization',
+]);
 
 /** Colunas de posse comuns aos itens da ficha: casal, membro e índices por ambos. */
 function ownerColumns() {
@@ -75,6 +82,25 @@ export const doctors = pgTable(
   }),
 );
 
+export const healthEvents = pgTable(
+  'health_events',
+  {
+    ...ownerColumns(),
+    kind: healthEventKindEnum('kind').notNull(),
+    occurredOn: date('occurred_on', { mode: 'string' }).notNull(),
+    title: text('title').notNull(),
+    doctorId: uuid('doctor_id').references(() => doctors.id, { onDelete: 'set null' }),
+    notes: text('notes'),
+  },
+  (table) => ({
+    coupleIdx: index('health_events_couple_id_idx').on(table.coupleId),
+    memberOccurredIdx: index('health_events_member_id_occurred_on_idx').on(
+      table.memberId,
+      table.occurredOn,
+    ),
+  }),
+);
+
 export type AllergyRow = typeof allergies.$inferSelect;
 export type NewAllergyRow = typeof allergies.$inferInsert;
 export type HealthConditionRow = typeof healthConditions.$inferSelect;
@@ -83,3 +109,5 @@ export type EmergencyContactRow = typeof emergencyContacts.$inferSelect;
 export type NewEmergencyContactRow = typeof emergencyContacts.$inferInsert;
 export type DoctorRow = typeof doctors.$inferSelect;
 export type NewDoctorRow = typeof doctors.$inferInsert;
+export type HealthEventRow = typeof healthEvents.$inferSelect;
+export type NewHealthEventRow = typeof healthEvents.$inferInsert;

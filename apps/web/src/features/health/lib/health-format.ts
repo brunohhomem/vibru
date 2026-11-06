@@ -2,6 +2,7 @@ import {
   daysOfMedicationLeft,
   type AllergySeverity,
   type BloodType,
+  type HealthEventKind,
   type Medication,
 } from '@vibru/shared';
 
@@ -13,6 +14,14 @@ export const SEVERITY_LABELS: Record<AllergySeverity, string> = {
   mild: 'Leve',
   moderate: 'Moderada',
   severe: 'Grave',
+};
+
+export const HEALTH_EVENT_KIND_LABELS: Record<HealthEventKind, string> = {
+  appointment: 'Consulta',
+  exam: 'Exame',
+  vaccine: 'Vacina',
+  surgery: 'Cirurgia',
+  hospitalization: 'Internação',
 };
 
 export function organDonorLabel(organDonor: boolean | null): string {

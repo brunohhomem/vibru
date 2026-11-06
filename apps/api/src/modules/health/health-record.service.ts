@@ -7,6 +7,7 @@ import { AllergiesRepository } from './allergies.repository';
 import { DoctorsRepository } from './doctors.repository';
 import { EmergencyContactsRepository } from './emergency-contacts.repository';
 import { HealthConditionsRepository } from './health-conditions.repository';
+import { HealthEventsRepository } from './health-events.repository';
 import { HealthMemberAccessService } from './health-member-access.service';
 import { HealthProfileRepository } from './health-profile.repository';
 import {
@@ -15,6 +16,7 @@ import {
   toDoctor,
   toEmergencyContact,
   toHealthCondition,
+  toHealthEvent,
   toHealthProfile,
 } from './health.mappers';
 
@@ -29,20 +31,23 @@ export class HealthRecordService {
     private readonly contactsRepository: EmergencyContactsRepository,
     private readonly doctorsRepository: DoctorsRepository,
     private readonly medicationsService: MedicationsService,
+    private readonly eventsRepository: HealthEventsRepository,
   ) {}
 
   async get(member: CurrentMemberContext, memberId: string): Promise<HealthRecord> {
     const target = await this.memberAccess.requireMember(member.coupleId, memberId);
     const { coupleId } = member;
 
-    const [profile, allergies, conditions, contacts, doctors, medications] = await Promise.all([
-      this.profileRepository.findByMember(coupleId, memberId),
-      this.allergiesRepository.listByMember(coupleId, memberId),
-      this.conditionsRepository.listByMember(coupleId, memberId),
-      this.contactsRepository.listByMember(coupleId, memberId),
-      this.doctorsRepository.listByMember(coupleId, memberId),
-      this.medicationsService.listByMember(coupleId, memberId),
-    ]);
+    const [profile, allergies, conditions, contacts, doctors, medications, events] =
+      await Promise.all([
+        this.profileRepository.findByMember(coupleId, memberId),
+        this.allergiesRepository.listByMember(coupleId, memberId),
+        this.conditionsRepository.listByMember(coupleId, memberId),
+        this.contactsRepository.listByMember(coupleId, memberId),
+        this.doctorsRepository.listByMember(coupleId, memberId),
+        this.medicationsService.listByMember(coupleId, memberId),
+        this.eventsRepository.listByMember(coupleId, memberId),
+      ]);
 
     return {
       memberId: target.id,
@@ -53,6 +58,7 @@ export class HealthRecordService {
       contacts: contacts.map(toEmergencyContact),
       doctors: doctors.map(toDoctor),
       medications: medications.map(toMedication),
+      events: events.map(toHealthEvent),
     };
   }
 }

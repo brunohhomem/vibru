@@ -489,6 +489,177 @@ describe('Saúde', () => {
     });
   });
 
+  it('Membro registra, edita e remove evento do histórico', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const base = `/api/health/members/${couple.blue.memberId}`;
+    const doctor = await couple.blue.agent
+      .post(`${base}/doctors`)
+      .send({ name: 'Dra. Ana' })
+      .expect(201);
+    const doctorId = (doctor.body as { id: string }).id;
+
+    const created = await couple.blue.agent
+      .post(`${base}/events`)
+      .send({ kind: 'exam', occurredOn: '2026-03-10', title: 'Hemograma', doctorId })
+      .expect(201);
+    const eventId = (created.body as { id: string }).id;
+
+    const seenByPartner = await getRecord(couple, couple.blue.memberId);
+    expect(seenByPartner.events).toHaveLength(1);
+    expect(seenByPartner.events[0]).toMatchObject({
+      kind: 'exam',
+      occurredOn: '2026-03-10',
+      title: 'Hemograma',
+      doctorId,
+      notes: null,
+    });
+
+    await couple.purple.agent
+      .patch(`${base}/events/${eventId}`)
+      .send({ kind: 'appointment', doctorId: null, notes: 'Retorno em seis meses' })
+      .expect(200);
+    const edited = await getRecord(couple, couple.blue.memberId, 'blue');
+    expect(edited.events[0]).toMatchObject({
+      kind: 'appointment',
+      title: 'Hemograma',
+      doctorId: null,
+      notes: 'Retorno em seis meses',
+    });
+
+    await couple.blue.agent.delete(`${base}/events/${eventId}`).expect(204);
+    const removed = await getRecord(couple, couple.blue.memberId, 'blue');
+    expect(removed.events).toHaveLength(0);
+  });
+
+  it('Histórico vem do evento mais recente para o mais antigo', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const base = `/api/health/members/${couple.blue.memberId}`;
+
+    for (const [occurredOn, title] of [
+      ['2024-01-15', 'Vacina da gripe'],
+      ['2026-02-20', 'Consulta'],
+      ['2025-07-01', 'Cirurgia'],
+    ]) {
+      await couple.blue.agent
+        .post(`${base}/events`)
+        .send({ kind: 'appointment', occurredOn, title })
+        .expect(201);
+    }
+
+    const record = await getRecord(couple, couple.blue.memberId);
+    expect(record.events.map((event) => event.title)).toEqual([
+      'Consulta',
+      'Cirurgia',
+      'Vacina da gripe',
+    ]);
+  });
+
+  it('Membro salva evento com tipo, data ou título inválido', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const base = `/api/health/members/${couple.blue.memberId}/events`;
+    const valid = { kind: 'exam', occurredOn: '2026-03-10', title: 'Hemograma' };
+
+    await couple.blue.agent
+      .post(base)
+      .send({ ...valid, kind: 'party' })
+      .expect(400);
+    await couple.blue.agent
+      .post(base)
+      .send({ ...valid, occurredOn: '10/03/2026' })
+      .expect(400);
+    await couple.blue.agent
+      .post(base)
+      .send({ ...valid, title: '  ' })
+      .expect(400);
+
+    const record = await getRecord(couple, couple.blue.memberId);
+    expect(record.events).toHaveLength(0);
+  });
+
+  it('Membro vincula evento a médico de outra pessoa ou de outro casal', async () => {
+    const scenario = makeScenario(app);
+    const couple = await scenario.createCouple({});
+    const otherCouple = await scenario.createCouple({});
+    const base = `/api/health/members/${couple.blue.memberId}`;
+    const event = { kind: 'appointment', occurredOn: '2026-03-10', title: 'Consulta' };
+
+    const partnerDoctor = await couple.purple.agent
+      .post(`/api/health/members/${couple.purple.memberId}/doctors`)
+      .send({ name: 'Dr. Paulo' })
+      .expect(201);
+    const foreignDoctor = await otherCouple.blue.agent
+      .post(`/api/health/members/${otherCouple.blue.memberId}/doctors`)
+      .send({ name: 'Dra. Eva' })
+      .expect(201);
+    const saved = await couple.blue.agent.post(`${base}/events`).send(event).expect(201);
+    const eventId = (saved.body as { id: string }).id;
+
+    const attempts = [
+      await couple.blue.agent
+        .post(`${base}/events`)
+        .send({ ...event, doctorId: (partnerDoctor.body as { id: string }).id }),
+      await couple.blue.agent
+        .post(`${base}/events`)
+        .send({ ...event, doctorId: (foreignDoctor.body as { id: string }).id }),
+      await couple.blue.agent
+        .patch(`${base}/events/${eventId}`)
+        .send({ doctorId: (foreignDoctor.body as { id: string }).id }),
+    ];
+    for (const res of attempts) {
+      expect(res.status).toBe(404);
+      expect((res.body as ErrorResponse).code).toBe('HEALTH_ITEM_NOT_FOUND');
+    }
+
+    const record = await getRecord(couple, couple.blue.memberId, 'blue');
+    expect(record.events).toHaveLength(1);
+    expect(record.events[0]?.doctorId).toBeNull();
+  });
+
+  it('Membro remove o médico de um evento do histórico', async () => {
+    const couple = await makeScenario(app).createCouple({});
+    const base = `/api/health/members/${couple.blue.memberId}`;
+    const doctor = await couple.blue.agent
+      .post(`${base}/doctors`)
+      .send({ name: 'Dra. Ana' })
+      .expect(201);
+    const doctorId = (doctor.body as { id: string }).id;
+    await couple.blue.agent
+      .post(`${base}/events`)
+      .send({ kind: 'surgery', occurredOn: '2025-01-10', title: 'Apendicite', doctorId })
+      .expect(201);
+
+    await couple.blue.agent.delete(`${base}/doctors/${doctorId}`).expect(204);
+
+    const record = await getRecord(couple, couple.blue.memberId);
+    expect(record.doctors).toHaveLength(0);
+    expect(record.events[0]).toMatchObject({ title: 'Apendicite' });
+  });
+
+  it('Membro de outro casal cria, edita ou exclui evento deste casal', async () => {
+    const scenario = makeScenario(app);
+    const couple = await scenario.createCouple({});
+    const otherCouple = await scenario.createCouple({});
+    const base = `/api/health/members/${couple.blue.memberId}`;
+    const event = { kind: 'vaccine', occurredOn: '2026-03-10', title: 'Vacina da gripe' };
+    const saved = await couple.blue.agent.post(`${base}/events`).send(event).expect(201);
+    const eventId = (saved.body as { id: string }).id;
+    const intruder = otherCouple.blue.agent;
+
+    const attempts = [
+      await intruder.post(`${base}/events`).send(event),
+      await intruder.patch(`${base}/events/${eventId}`).send({ title: 'Invadido' }),
+      await intruder.delete(`${base}/events/${eventId}`),
+    ];
+    for (const res of attempts) {
+      expect(res.status).toBe(404);
+      expect((res.body as ErrorResponse).code).toBe('HEALTH_MEMBER_NOT_FOUND');
+    }
+
+    const record = await getRecord(couple, couple.blue.memberId, 'blue');
+    expect(record.events).toHaveLength(1);
+    expect(record.events[0]?.title).toBe('Vacina da gripe');
+  });
+
   it('Membro de outro casal acessa, edita ou exclui remédio deste casal', async () => {
     const scenario = makeScenario(app);
     const couple = await scenario.createCouple({});

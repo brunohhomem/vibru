@@ -1,5 +1,10 @@
 import { z } from '@vibru/shared/zod';
-import { ALLERGY_SEVERITIES, BLOOD_TYPES, MAX_MEDICATION_TIMES } from '@vibru/shared';
+import {
+  ALLERGY_SEVERITIES,
+  BLOOD_TYPES,
+  HEALTH_EVENT_KINDS,
+  MAX_MEDICATION_TIMES,
+} from '@vibru/shared';
 
 const ORGAN_DONOR_VALUES = ['unknown', 'yes', 'no'] as const;
 
@@ -62,6 +67,14 @@ export const doctorFormSchema = z.object({
   notes: limited(500),
 });
 
+export const healthEventFormSchema = z.object({
+  kind: z.enum(HEALTH_EVENT_KINDS),
+  occurredOn: z.string().min(1, { message: 'Informe a data' }),
+  title: required(120, 'Informe o título'),
+  doctorId: z.string(),
+  notes: limited(1000),
+});
+
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 function wholeNumber(min: number, max: number) {
@@ -111,4 +124,5 @@ export type AllergyFormValues = z.infer<typeof allergyFormSchema>;
 export type ConditionFormValues = z.infer<typeof conditionFormSchema>;
 export type ContactFormValues = z.infer<typeof contactFormSchema>;
 export type DoctorFormValues = z.infer<typeof doctorFormSchema>;
+export type HealthEventFormValues = z.infer<typeof healthEventFormSchema>;
 export type MedicationFormValues = z.infer<typeof medicationFormSchema>;

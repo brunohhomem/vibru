@@ -6,6 +6,16 @@ export const ALLERGY_SEVERITIES = ['mild', 'moderate', 'severe'] as const;
 
 export type AllergySeverity = (typeof ALLERGY_SEVERITIES)[number];
 
+export const HEALTH_EVENT_KINDS = [
+  'appointment',
+  'exam',
+  'vaccine',
+  'surgery',
+  'hospitalization',
+] as const;
+
+export type HealthEventKind = (typeof HEALTH_EVENT_KINDS)[number];
+
 export const MAX_MEDICATION_TIMES = 6;
 
 export const DEFAULT_LOW_STOCK_DAYS = 7;

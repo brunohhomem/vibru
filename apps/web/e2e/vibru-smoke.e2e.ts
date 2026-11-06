@@ -209,6 +209,17 @@ test('admin monta a ficha, cria remédio, conclui a tomada e usa a Farmácia', a
   await page.getByLabel('Unidades em estoque').fill('2');
   await page.getByRole('button', { name: 'Salvar' }).click();
   await expect(page.getByText('Remédio adicionado')).toBeVisible();
+
+  const history = page.getByRole('region', { name: 'Histórico' });
+  await history.getByRole('button', { name: 'Adicionar' }).click();
+  await page.getByLabel('Tipo', { exact: true }).selectOption('vaccine');
+  await page.getByLabel('Título').fill('Vacina da gripe');
+  await page.getByLabel('Data', { exact: true }).fill('2026-03-10');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Evento registrado')).toBeVisible();
+  await expect(history.getByRole('button', { name: /Vacina da gripe/ })).toContainText(
+    'Vacina · 10 de março de 2026',
+  );
   await expectNoHorizontalScroll(page);
 
   const bottomNav = page.getByRole('navigation', { name: 'Navegação principal' });
