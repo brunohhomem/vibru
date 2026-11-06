@@ -12,6 +12,8 @@ import { EmergencyContactsRepository } from './emergency-contacts.repository';
 import { EmergencyContactsService } from './emergency-contacts.service';
 import { HealthConditionsRepository } from './health-conditions.repository';
 import { HealthConditionsService } from './health-conditions.service';
+import { HealthEventsRepository } from './health-events.repository';
+import { HealthEventsService } from './health-events.service';
 import { HealthItemsController } from './health-items.controller';
 import { HealthMembersController } from './health-members.controller';
 import { HealthMembersService } from './health-members.service';
@@ -46,6 +48,8 @@ import { PharmacyService } from './pharmacy.service';
     EmergencyContactsService,
     DoctorsRepository,
     DoctorsService,
+    HealthEventsRepository,
+    HealthEventsService,
     HealthMembersService,
     MedicationLifecycleService,
     PharmacyService,

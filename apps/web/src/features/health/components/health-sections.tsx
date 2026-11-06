@@ -3,6 +3,7 @@ import type {
   Doctor,
   EmergencyContact,
   HealthCondition,
+  HealthEvent,
   HealthProfile,
   Medication,
 } from '@vibru/shared';
@@ -11,9 +12,11 @@ import type { ReactNode } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatSinceDate } from '@/features/home/lib/home-format';
 import { formatPhone } from '@/lib/masks';
 import {
   bloodTypeLabel,
+  HEALTH_EVENT_KIND_LABELS,
   SEVERITY_LABELS,
   isMedicationLowStock,
   medicationScheduleLabel,
@@ -215,6 +218,39 @@ export function DoctorsSection({ items, onAdd, onEdit }: ListSectionProps<Doctor
             .filter(Boolean)
             .join(' · ')}
           onOpen={() => onEdit(doctor)}
+        />
+      ))}
+    </Section>
+  );
+}
+
+type HistorySectionProps = ListSectionProps<HealthEvent> & { doctors: Doctor[] };
+
+export function HistorySection({ items, doctors, onAdd, onEdit }: HistorySectionProps) {
+  function doctorName(doctorId: string | null): string | undefined {
+    return doctors.find((doctor) => doctor.id === doctorId)?.name;
+  }
+
+  return (
+    <Section
+      title="Histórico"
+      onAdd={onAdd}
+      isEmpty={items.length === 0}
+      empty="Nenhum evento registrado."
+    >
+      {items.map((event) => (
+        <Row
+          key={event.id}
+          label={`Editar evento ${event.title}`}
+          title={event.title}
+          subtitle={[
+            HEALTH_EVENT_KIND_LABELS[event.kind],
+            formatSinceDate(event.occurredOn),
+            doctorName(event.doctorId),
+          ]
+            .filter(Boolean)
+            .join(' · ')}
+          onOpen={() => onEdit(event)}
         />
       ))}
     </Section>

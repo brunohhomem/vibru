@@ -15,18 +15,22 @@ import {
   createDoctorRequestSchema,
   createEmergencyContactRequestSchema,
   createHealthConditionRequestSchema,
+  createHealthEventRequestSchema,
   updateAllergyRequestSchema,
   updateDoctorRequestSchema,
   updateEmergencyContactRequestSchema,
   updateHealthConditionRequestSchema,
+  updateHealthEventRequestSchema,
   type CreateAllergyRequest,
   type CreateDoctorRequest,
   type CreateEmergencyContactRequest,
   type CreateHealthConditionRequest,
+  type CreateHealthEventRequest,
   type UpdateAllergyRequest,
   type UpdateDoctorRequest,
   type UpdateEmergencyContactRequest,
   type UpdateHealthConditionRequest,
+  type UpdateHealthEventRequest,
 } from '@vibru/shared';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { CoupleMemberGuard } from '../couple/couple-member.guard';
@@ -39,8 +43,9 @@ import { AllergiesService } from './allergies.service';
 import { DoctorsService } from './doctors.service';
 import { EmergencyContactsService } from './emergency-contacts.service';
 import { HealthConditionsService } from './health-conditions.service';
+import { HealthEventsService } from './health-events.service';
 
-/** Alergias, condições, contatos de emergência e médicos de um membro. */
+/** Alergias, condições, contatos de emergência, médicos e histórico de um membro. */
 @ApiTags('health')
 @ApiCookieAuth('access_token')
 @Controller('health/members/:memberId')
@@ -54,6 +59,7 @@ export class HealthItemsController {
     private readonly conditionsService: HealthConditionsService,
     private readonly contactsService: EmergencyContactsService,
     private readonly doctorsService: DoctorsService,
+    private readonly eventsService: HealthEventsService,
   ) {}
 
   @Post('allergies')
@@ -174,5 +180,34 @@ export class HealthItemsController {
     @CurrentMember() member: CurrentMemberContext,
   ) {
     await this.doctorsService.remove(member, memberId, itemId);
+  }
+
+  @Post('events')
+  async createEvent(
+    @Param('memberId') memberId: string,
+    @Body(new ZodValidationPipe(createHealthEventRequestSchema)) body: CreateHealthEventRequest,
+    @CurrentMember() member: CurrentMemberContext,
+  ) {
+    return this.eventsService.create(member, memberId, body);
+  }
+
+  @Patch('events/:itemId')
+  async updateEvent(
+    @Param('memberId') memberId: string,
+    @Param('itemId') itemId: string,
+    @Body(new ZodValidationPipe(updateHealthEventRequestSchema)) body: UpdateHealthEventRequest,
+    @CurrentMember() member: CurrentMemberContext,
+  ) {
+    return this.eventsService.update(member, memberId, itemId, body);
+  }
+
+  @Delete('events/:itemId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeEvent(
+    @Param('memberId') memberId: string,
+    @Param('itemId') itemId: string,
+    @CurrentMember() member: CurrentMemberContext,
+  ) {
+    await this.eventsService.remove(member, memberId, itemId);
   }
 }

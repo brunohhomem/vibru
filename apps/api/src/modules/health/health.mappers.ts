@@ -3,6 +3,7 @@ import type {
   Doctor,
   EmergencyContact,
   HealthCondition,
+  HealthEvent,
   HealthProfile,
 } from '@vibru/shared';
 import type { HealthProfileRow } from './health-profile.entity';
@@ -11,6 +12,7 @@ import type {
   DoctorRow,
   EmergencyContactRow,
   HealthConditionRow,
+  HealthEventRow,
 } from './health-records.entity';
 
 export function emptyProfile(): HealthProfile {
@@ -61,6 +63,18 @@ export function toEmergencyContact(row: EmergencyContactRow): EmergencyContact {
     name: row.name,
     relationship: row.relationship,
     phone: row.phone,
+    createdAt: row.createdAt.toISOString(),
+  };
+}
+
+export function toHealthEvent(row: HealthEventRow): HealthEvent {
+  return {
+    id: row.id,
+    kind: row.kind,
+    occurredOn: row.occurredOn,
+    title: row.title,
+    doctorId: row.doctorId,
+    notes: row.notes,
     createdAt: row.createdAt.toISOString(),
   };
 }
