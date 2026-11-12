@@ -11,6 +11,7 @@ const MEDICATION_NAME = 'Losartana';
 const MEDICATION_TASK = 'Tomar Losartana 50 mg';
 const ALLERGY_SUBSTANCE = 'Amendoim';
 const AGENDA_EVENT = 'Jantar de aniversário';
+const WISH_TITLE = 'Piquenique';
 
 async function expectNoHorizontalScroll(page: Page): Promise<void> {
   const overflow = await page.evaluate(
@@ -173,6 +174,24 @@ test('admin cria lista, marca itens e acompanha o progresso na home', async ({ p
   await expect(page.getByText('Evento criado')).toBeVisible();
   await expect(page.getByRole('button', { name: `Editar 20:30 · ${AGENDA_EVENT}` })).toBeVisible();
   await expectNoHorizontalScroll(page);
+
+  await bottomNav.getByRole('link', { name: 'Desejos' }).click();
+  await page.waitForURL(/\/app\/wishes/);
+  await page.getByRole('button', { name: 'Novo desejo' }).click();
+  await page.getByLabel('Título').fill(WISH_TITLE);
+  await page.getByRole('combobox', { name: 'Categoria' }).selectOption('date_idea');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Desejo adicionado')).toBeVisible();
+  await page.getByRole('button', { name: `Planejar ${WISH_TITLE}` }).click();
+  await page.getByLabel('Horário').fill('19:00');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Planejado na Agenda')).toBeVisible();
+  await expect(page.getByText(/Planejado para/)).toBeVisible();
+  await expectNoHorizontalScroll(page);
+
+  await bottomNav.getByRole('link', { name: 'Agenda' }).click();
+  await page.waitForURL(/\/app\/agenda$/);
+  await expect(page.getByRole('button', { name: `Editar 19:00 · ${WISH_TITLE}` })).toBeVisible();
 
   await page.goto('/app/couple');
   await page.getByRole('button', { name: 'Gerar link' }).click();
