@@ -12,6 +12,7 @@ const MEDICATION_TASK = 'Tomar Losartana 50 mg';
 const ALLERGY_SUBSTANCE = 'Amendoim';
 const AGENDA_EVENT = 'Jantar de aniversário';
 const WISH_TITLE = 'Piquenique';
+const DATE_IDEA_TITLE = 'Cinema ao ar livre no parque da cidade';
 
 async function expectNoHorizontalScroll(page: Page): Promise<void> {
   const overflow = await page.evaluate(
@@ -50,11 +51,30 @@ test('admin entra, vê a home do casal, navega e salva o próprio nome', async (
   await expectNoHorizontalScroll(page);
 
   await page.getByLabel('Meu nome no casal').fill(NEW_DISPLAY_NAME);
+  // O seed traz as datas do casal; sem elas, a home fica só com os blocos fixos.
+  await page.getByLabel('Início do namoro').fill('');
+  await page.getByLabel('Data do casamento').fill('');
   await page.getByRole('button', { name: 'Salvar' }).click();
   await expect(page.getByText('Configurações do casal salvas')).toBeVisible();
 
   await page.getByRole('button', { name: 'Abrir menu do casal' }).click();
   await expect(page.getByText(`${NEW_DISPLAY_NAME} e Parceira`)).toBeVisible();
+  await page.keyboard.press('Escape');
+
+  await bottomNav.getByRole('link', { name: 'Início' }).click();
+  await page.waitForURL(/\/app$/);
+  await expect(page.getByText('Defina as datas do casal')).toBeVisible();
+  await expect(page.getByRole('link', { name: new RegExp(NEW_DISPLAY_NAME) })).toBeVisible();
+  for (const optionalTile of [
+    'Próxima data',
+    'Lista em andamento',
+    'Ideia de rolê',
+    'Próximas bodas',
+    'Aniversário de namoro',
+  ]) {
+    await expect(page.getByText(optionalTile)).toHaveCount(0);
+  }
+  await expectNoHorizontalScroll(page);
 });
 
 test('parceira cria tarefa para hoje, conclui, desfaz e a home conta para o Bruno', async ({
@@ -192,6 +212,28 @@ test('admin cria lista, marca itens e acompanha o progresso na home', async ({ p
   await bottomNav.getByRole('link', { name: 'Agenda' }).click();
   await page.waitForURL(/\/app\/agenda$/);
   await expect(page.getByRole('button', { name: `Editar 19:00 · ${WISH_TITLE}` })).toBeVisible();
+
+  // O desejo planejado sai da ideia de rolê; uma ideia sem plano toma o lugar dele.
+  await bottomNav.getByRole('link', { name: 'Desejos' }).click();
+  await page.waitForURL(/\/app\/wishes/);
+  await page.getByRole('button', { name: 'Novo desejo' }).click();
+  await page.getByLabel('Título').fill(DATE_IDEA_TITLE);
+  await page.getByRole('combobox', { name: 'Categoria' }).selectOption('date_idea');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Desejo adicionado')).toBeVisible();
+
+  await bottomNav.getByRole('link', { name: 'Início' }).click();
+  await page.waitForURL(/\/app$/);
+  const nextDateTile = page.getByRole('link', { name: /Próxima data/ });
+  await expect(nextDateTile).toContainText(WISH_TITLE);
+  await expect(nextDateTile).toContainText('Hoje');
+  const dateIdeaTile = page.getByRole('link', { name: /Ideia de rolê/ });
+  await expect(dateIdeaTile).toContainText(DATE_IDEA_TITLE);
+  await expectNoHorizontalScroll(page);
+
+  await dateIdeaTile.click();
+  await page.waitForURL(/\/app\/wishes\?categoria=date_idea$/);
+  await expect(page.getByRole('article', { name: DATE_IDEA_TITLE })).toBeVisible();
 
   await page.goto('/app/couple');
   await page.getByRole('button', { name: 'Gerar link' }).click();
