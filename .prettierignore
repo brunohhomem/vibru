@@ -6,3 +6,4 @@ coverage
 pnpm-lock.yaml
 apps/web/next-env.d.ts
 packages/config/eslint/fixtures/apps/
+.superpowers

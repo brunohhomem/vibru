@@ -10,12 +10,14 @@
 
 ## Cookies
 
-| Cookie          | Path        | Duração | Flags                             |
-| --------------- | ----------- | ------- | --------------------------------- |
-| `access_token`  | `/`         | 15 min  | `HttpOnly; SameSite=Lax; Secure`* |
-| `refresh_token` | `/api/auth` | 7 dias  | `HttpOnly; SameSite=Lax; Secure`* |
+| Cookie          | Path        | Duração                           | Flags                             |
+| --------------- | ----------- | --------------------------------- | --------------------------------- |
+| `access_token`  | `/`         | `AUTH_REFRESH_TTL_DAYS` (90 dias) | `HttpOnly; SameSite=Lax; Secure`* |
+| `refresh_token` | `/api/auth` | `AUTH_REFRESH_TTL_DAYS` (90 dias) | `HttpOnly; SameSite=Lax; Secure`* |
 
 *`Secure` ativo quando `COOKIE_SECURE=true` (padrão em produção, desativado em dev/teste).
+
+O JWT dentro do `access_token` continua expirando em `AUTH_ACCESS_TTL_MINUTES` (15 min); só o cookie vive o prazo da sessão. O middleware do web enxerga apenas esse cookie: se ele sumisse em 15 min, a navegação cairia no login com a sessão ainda válida. O JWT expirado responde 401, e o cliente renova pelo refresh e repete a chamada.
 
 Limpar cookies = mesmo nome, path e flags com `Max-Age=0`. Sem atributo `Domain` (host-only).
 
@@ -54,8 +56,10 @@ Comportamento idempotente:
 
 - **Admin já existe**: não faz nada (não sobrescreve senha).
 - **Admin não existe**: cria com `role=admin`, `must_change_password=true`, `email_verified_at=now()`.
-  - `NODE_ENV=development`: senha fixa `Admin@12345`.
-  - Outros ambientes: usa `ADMIN_INITIAL_PASSWORD` se definida; senão gera 24 chars aleatórios e **imprime uma única vez** no stdout.
+  - `ADMIN_INITIAL_PASSWORD` definida: usa essa senha em qualquer ambiente.
+  - Sem ela, em `NODE_ENV=development`: senha fixa `Admin@12345`.
+  - Sem ela, nos outros ambientes: gera 24 chars aleatórios e **imprime uma única vez** no stdout.
+  - A parceira segue a mesma regra com `PARTNER_INITIAL_PASSWORD`. Os testes de integração e o smoke E2E fixam `Admin@12345`, sem depender do `.env` pessoal.
 - Insere `registration_enabled` em `system_settings` (`true` em dev/test, `false` em produção) **somente se não existir**.
 
 ## Variáveis de ambiente
@@ -65,7 +69,7 @@ Comportamento idempotente:
 | `JWT_ACCESS_SECRET`                | sim         | —                       | Segredo HS256 ≥ 32 chars. `pnpm keys:generate` cria se ausente. **Rotacionar invalida todas as sessões ativas.** |
 | `ADMIN_EMAIL`                      | sim         | —                       | E-mail do administrador inicial                                                                                  |
 | `WEB_ORIGIN`                       | sim         | `http://localhost:3100` | Origin permitida para verificação CSRF. Sem barra final.                                                         |
-| `ADMIN_INITIAL_PASSWORD`           | não         | —                       | Senha inicial do admin em produção                                                                               |
+| `ADMIN_INITIAL_PASSWORD`           | não         | —                       | Senha inicial do admin; vale em qualquer ambiente                                                                |
 | `COOKIE_SECURE`                    | não         | `true` em prod          | Ativa flag `Secure` nos cookies                                                                                  |
 | `TRUST_PROXY_HOPS`                 | não         | `0`                     | Número de proxies reversos confiáveis (1 atrás do Nginx)                                                         |
 | `AUTH_ACCESS_TTL_MINUTES`          | não         | `15`                    | TTL do access token (1–120)                                                                                      |

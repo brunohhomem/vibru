@@ -23,6 +23,64 @@ describe('Sessão', () => {
     await resetThrottle();
   });
 
+  it('Cookie de acesso vive o prazo do refresh para a navegação não cair no login', async () => {
+    const scenario = makeScenario(app);
+    const user = await scenario.createUser({ email: 'navegacao@teste.com' });
+
+    const maxAgeOf = (headers: Record<string, unknown>, name: string): string | undefined => {
+      const cookies = headers['set-cookie'] as string[];
+      const cookie = cookies.find((value) => value.startsWith(`${name}=`));
+      return /Max-Age=(\d+)/.exec(cookie ?? '')?.[1];
+    };
+
+    const loginRes = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ email: user.email, password: user.password })
+      .expect(200);
+
+    expect(maxAgeOf(loginRes.headers, 'refresh_token')).toBeDefined();
+    expect(maxAgeOf(loginRes.headers, 'access_token')).toBe(
+      maxAgeOf(loginRes.headers, 'refresh_token'),
+    );
+
+    const refreshCookie = scenario.cookieFrom(
+      loginRes.headers as Record<string, string | string[]>,
+      'refresh_token',
+    );
+    const refreshRes = await request(app.getHttpServer())
+      .post('/api/auth/refresh')
+      .set('Cookie', refreshCookie)
+      .expect(200);
+
+    expect(maxAgeOf(refreshRes.headers, 'access_token')).toBe(
+      maxAgeOf(refreshRes.headers, 'refresh_token'),
+    );
+  });
+
+  it('Navegador com cookies de sessão estranhos renova e tem os cookies apagados', async () => {
+    const clearedCookies = (headers: Record<string, unknown>): string[] =>
+      ((headers['set-cookie'] ?? []) as string[])
+        .filter((cookie) => /Expires=Thu, 01 Jan 1970/.test(cookie))
+        .map((cookie) => cookie.split('=')[0] ?? '');
+
+    // Cookie de localhost vale para todas as portas: outro projeto local com o
+    // mesmo nome de cookie, ou uma sessão de um banco recriado, chega aqui.
+    const onlyAccess = await request(app.getHttpServer())
+      .post('/api/auth/refresh')
+      .set('Cookie', 'access_token=jwt-de-outro-projeto')
+      .expect(401);
+    const bothForeign = await request(app.getHttpServer())
+      .post('/api/auth/refresh')
+      .set('Cookie', 'access_token=jwt-de-outro-projeto; refresh_token=refresh-desconhecido')
+      .expect(401);
+
+    for (const res of [onlyAccess, bothForeign]) {
+      expect(clearedCookies(res.headers)).toEqual(
+        expect.arrayContaining(['access_token', 'refresh_token']),
+      );
+    }
+  });
+
   it('Anônimo acessa rota protegida', async () => {
     const res = await request(app.getHttpServer()).get('/api/auth/me').expect(401);
 
