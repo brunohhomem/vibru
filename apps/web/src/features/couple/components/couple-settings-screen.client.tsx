@@ -12,6 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
+import { IcsFeedCard } from '@/features/agenda/components/ics-feed-card.client';
+import { AGENDA_QUERY_KEY } from '@/features/agenda/hooks/use-agenda';
 import { COUPLE_QUERY_KEY, useCouple } from '@/features/couple/hooks/use-couple';
 import { coupleFormSchema, type CoupleFormValues } from '@/features/couple/schemas/forms';
 import { api } from '@/lib/api';
@@ -53,6 +55,7 @@ export function CoupleSettingsScreen() {
     mutationFn: saveCouple,
     onSuccess: (data) => {
       queryClient.setQueryData(COUPLE_QUERY_KEY, data);
+      void queryClient.invalidateQueries({ queryKey: AGENDA_QUERY_KEY });
       toast.success('Configurações do casal salvas');
     },
     onError: (error) => applyApiError(error, form.setError),
@@ -115,6 +118,7 @@ export function CoupleSettingsScreen() {
           </form>
         </CardContent>
       </Card>
+      <IcsFeedCard />
     </div>
   );
 }

@@ -45,11 +45,22 @@ export function resolveRequestId(headerValue: string | string[] | undefined): st
 }
 
 /**
- * Rotas excluídas do log automático de requisições para não poluir a saída
- * com chamadas de sondagem (health) e documentação (docs).
+ * Troca o token do feed ICS em uma URL que vai para o log. A URL é a
+ * credencial (ADR 0003, 4.3).
+ */
+export function redactIcsToken(url: string): string {
+  return url.replace(/^\/api\/ics\/.*/, `/api/ics/${REDACTED_FIELDS}`);
+}
+
+/**
+ * Rotas excluídas do log automático de requisições: sondagem (health) e
+ * documentação (docs) poluem a saída, e a URL do feed ICS carrega o token.
  */
 export function isRouteExcludedFromRequestLog(url: string | undefined): boolean {
   if (url === '/api/health' || url === '/api/health/') {
+    return true;
+  }
+  if (url?.startsWith('/api/ics/')) {
     return true;
   }
   return url === '/api/docs' || (url?.startsWith('/api/docs/') ?? false);

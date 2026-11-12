@@ -6,8 +6,9 @@ import { couples, type Couple } from './couple.entity';
 
 /**
  * Acesso a `couples` e `couple_members`. Todo método de domínio exige
- * `coupleId`; a única exceção é `findMembershipByUserId`, que resolve o
- * vínculo do usuário logado antes de existir um casal no contexto.
+ * `coupleId`; as exceções são `findMembershipByUserId` e
+ * `findMemberByIcsTokenHash`, que resolvem o membro antes de existir um casal
+ * no contexto.
  */
 @Injectable()
 export class CoupleRepository {
@@ -20,6 +21,26 @@ export class CoupleRepository {
       .where(eq(coupleMembers.userId, userId))
       .limit(1);
     return result[0] ?? null;
+  }
+
+  async findMemberByIcsTokenHash(tokenHash: string): Promise<CoupleMemberRow | null> {
+    const result = await this.db
+      .select()
+      .from(coupleMembers)
+      .where(eq(coupleMembers.icsTokenHash, tokenHash))
+      .limit(1);
+    return result[0] ?? null;
+  }
+
+  async updateMemberIcsTokenHash(
+    coupleId: string,
+    memberId: string,
+    tokenHash: string | null,
+  ): Promise<void> {
+    await this.db
+      .update(coupleMembers)
+      .set({ icsTokenHash: tokenHash })
+      .where(and(eq(coupleMembers.coupleId, coupleId), eq(coupleMembers.id, memberId)));
   }
 
   async findById(coupleId: string): Promise<Couple | null> {

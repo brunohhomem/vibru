@@ -22,6 +22,8 @@ export const coupleMembers = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     displayName: text('display_name').notNull(),
     color: memberColorEnum('color').notNull(),
+    // Só o SHA-256: a URL do feed é a credencial (ADR 0003, 4.3). Nulo = feed desligado.
+    icsTokenHash: text('ics_token_hash'),
   },
   (table) => ({
     coupleIdIdx: index('couple_members_couple_id_idx').on(table.coupleId),
@@ -30,6 +32,7 @@ export const coupleMembers = pgTable(
       table.coupleId,
       table.color,
     ),
+    icsTokenHashIdx: uniqueIndex('couple_members_ics_token_hash_idx').on(table.icsTokenHash),
   }),
 );
 

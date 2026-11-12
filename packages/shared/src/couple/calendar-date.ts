@@ -147,6 +147,11 @@ export function nextAnnualOccurrence(date: CalendarDate, today: CalendarDate): C
   return occurrenceForYear(occurrence, current.year + 1);
 }
 
+/** Ocorrência de uma data anual em um ano qualquer, com a mesma regra do 29/02. */
+export function annualOccurrenceInYear(date: CalendarDate, year: number): CalendarDate {
+  return occurrenceForYear(parseCalendarDate(date), year);
+}
+
 function occurrenceForYear(occurrence: CalendarDateParts, year: number): CalendarDate {
   const day =
     occurrence.month === 2 && occurrence.day === 29 && !isLeapYear(year) ? 28 : occurrence.day;

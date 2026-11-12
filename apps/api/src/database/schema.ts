@@ -31,6 +31,14 @@ export type { CoupleMemberRow, NewCoupleMember } from '../modules/couple/couple-
 export { tasks, taskRecurrenceEnum, taskCategoryEnum } from '../modules/tasks/task.entity';
 export type { TaskRow, NewTaskRow } from '../modules/tasks/task.entity';
 
+export { agendaEvents, importantDates } from '../modules/agenda/agenda.entity';
+export type {
+  AgendaEventRow,
+  NewAgendaEventRow,
+  ImportantDateRow,
+  NewImportantDateRow,
+} from '../modules/agenda/agenda.entity';
+
 export { lists } from '../modules/lists/list.entity';
 export type { ListRow, NewListRow } from '../modules/lists/list.entity';
 

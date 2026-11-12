@@ -10,6 +10,7 @@ import { Request, Response } from 'express';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodIssue } from 'zod';
 import { errorResponseSchema, type ErrorResponse } from '@vibru/shared';
+import { redactIcsToken } from '../logging/logger-options';
 
 /**
  * Filtro global de exceções.
@@ -69,7 +70,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       this.logger.error({
         message: 'Unhandled exception',
         requestId,
-        path,
+        path: redactIcsToken(path),
         error: exception instanceof Error ? exception.stack : String(exception),
       });
     }
@@ -92,7 +93,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       this.logger.error({
         message: 'Error response failed schema validation',
         requestId,
-        path,
+        path: redactIcsToken(path),
         issues: parseResult.error.issues,
       });
     }

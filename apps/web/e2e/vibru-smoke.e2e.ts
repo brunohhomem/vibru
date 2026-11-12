@@ -10,6 +10,7 @@ const SECOND_ITEM = 'Pão';
 const MEDICATION_NAME = 'Losartana';
 const MEDICATION_TASK = 'Tomar Losartana 50 mg';
 const ALLERGY_SUBSTANCE = 'Amendoim';
+const AGENDA_EVENT = 'Jantar de aniversário';
 
 async function expectNoHorizontalScroll(page: Page): Promise<void> {
   const overflow = await page.evaluate(
@@ -159,6 +160,27 @@ test('admin cria lista, marca itens e acompanha o progresso na home', async ({ p
   await page.waitForURL(/\/app$/);
   await expect(page.getByText('Casados há')).toBeVisible();
   await expect(page.getByText('Lista em andamento')).toHaveCount(0);
+  await expectNoHorizontalScroll(page);
+
+  await bottomNav.getByRole('link', { name: 'Agenda' }).click();
+  await page.waitForURL(/\/app\/agenda$/);
+  await expect(page.getByRole('heading', { name: 'Agenda' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Novo evento' }).click();
+  await page.getByLabel('Título').fill(AGENDA_EVENT);
+  await page.getByLabel('Horário').fill('20:30');
+  await page.getByRole('button', { name: 'Salvar' }).click();
+  await expect(page.getByText('Evento criado')).toBeVisible();
+  await expect(page.getByRole('button', { name: `Editar 20:30 · ${AGENDA_EVENT}` })).toBeVisible();
+  await expectNoHorizontalScroll(page);
+
+  await page.goto('/app/couple');
+  await page.getByRole('button', { name: 'Gerar link' }).click();
+  const feedUrl = await page.getByLabel('Link do calendário').inputValue();
+  const feed = await page.request.get(feedUrl);
+  expect(feed.status()).toBe(200);
+  expect(feed.headers()['content-type']).toContain('text/calendar');
+  expect(await feed.text()).toContain(`SUMMARY:${AGENDA_EVENT}`);
   await expectNoHorizontalScroll(page);
 });
 
