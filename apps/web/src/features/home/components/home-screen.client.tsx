@@ -287,7 +287,7 @@ export function HomeScreen() {
           {formatLongDate(data.today)}
         </p>
       </header>
-      <div className="grid auto-rows-[minmax(9rem,auto)] grid-cols-2 gap-2 lg:grid-cols-4">
+      <div className="grid grid-flow-dense auto-rows-[minmax(9rem,auto)] grid-cols-2 gap-2 lg:grid-cols-4">
         <MarriedTile couple={data} />
         {data.members.map((member) => (
           <MemberTile

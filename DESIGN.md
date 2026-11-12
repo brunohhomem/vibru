@@ -34,6 +34,18 @@ Texto em Nunito (`font-sans`), títulos e números em Bricolage Grotesque (`font
 
 Grade de 2 colunas no mobile e 4 a partir de `lg`, com `gap` de 8px e cantos de 24–28px. Bloco opcional sem dado não aparece; os demais sobem na grade, sem buraco (ADR 0003, seção 6, regra 6).
 
+A ordem da home é fixa:
+
+1. contador do casamento (2×2);
+2. tarefas de cada um;
+3. próxima data;
+4. lista em andamento;
+5. ideia de rolê;
+6. bodas;
+7. namoro.
+
+A grade usa `grid-flow-dense`, que deixa um bloco menor ocupar a vaga que um bloco ausente deixaria. A linha "Remédios de hoje" fica fora da grade, logo abaixo dela.
+
 ## Tokens
 
 Use o token semântico (`bg-primary`, `text-muted`, `border-border`). Não escreva hex, rgb nem oklch no componente. A fonte da verdade dos valores é o `globals.css`.
