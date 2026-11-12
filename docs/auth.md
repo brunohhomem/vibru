@@ -10,12 +10,14 @@
 
 ## Cookies
 
-| Cookie          | Path        | Duração | Flags                             |
-| --------------- | ----------- | ------- | --------------------------------- |
-| `access_token`  | `/`         | 15 min  | `HttpOnly; SameSite=Lax; Secure`* |
-| `refresh_token` | `/api/auth` | 7 dias  | `HttpOnly; SameSite=Lax; Secure`* |
+| Cookie          | Path        | Duração                           | Flags                             |
+| --------------- | ----------- | --------------------------------- | --------------------------------- |
+| `access_token`  | `/`         | `AUTH_REFRESH_TTL_DAYS` (90 dias) | `HttpOnly; SameSite=Lax; Secure`* |
+| `refresh_token` | `/api/auth` | `AUTH_REFRESH_TTL_DAYS` (90 dias) | `HttpOnly; SameSite=Lax; Secure`* |
 
 *`Secure` ativo quando `COOKIE_SECURE=true` (padrão em produção, desativado em dev/teste).
+
+O JWT dentro do `access_token` continua expirando em `AUTH_ACCESS_TTL_MINUTES` (15 min); só o cookie vive o prazo da sessão. O middleware do web enxerga apenas esse cookie: se ele sumisse em 15 min, a navegação cairia no login com a sessão ainda válida. O JWT expirado responde 401, e o cliente renova pelo refresh e repete a chamada.
 
 Limpar cookies = mesmo nome, path e flags com `Max-Age=0`. Sem atributo `Domain` (host-only).
 

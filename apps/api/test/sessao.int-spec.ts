@@ -23,6 +23,40 @@ describe('Sessão', () => {
     await resetThrottle();
   });
 
+  it('Cookie de acesso vive o prazo do refresh para a navegação não cair no login', async () => {
+    const scenario = makeScenario(app);
+    const user = await scenario.createUser({ email: 'navegacao@teste.com' });
+
+    const maxAgeOf = (headers: Record<string, unknown>, name: string): string | undefined => {
+      const cookies = headers['set-cookie'] as string[];
+      const cookie = cookies.find((value) => value.startsWith(`${name}=`));
+      return /Max-Age=(\d+)/.exec(cookie ?? '')?.[1];
+    };
+
+    const loginRes = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ email: user.email, password: user.password })
+      .expect(200);
+
+    expect(maxAgeOf(loginRes.headers, 'refresh_token')).toBeDefined();
+    expect(maxAgeOf(loginRes.headers, 'access_token')).toBe(
+      maxAgeOf(loginRes.headers, 'refresh_token'),
+    );
+
+    const refreshCookie = scenario.cookieFrom(
+      loginRes.headers as Record<string, string | string[]>,
+      'refresh_token',
+    );
+    const refreshRes = await request(app.getHttpServer())
+      .post('/api/auth/refresh')
+      .set('Cookie', refreshCookie)
+      .expect(200);
+
+    expect(maxAgeOf(refreshRes.headers, 'access_token')).toBe(
+      maxAgeOf(refreshRes.headers, 'refresh_token'),
+    );
+  });
+
   it('Anônimo acessa rota protegida', async () => {
     const res = await request(app.getHttpServer()).get('/api/auth/me').expect(401);
 
