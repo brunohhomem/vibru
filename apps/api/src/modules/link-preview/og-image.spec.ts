@@ -16,6 +16,13 @@ describe('Busca do og:image', () => {
     }
   });
 
+  it('IPv4 embutido em IPv6 na forma hexadecimal, NAT64 ou compatível é bloqueado', () => {
+    // Um registro AAAA pode trazer o loopback em qualquer uma dessas formas.
+    for (const address of ['::ffff:7f00:1', '64:ff9b::7f00:1', '::7f00:1', '::ffff:a9fe:a9fe']) {
+      expect(isBlockedAddress(address), address).toBe(true);
+    }
+  });
+
   it('Endereço público passa', () => {
     expect(isBlockedAddress('93.184.216.34')).toBe(false);
     expect(isBlockedAddress('2606:2800::1')).toBe(false);

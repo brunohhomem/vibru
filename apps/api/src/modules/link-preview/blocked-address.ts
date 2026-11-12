@@ -13,8 +13,10 @@ const IPV4_BLOCKED: readonly [string, number][] = [
 ];
 
 const IPV6_BLOCKED: readonly [string, number][] = [
-  ['::', 128],
-  ['::1', 128],
+  // `::/96` cobre `::`, `::1` e o IPv4 compatível (`::7f00:1` é o loopback).
+  ['::', 96],
+  // NAT64: `64:ff9b::7f00:1` chega ao 127.0.0.1 numa rede com tradutor.
+  ['64:ff9b::', 96],
   ['fc00::', 7],
   ['fe80::', 10],
   ['ff00::', 8],
