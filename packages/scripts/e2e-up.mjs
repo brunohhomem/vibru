@@ -17,6 +17,9 @@ function childEnv() {
     NODE_ENV: 'development',
     WEB_ORIGIN,
     APP_ORIGIN: WEB_ORIGIN,
+    // O smoke entra com a senha fixa de desenvolvimento, não com a do .env pessoal.
+    ADMIN_INITIAL_PASSWORD: 'Admin@12345',
+    PARTNER_INITIAL_PASSWORD: 'Admin@12345',
   };
 }
 

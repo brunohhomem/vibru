@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import type { INestApplication } from '@nestjs/common';
 import type { CoupleResponse, ErrorResponse } from '@vibru/shared';
+import { resetEnvCache } from '../src/config/load-env';
 import { seedAdmin } from '../src/database/seed/admin.seed';
 import { closeTestApp, createTestApp, resetDatabase, resetThrottle } from './integration-utils';
 import {
@@ -189,5 +190,23 @@ describe('Casal', () => {
 
     expect(counts.rows[0]).toEqual({ couples: 1, members: 2 });
     expect(secondPasswords.rows).toEqual(firstPasswords.rows);
+  });
+
+  it('Seed em desenvolvimento usa a senha definida no .env', async () => {
+    const previousPassword = process.env.ADMIN_INITIAL_PASSWORD;
+    process.env.ADMIN_INITIAL_PASSWORD = 'SenhaDoEnv789';
+    resetEnvCache();
+
+    try {
+      await seedAdmin(getTestDb());
+    } finally {
+      process.env.ADMIN_INITIAL_PASSWORD = previousPassword;
+      resetEnvCache();
+    }
+
+    await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ email: 'admin@example.com', password: 'SenhaDoEnv789' })
+      .expect(200);
   });
 });

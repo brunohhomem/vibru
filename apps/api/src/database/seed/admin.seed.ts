@@ -172,8 +172,8 @@ async function resolvePassword(
   passwordHasher: PasswordHasher,
   explicitPassword: string | undefined,
 ): Promise<PasswordChoice> {
-  if (isDevelopment) return { password: 'Admin@12345', generated: false };
   if (explicitPassword) return { password: explicitPassword, generated: false };
+  if (isDevelopment) return { password: 'Admin@12345', generated: false };
 
   const generated = randomBytes(18)
     .toString('base64')

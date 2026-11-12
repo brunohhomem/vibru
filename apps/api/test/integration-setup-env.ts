@@ -10,6 +10,13 @@ import { getEnv, resetEnvCache } from '../src/config/load-env';
 process.env.NODE_ENV = 'test';
 process.env.MAIL_DRIVER = 'memory';
 
+// O seed lê o casal do .env; os testes entram com estes valores, então eles
+// não podem depender do e-mail e da senha que cada pessoa usa no próprio .env.
+process.env.ADMIN_EMAIL = 'admin@example.com';
+process.env.ADMIN_INITIAL_PASSWORD = 'Admin@12345';
+process.env.PARTNER_EMAIL = 'parceira@example.com';
+process.env.PARTNER_INITIAL_PASSWORD = 'Admin@12345';
+
 // Reseta o cache para forçar recarregamento com NODE_ENV=test
 resetEnvCache();
 
