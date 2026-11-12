@@ -28,7 +28,7 @@ function WishCover({ wish }: { wish: Wish }) {
   }
 
   return (
-    <div className="flex aspect-video w-full items-center justify-center rounded-t-xl bg-sand text-sand-foreground">
+    <div className="flex h-28 w-full items-center justify-center rounded-t-xl bg-sand text-sand-foreground">
       <WishCategoryIcon category={wish.category} className="size-10" />
     </div>
   );
