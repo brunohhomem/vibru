@@ -30,6 +30,7 @@ describe('Calendário da agenda', () => {
           startsOn: '2026-12-10',
           startTime: '20:30',
           notes: null,
+          wishId: null,
           createdAt: '',
         },
       ],

@@ -15,6 +15,8 @@ import { TasksModule } from '../src/modules/tasks/tasks.module';
 import { ListsModule } from '../src/modules/lists/lists.module';
 import { HealthRecordsModule } from '../src/modules/health/health-records.module';
 import { AgendaModule } from '../src/modules/agenda/agenda.module';
+import { WishesModule } from '../src/modules/wishes/wishes.module';
+import { GiftsModule } from '../src/modules/gifts/gifts.module';
 import { UsersModule } from '../src/modules/users/users.module';
 import { TestThrottlerController } from './test-throttler.controller';
 import { ZodValidationPipe } from '../src/common/pipes/zod-validation.pipe';
@@ -44,6 +46,8 @@ import Redis from 'ioredis';
     ListsModule,
     HealthRecordsModule,
     AgendaModule,
+    WishesModule,
+    GiftsModule,
     UsersModule,
     ThrottlerModule.forRootAsync({
       imports: [RedisModule.forRoot()],

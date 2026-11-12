@@ -1,6 +1,7 @@
 import { boolean, date, index, pgTable, text, time, uuid } from 'drizzle-orm/pg-core';
 import { coreColumns } from '../../database/columns/core-columns';
 import { couples } from '../couple/couple.entity';
+import { wishes } from '../wishes/wish.entity';
 
 function coupleColumn() {
   return uuid('couple_id')
@@ -17,9 +18,12 @@ export const agendaEvents = pgTable(
     startsOn: date('starts_on', { mode: 'string' }).notNull(),
     startTime: time('start_time'),
     notes: text('notes'),
+    // "Planejar" um desejo cria o evento ligado a ele (ADR 0003, 3.9).
+    wishId: uuid('wish_id').references(() => wishes.id, { onDelete: 'set null' }),
   },
   (table) => ({
     coupleStartsOnIdx: index('events_couple_id_starts_on_idx').on(table.coupleId, table.startsOn),
+    wishIdx: index('events_wish_id_idx').on(table.wishId),
   }),
 );
 

@@ -22,5 +22,6 @@ import { ImportantDatesService } from './important-dates.service';
     ImportantDatesService,
     IcsFeedService,
   ],
+  exports: [AgendaEventsService],
 })
 export class AgendaModule {}
