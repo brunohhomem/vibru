@@ -42,6 +42,7 @@ export const agendaEventSchema = z.object({
   startsOn: calendarDateSchema,
   startTime: taskDueTimeSchema.nullable(),
   notes: z.string().nullable(),
+  wishId: z.string().uuid().nullable(),
   createdAt: z.string(),
 });
 

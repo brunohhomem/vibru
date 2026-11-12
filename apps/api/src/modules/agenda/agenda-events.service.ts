@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type {
   AgendaEvent,
   CreateAgendaEventRequest,
+  PlanWishRequest,
   UpdateAgendaEventRequest,
 } from '@vibru/shared';
 import type { CurrentMemberContext } from '../couple/decorators/current-member.decorator';
@@ -17,6 +18,25 @@ export class AgendaEventsService {
   async create(member: CurrentMemberContext, data: CreateAgendaEventRequest): Promise<AgendaEvent> {
     const row = await this.repository.create({ ...data, coupleId: member.coupleId });
     return toAgendaEvent(row);
+  }
+
+  /** "Planejar" um desejo: o evento nasce com o título do desejo e fica ligado a ele. */
+  async createForWish(
+    member: CurrentMemberContext,
+    wish: { id: string; title: string },
+    data: PlanWishRequest,
+  ): Promise<AgendaEvent> {
+    const row = await this.repository.create({
+      ...data,
+      title: wish.title,
+      wishId: wish.id,
+      coupleId: member.coupleId,
+    });
+    return toAgendaEvent(row);
+  }
+
+  async detachWish(coupleId: string, wishId: string): Promise<void> {
+    await this.repository.detachWish(coupleId, wishId);
   }
 
   async update(

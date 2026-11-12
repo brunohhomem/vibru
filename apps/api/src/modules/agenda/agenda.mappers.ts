@@ -9,6 +9,7 @@ export function toAgendaEvent(row: AgendaEventRow): AgendaEvent {
     // O Postgres devolve HH:MM:SS; o contrato é HH:MM.
     startTime: row.startTime ? row.startTime.slice(0, 5) : null,
     notes: row.notes,
+    wishId: row.wishId,
     createdAt: row.createdAt.toISOString(),
   };
 }

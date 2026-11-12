@@ -62,6 +62,14 @@ export class AgendaEventsRepository {
     return result.length > 0;
   }
 
+  /** O desejo some em soft delete, então a FK `set null` não dispara: o vínculo sai aqui. */
+  async detachWish(coupleId: string, wishId: string): Promise<void> {
+    await this.db
+      .update(agendaEvents)
+      .set({ wishId: null })
+      .where(and(eq(agendaEvents.coupleId, coupleId), eq(agendaEvents.wishId, wishId)));
+  }
+
   private activeOfCouple(coupleId: string) {
     return and(eq(agendaEvents.coupleId, coupleId), eq(agendaEvents.isActive, true));
   }

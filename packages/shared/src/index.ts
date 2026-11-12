@@ -9,3 +9,4 @@ export * from './tasks';
 export * from './lists';
 export * from './health';
 export * from './agenda';
+export * from './wishes';
