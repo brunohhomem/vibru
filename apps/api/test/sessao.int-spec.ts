@@ -130,6 +130,37 @@ describe('Sessão', () => {
     await request(app.getHttpServer()).get('/api/auth/me').set('Cookie', secondCookies).expect(401);
   }, 20000);
 
+  it('Duas abas renovam a sessão ao mesmo tempo e a segunda não apaga os cookies novos', async () => {
+    const scenario = makeScenario(app);
+    const user = await scenario.createUser({ email: 'duas-abas@teste.com' });
+
+    const loginRes = await request(app.getHttpServer())
+      .post('/api/auth/login')
+      .send({ email: user.email, password: user.password })
+      .expect(200);
+    const refreshCookie = scenario.cookieFrom(
+      loginRes.headers as Record<string, string | string[]>,
+      'refresh_token',
+    );
+
+    await request(app.getHttpServer())
+      .post('/api/auth/refresh')
+      .set('Cookie', [refreshCookie])
+      .expect(200);
+
+    // Dentro da janela de tolerância, o refresh antigo responde 401 sem derrubar
+    // a família. Os cookies que a primeira aba acabou de receber continuam valendo.
+    const lateTab = await request(app.getHttpServer())
+      .post('/api/auth/refresh')
+      .set('Cookie', [refreshCookie])
+      .expect(401);
+
+    const cleared = ((lateTab.headers['set-cookie'] ?? []) as string[]).filter((cookie) =>
+      /Expires=Thu, 01 Jan 1970/.test(cookie),
+    );
+    expect(cleared).toEqual([]);
+  });
+
   it('Usuário faz logout e tenta renovar a sessão', async () => {
     const scenario = makeScenario(app);
     const user = await scenario.createUser({ email: 'logout@teste.com' });
