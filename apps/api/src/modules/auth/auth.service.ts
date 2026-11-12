@@ -20,6 +20,9 @@ import { UsersRepository } from './users.repository';
 import { PeopleRepository } from '../people/people.repository';
 import type { AuthUserResponse } from './auth-types';
 
+/** Refresh já rotacionado por outra aba dentro da janela de tolerância: a sessão segue viva. */
+class SupersededRefreshException extends UnauthorizedException {}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -221,13 +224,17 @@ export class AuthService {
   /**
    * Sessão que não renova não pode deixar cookie para trás: o middleware do web
    * vê o access_token, devolve o /login para o /app, e a navegação entra em
-   * loop. Só a falha de sessão (401) limpa; erro interno não derruba ninguém.
+   * loop. Só a falha de sessão (401) limpa; erro interno não derruba ninguém, e
+   * a aba que chega atrasada na janela de tolerância não apaga os cookies que a
+   * outra aba acabou de receber.
    */
   async refresh(refreshToken: string, res: Response): Promise<AuthUserResponse> {
     try {
       return await this.rotateSession(refreshToken, res);
     } catch (error) {
-      if (error instanceof UnauthorizedException) this.cookieService.clearAuthCookies(res);
+      const endsSession =
+        error instanceof UnauthorizedException && !(error instanceof SupersededRefreshException);
+      if (endsSession) this.cookieService.clearAuthCookies(res);
       throw error;
     }
   }
@@ -305,7 +312,7 @@ export class AuthService {
         });
       }
 
-      throw new UnauthorizedException({
+      throw new SupersededRefreshException({
         statusCode: 401,
         error: 'Unauthorized',
         message: 'Token de refresh já utilizado',
