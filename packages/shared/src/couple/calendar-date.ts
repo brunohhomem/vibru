@@ -92,6 +92,16 @@ export function daysBetween(from: CalendarDate, to: CalendarDate): number {
   return Math.round((end - start) / MILLISECONDS_PER_DAY);
 }
 
+/** Soma dias civis a uma data; o cálculo em UTC não sofre com horário de verão. */
+export function addDays(date: CalendarDate, days: number): CalendarDate {
+  const shifted = new Date(Date.UTC(...toUtcTuple(date)) + days * MILLISECONDS_PER_DAY);
+  return formatCalendarDate({
+    year: shifted.getUTCFullYear(),
+    month: shifted.getUTCMonth() + 1,
+    day: shifted.getUTCDate(),
+  });
+}
+
 function toUtcTuple(date: CalendarDate): [number, number, number] {
   const { year, month, day } = parseCalendarDate(date);
   return [year, month - 1, day];

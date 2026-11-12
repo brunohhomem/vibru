@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import {
   medicationProgressToday,
+  type AgendaUpcomingItem,
   type CoupleMember,
   type CoupleResponse,
   type ListSummary,
   type MedicationProgress,
   type TasksResponse,
+  type Wish,
 } from '@vibru/shared';
 import { ChevronRight, Pill } from 'lucide-react';
 import { ErrorState } from '@/components/ui/screen-state';
@@ -23,8 +25,12 @@ import {
   daysUntilLabel,
   formatLongDate,
   formatSinceDate,
+  nextDateLabel,
   yearsLabel,
 } from '@/features/home/lib/home-format';
+import { useAgendaUpcoming } from '@/features/agenda/hooks/use-agenda-upcoming';
+import { pickDateIdea } from '@/features/home/lib/pick-date-idea';
+import { useWishes } from '@/features/wishes/hooks/use-wishes';
 import { cn } from '@/lib/cn';
 
 type WeddingAnniversary = NonNullable<CoupleResponse['nextWeddingAnniversary']>;
@@ -133,6 +139,61 @@ function DatingTile({ anniversary }: { anniversary: DatingAnniversary }) {
   );
 }
 
+function NextDateTile({ item }: { item: AgendaUpcomingItem }) {
+  const isCoupleDate = item.kind === 'wedding' || item.kind === 'dating';
+
+  return (
+    <Link
+      href="/app/agenda"
+      className={cn(
+        'flex flex-col justify-between gap-3 rounded-xl p-4 transition-opacity hover:opacity-90',
+        isCoupleDate ? 'bg-sand text-sand-foreground' : 'border border-border bg-card',
+      )}
+    >
+      <p
+        className={cn(
+          'text-xs font-medium tracking-wide uppercase',
+          isCoupleDate ? 'opacity-80' : 'text-muted-foreground',
+        )}
+      >
+        Próxima data
+      </p>
+      <div>
+        <p className="line-clamp-2 font-display text-lg font-semibold break-words">{item.title}</p>
+        <p className={cn('text-sm', isCoupleDate ? undefined : 'text-muted-foreground')}>
+          {nextDateLabel(item.date, item.daysUntil)}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
+function DateIdeaTile({ wish }: { wish: Wish }) {
+  return (
+    <Link
+      href="/app/wishes?categoria=date_idea"
+      className="flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-colors hover:bg-accent"
+    >
+      {wish.imageUrl ? (
+        // A imagem vem de outro site: sem Referer, a loja não sabe de onde veio a visita.
+        <img
+          src={wish.imageUrl}
+          alt=""
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          className="h-20 w-full object-cover"
+        />
+      ) : null}
+      <div className="flex flex-1 flex-col justify-between gap-3 p-4">
+        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+          Ideia de rolê
+        </p>
+        <p className="line-clamp-3 font-display text-lg font-semibold break-words">{wish.title}</p>
+      </div>
+    </Link>
+  );
+}
+
 /** Primeira lista (a de atividade mais recente) que ainda tem item aberto. */
 function findListInProgress(lists: ListSummary[]): ListSummary | undefined {
   return lists.find((list) => list.totalItems > list.checkedItems);
@@ -195,6 +256,8 @@ export function HomeScreen() {
   const couple = useCouple();
   const tasks = useTasks();
   const lists = useLists();
+  const upcoming = useAgendaUpcoming();
+  const openWishes = useWishes({ status: 'open' });
 
   if (couple.isPending) return <HomeSkeleton />;
 
@@ -211,6 +274,7 @@ export function HomeScreen() {
   const data = couple.data;
   const me = data.members.find((member) => member.isMe);
   const listInProgress = lists.data ? findListInProgress(lists.data.lists) : undefined;
+  const dateIdea = openWishes.data ? pickDateIdea(openWishes.data.wishes) : undefined;
   const medicationProgress = tasks.data ? medicationProgressToday(tasks.data, data.today) : null;
 
   return (
@@ -223,7 +287,7 @@ export function HomeScreen() {
           {formatLongDate(data.today)}
         </p>
       </header>
-      <div className="grid auto-rows-[minmax(9rem,auto)] grid-cols-2 gap-2 lg:grid-cols-4">
+      <div className="grid grid-flow-dense auto-rows-[minmax(9rem,auto)] grid-cols-2 gap-2 lg:grid-cols-4">
         <MarriedTile couple={data} />
         {data.members.map((member) => (
           <MemberTile
@@ -234,7 +298,9 @@ export function HomeScreen() {
             }
           />
         ))}
+        {upcoming.data?.next ? <NextDateTile item={upcoming.data.next} /> : null}
         {listInProgress ? <ListInProgressTile list={listInProgress} /> : null}
+        {dateIdea ? <DateIdeaTile wish={dateIdea} /> : null}
         {data.nextWeddingAnniversary ? (
           <WeddingTile anniversary={data.nextWeddingAnniversary} />
         ) : null}

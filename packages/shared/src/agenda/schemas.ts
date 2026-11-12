@@ -86,6 +86,19 @@ export const agendaResponseSchema = z.object({
   anniversaries: z.array(agendaAnniversarySchema),
 });
 
+/** A data mais próxima entre hoje e daqui a 365 dias, para o bloco "Próxima data" da home. */
+export const agendaUpcomingResponseSchema = z.object({
+  today: calendarDateSchema,
+  next: z
+    .object({
+      kind: z.enum(['event', 'important_date', 'wedding', 'dating']),
+      date: calendarDateSchema,
+      title: z.string(),
+      daysUntil: z.number().int().nonnegative(),
+    })
+    .nullable(),
+});
+
 export const icsFeedStatusSchema = z.object({ active: z.boolean() });
 
 /** O caminho só existe nesta resposta: o banco guarda apenas o hash do token. */
@@ -100,5 +113,7 @@ export type CreateImportantDateRequest = z.infer<typeof createImportantDateReque
 export type UpdateImportantDateRequest = z.infer<typeof updateImportantDateRequestSchema>;
 export type AgendaAnniversary = z.infer<typeof agendaAnniversarySchema>;
 export type AgendaResponse = z.infer<typeof agendaResponseSchema>;
+export type AgendaUpcomingResponse = z.infer<typeof agendaUpcomingResponseSchema>;
+export type AgendaUpcomingItem = NonNullable<AgendaUpcomingResponse['next']>;
 export type IcsFeedStatus = z.infer<typeof icsFeedStatusSchema>;
 export type IcsFeedCreated = z.infer<typeof icsFeedCreatedSchema>;
