@@ -57,6 +57,30 @@ describe('Sessão', () => {
     );
   });
 
+  it('Navegador com cookies de sessão estranhos renova e tem os cookies apagados', async () => {
+    const clearedCookies = (headers: Record<string, unknown>): string[] =>
+      ((headers['set-cookie'] ?? []) as string[])
+        .filter((cookie) => /Expires=Thu, 01 Jan 1970/.test(cookie))
+        .map((cookie) => cookie.split('=')[0] ?? '');
+
+    // Cookie de localhost vale para todas as portas: outro projeto local com o
+    // mesmo nome de cookie, ou uma sessão de um banco recriado, chega aqui.
+    const onlyAccess = await request(app.getHttpServer())
+      .post('/api/auth/refresh')
+      .set('Cookie', 'access_token=jwt-de-outro-projeto')
+      .expect(401);
+    const bothForeign = await request(app.getHttpServer())
+      .post('/api/auth/refresh')
+      .set('Cookie', 'access_token=jwt-de-outro-projeto; refresh_token=refresh-desconhecido')
+      .expect(401);
+
+    for (const res of [onlyAccess, bothForeign]) {
+      expect(clearedCookies(res.headers)).toEqual(
+        expect.arrayContaining(['access_token', 'refresh_token']),
+      );
+    }
+  });
+
   it('Anônimo acessa rota protegida', async () => {
     const res = await request(app.getHttpServer()).get('/api/auth/me').expect(401);
 

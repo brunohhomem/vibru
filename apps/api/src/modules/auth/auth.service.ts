@@ -218,7 +218,21 @@ export class AuthService {
     };
   }
 
+  /**
+   * Sessão que não renova não pode deixar cookie para trás: o middleware do web
+   * vê o access_token, devolve o /login para o /app, e a navegação entra em
+   * loop. Só a falha de sessão (401) limpa; erro interno não derruba ninguém.
+   */
   async refresh(refreshToken: string, res: Response): Promise<AuthUserResponse> {
+    try {
+      return await this.rotateSession(refreshToken, res);
+    } catch (error) {
+      if (error instanceof UnauthorizedException) this.cookieService.clearAuthCookies(res);
+      throw error;
+    }
+  }
+
+  private async rotateSession(refreshToken: string, res: Response): Promise<AuthUserResponse> {
     if (!refreshToken) {
       throw new UnauthorizedException({
         statusCode: 401,
