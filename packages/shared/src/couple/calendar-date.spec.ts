@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { daysBetween, elapsedParts, nextAnnualOccurrence, todayInSaoPaulo } from './calendar-date';
+import {
+  addDays,
+  daysBetween,
+  elapsedParts,
+  nextAnnualOccurrence,
+  todayInSaoPaulo,
+} from './calendar-date';
 
 describe('todayInSaoPaulo', () => {
   it('usa o dia anterior quando em UTC já virou o dia', () => {
@@ -23,6 +29,16 @@ describe('daysBetween', () => {
 
   it('devolve zero para o mesmo dia', () => {
     expect(daysBetween('2026-10-28', '2026-10-28')).toBe(0);
+  });
+});
+
+describe('addDays', () => {
+  it('atravessa o fim do ano', () => {
+    expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
+  });
+
+  it('volta dias e cai no 29/02 do ano bissexto', () => {
+    expect(addDays('2028-03-01', -1)).toBe('2028-02-29');
   });
 });
 

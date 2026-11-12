@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import {
+  addDays,
   annualOccurrenceInYear,
   bodasName,
+  daysBetween,
   daysInMonth,
   parseCalendarDate,
   todayInSaoPaulo,
   type AgendaAnniversary,
   type AgendaEvent,
   type AgendaResponse,
+  type AgendaUpcomingItem,
+  type AgendaUpcomingResponse,
   type CalendarDate,
   type ImportantDateOccurrence,
 } from '@vibru/shared';
@@ -88,6 +92,48 @@ function byDate(left: { date: CalendarDate }, right: { date: CalendarDate }): nu
   return left.date.localeCompare(right.date);
 }
 
+const UPCOMING_WINDOW_DAYS = 365;
+
+/** No mesmo dia, a data do casal vem antes da data importante, que vem antes do evento. */
+function sameDayPriority(kind: AgendaUpcomingItem['kind']): number {
+  switch (kind) {
+    case 'wedding':
+      return 0;
+    case 'dating':
+      return 1;
+    case 'important_date':
+      return 2;
+    case 'event':
+      return 3;
+  }
+}
+
+type UpcomingCandidate = AgendaUpcomingItem & { startTime: string | null };
+
+function upcomingCandidates(entries: CalendarEntries, today: CalendarDate): UpcomingCandidate[] {
+  const candidate = (
+    kind: AgendaUpcomingItem['kind'],
+    date: CalendarDate,
+    title: string,
+    startTime: string | null = null,
+  ): UpcomingCandidate => ({ kind, date, title, daysUntil: daysBetween(today, date), startTime });
+
+  return [
+    ...entries.anniversaries.map((item) => candidate(item.kind, item.date, item.title)),
+    ...entries.importantDates.map((item) => candidate('important_date', item.date, item.title)),
+    ...entries.events.map((item) => candidate('event', item.startsOn, item.title, item.startTime)),
+  ];
+}
+
+/** Evento sem horário vale o dia todo, então vem antes do evento com horário. */
+function bySoonest(left: UpcomingCandidate, right: UpcomingCandidate): number {
+  return (
+    left.date.localeCompare(right.date) ||
+    sameDayPriority(left.kind) - sameDayPriority(right.kind) ||
+    (left.startTime ?? '').localeCompare(right.startTime ?? '')
+  );
+}
+
 /** Reúne o que aparece no calendário do casal; a tela do mês e o feed ICS usam a mesma fonte. */
 @Injectable()
 export class AgendaCalendarService {
@@ -109,6 +155,19 @@ export class AgendaCalendarService {
       today: todayInSaoPaulo(new Date()),
       ...(await this.listBetween(member.coupleId, range)),
     };
+  }
+
+  async getUpcoming(member: CurrentMemberContext): Promise<AgendaUpcomingResponse> {
+    const today = todayInSaoPaulo(new Date());
+    const entries = await this.listBetween(member.coupleId, {
+      from: today,
+      to: addDays(today, UPCOMING_WINDOW_DAYS),
+    });
+    const soonest = upcomingCandidates(entries, today).sort(bySoonest)[0];
+    if (!soonest) return { today, next: null };
+
+    const { kind, date, title, daysUntil } = soonest;
+    return { today, next: { kind, date, title, daysUntil } };
   }
 
   async listBetween(coupleId: string, range: DateRange): Promise<CalendarEntries> {

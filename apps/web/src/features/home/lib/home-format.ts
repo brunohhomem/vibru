@@ -36,6 +36,18 @@ export function daysUntilLabel(daysUntil: number): string {
   return `em ${daysUntil} dias`;
 }
 
+const dayAndMonth = new Intl.DateTimeFormat('pt-BR', {
+  day: 'numeric',
+  month: 'long',
+  timeZone: 'UTC',
+});
+
+export function nextDateLabel(calendarDate: CalendarDate, daysUntil: number): string {
+  if (daysUntil === 0) return 'Hoje';
+  if (daysUntil === 1) return 'Amanhã';
+  return `${dayAndMonth.format(noonUtc(calendarDate))} · ${daysUntilLabel(daysUntil)}`;
+}
+
 export function countLabel(count: number, singular: string, plural: string): string {
   return `${count} ${count === 1 ? singular : plural}`;
 }

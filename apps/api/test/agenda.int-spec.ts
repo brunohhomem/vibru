@@ -1,8 +1,14 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import type { AgendaEvent, AgendaResponse, ErrorResponse, IcsFeedCreated } from '@vibru/shared';
-import { bodasName, todayInSaoPaulo } from '@vibru/shared';
+import type {
+  AgendaEvent,
+  AgendaResponse,
+  AgendaUpcomingResponse,
+  ErrorResponse,
+  IcsFeedCreated,
+} from '@vibru/shared';
+import { addDays, bodasName, todayInSaoPaulo } from '@vibru/shared';
 import {
   isRouteExcludedFromRequestLog,
   redactIcsToken,
@@ -374,5 +380,81 @@ describe('Agenda', () => {
     expect(stored.rows[0]?.icsTokenHash).not.toContain(token);
     expect(isRouteExcludedFromRequestLog(feedPath)).toBe(true);
     expect(redactIcsToken(feedPath)).not.toContain(token);
+  });
+
+  describe('Próxima data', () => {
+    const today = () => todayInSaoPaulo(new Date());
+
+    async function getUpcoming(couple: CoupleScenario): Promise<AgendaUpcomingResponse> {
+      const res = await couple.blue.agent.get('/api/agenda/upcoming').expect(200);
+      return res.body as AgendaUpcomingResponse;
+    }
+
+    it('Próxima data é o aniversário de amanhã', async () => {
+      const couple = await makeScenario(app).createCouple({});
+      const tomorrow = addDays(today(), 1);
+      await couple.blue.agent
+        .post('/api/agenda/important-dates')
+        .send({ title: 'Aniversário da Ana', occursOn: tomorrow, repeatsYearly: true })
+        .expect(201);
+      await couple.blue.agent
+        .post('/api/agenda/events')
+        .send({ title: 'Depois', startsOn: addDays(today(), 3) })
+        .expect(201);
+
+      const upcoming = await getUpcoming(couple);
+      expect(upcoming.today).toBe(today());
+      expect(upcoming.next).toEqual({
+        kind: 'important_date',
+        date: tomorrow,
+        title: 'Aniversário da Ana',
+        daysUntil: 1,
+      });
+    });
+
+    it('Evento hoje', async () => {
+      const couple = await makeScenario(app).createCouple({});
+      await couple.blue.agent
+        .post('/api/agenda/events')
+        .send({ title: 'Piquenique', startsOn: today(), startTime: '19:00' })
+        .expect(201);
+
+      expect((await getUpcoming(couple)).next).toMatchObject({
+        kind: 'event',
+        title: 'Piquenique',
+        daysUntil: 0,
+      });
+    });
+
+    it('No mesmo dia, bodas vêm antes do evento e o evento sem horário antes do com horário', async () => {
+      const fiveYearsAgo = `${Number(today().slice(0, 4)) - 5}${today().slice(4)}`;
+      const couple = await makeScenario(app).createCouple({ marriedOn: fiveYearsAgo });
+      const eventsAt = async (startTime: string | null, title: string) =>
+        couple.blue.agent
+          .post('/api/agenda/events')
+          .send({ title, startsOn: today(), startTime })
+          .expect(201);
+      await eventsAt('08:00', 'Com horário');
+      await eventsAt(null, 'Sem horário');
+
+      expect((await getUpcoming(couple)).next).toMatchObject({ kind: 'wedding', daysUntil: 0 });
+
+      await couple.blue.agent.patch('/api/couple').send({ marriedOn: null }).expect(200);
+      expect((await getUpcoming(couple)).next?.title).toBe('Sem horário');
+    });
+
+    it('Nada nos próximos 365 dias', async () => {
+      const couple = await makeScenario(app).createCouple({});
+      await couple.blue.agent
+        .post('/api/agenda/events')
+        .send({ title: 'Longe', startsOn: addDays(today(), 366) })
+        .expect(201);
+      await couple.blue.agent
+        .post('/api/agenda/events')
+        .send({ title: 'Passou', startsOn: addDays(today(), -1) })
+        .expect(201);
+
+      expect(await getUpcoming(couple)).toEqual({ today: today(), next: null });
+    });
   });
 });

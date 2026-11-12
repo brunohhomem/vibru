@@ -57,6 +57,11 @@ export class AgendaController {
     return this.calendarService.getMonth(member, month);
   }
 
+  @Get('upcoming')
+  async getUpcoming(@CurrentMember() member: CurrentMemberContext) {
+    return this.calendarService.getUpcoming(member);
+  }
+
   @Post('events')
   async createEvent(
     @Body(new ZodValidationPipe(createAgendaEventRequestSchema)) body: CreateAgendaEventRequest,

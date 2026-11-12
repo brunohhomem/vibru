@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import {
   medicationProgressToday,
+  type AgendaUpcomingItem,
   type CoupleMember,
   type CoupleResponse,
   type ListSummary,
@@ -23,8 +24,10 @@ import {
   daysUntilLabel,
   formatLongDate,
   formatSinceDate,
+  nextDateLabel,
   yearsLabel,
 } from '@/features/home/lib/home-format';
+import { useAgendaUpcoming } from '@/features/agenda/hooks/use-agenda-upcoming';
 import { cn } from '@/lib/cn';
 
 type WeddingAnniversary = NonNullable<CoupleResponse['nextWeddingAnniversary']>;
@@ -133,6 +136,35 @@ function DatingTile({ anniversary }: { anniversary: DatingAnniversary }) {
   );
 }
 
+function NextDateTile({ item }: { item: AgendaUpcomingItem }) {
+  const isCoupleDate = item.kind === 'wedding' || item.kind === 'dating';
+
+  return (
+    <Link
+      href="/app/agenda"
+      className={cn(
+        'flex flex-col justify-between gap-3 rounded-xl p-4 transition-opacity hover:opacity-90',
+        isCoupleDate ? 'bg-sand text-sand-foreground' : 'border border-border bg-card',
+      )}
+    >
+      <p
+        className={cn(
+          'text-xs font-medium tracking-wide uppercase',
+          isCoupleDate ? 'opacity-80' : 'text-muted-foreground',
+        )}
+      >
+        Próxima data
+      </p>
+      <div>
+        <p className="line-clamp-2 font-display text-lg font-semibold break-words">{item.title}</p>
+        <p className={cn('text-sm', isCoupleDate ? undefined : 'text-muted-foreground')}>
+          {nextDateLabel(item.date, item.daysUntil)}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
 /** Primeira lista (a de atividade mais recente) que ainda tem item aberto. */
 function findListInProgress(lists: ListSummary[]): ListSummary | undefined {
   return lists.find((list) => list.totalItems > list.checkedItems);
@@ -195,6 +227,7 @@ export function HomeScreen() {
   const couple = useCouple();
   const tasks = useTasks();
   const lists = useLists();
+  const upcoming = useAgendaUpcoming();
 
   if (couple.isPending) return <HomeSkeleton />;
 
@@ -234,6 +267,7 @@ export function HomeScreen() {
             }
           />
         ))}
+        {upcoming.data?.next ? <NextDateTile item={upcoming.data.next} /> : null}
         {listInProgress ? <ListInProgressTile list={listInProgress} /> : null}
         {data.nextWeddingAnniversary ? (
           <WeddingTile anniversary={data.nextWeddingAnniversary} />
