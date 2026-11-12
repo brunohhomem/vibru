@@ -9,6 +9,7 @@ import {
   type ListSummary,
   type MedicationProgress,
   type TasksResponse,
+  type Wish,
 } from '@vibru/shared';
 import { ChevronRight, Pill } from 'lucide-react';
 import { ErrorState } from '@/components/ui/screen-state';
@@ -28,6 +29,8 @@ import {
   yearsLabel,
 } from '@/features/home/lib/home-format';
 import { useAgendaUpcoming } from '@/features/agenda/hooks/use-agenda-upcoming';
+import { pickDateIdea } from '@/features/home/lib/pick-date-idea';
+import { useWishes } from '@/features/wishes/hooks/use-wishes';
 import { cn } from '@/lib/cn';
 
 type WeddingAnniversary = NonNullable<CoupleResponse['nextWeddingAnniversary']>;
@@ -165,6 +168,32 @@ function NextDateTile({ item }: { item: AgendaUpcomingItem }) {
   );
 }
 
+function DateIdeaTile({ wish }: { wish: Wish }) {
+  return (
+    <Link
+      href="/app/wishes?categoria=date_idea"
+      className="flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-colors hover:bg-accent"
+    >
+      {wish.imageUrl ? (
+        // A imagem vem de outro site: sem Referer, a loja não sabe de onde veio a visita.
+        <img
+          src={wish.imageUrl}
+          alt=""
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          className="h-20 w-full object-cover"
+        />
+      ) : null}
+      <div className="flex flex-1 flex-col justify-between gap-3 p-4">
+        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+          Ideia de rolê
+        </p>
+        <p className="line-clamp-3 font-display text-lg font-semibold break-words">{wish.title}</p>
+      </div>
+    </Link>
+  );
+}
+
 /** Primeira lista (a de atividade mais recente) que ainda tem item aberto. */
 function findListInProgress(lists: ListSummary[]): ListSummary | undefined {
   return lists.find((list) => list.totalItems > list.checkedItems);
@@ -228,6 +257,7 @@ export function HomeScreen() {
   const tasks = useTasks();
   const lists = useLists();
   const upcoming = useAgendaUpcoming();
+  const openWishes = useWishes({ status: 'open' });
 
   if (couple.isPending) return <HomeSkeleton />;
 
@@ -244,6 +274,7 @@ export function HomeScreen() {
   const data = couple.data;
   const me = data.members.find((member) => member.isMe);
   const listInProgress = lists.data ? findListInProgress(lists.data.lists) : undefined;
+  const dateIdea = openWishes.data ? pickDateIdea(openWishes.data.wishes) : undefined;
   const medicationProgress = tasks.data ? medicationProgressToday(tasks.data, data.today) : null;
 
   return (
@@ -269,6 +300,7 @@ export function HomeScreen() {
         ))}
         {upcoming.data?.next ? <NextDateTile item={upcoming.data.next} /> : null}
         {listInProgress ? <ListInProgressTile list={listInProgress} /> : null}
+        {dateIdea ? <DateIdeaTile wish={dateIdea} /> : null}
         {data.nextWeddingAnniversary ? (
           <WeddingTile anniversary={data.nextWeddingAnniversary} />
         ) : null}
