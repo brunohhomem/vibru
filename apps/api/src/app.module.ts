@@ -17,6 +17,7 @@ import { ListsModule } from './modules/lists/lists.module';
 import { HealthRecordsModule } from './modules/health/health-records.module';
 import { AgendaModule } from './modules/agenda/agenda.module';
 import { WishesModule } from './modules/wishes/wishes.module';
+import { GiftsModule } from './modules/gifts/gifts.module';
 import { UsersModule } from './modules/users/users.module';
 import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
@@ -47,6 +48,7 @@ import Redis from 'ioredis';
     HealthRecordsModule,
     AgendaModule,
     WishesModule,
+    GiftsModule,
     UsersModule,
     ThrottlerModule.forRootAsync({
       imports: [RedisModule.forRoot()],

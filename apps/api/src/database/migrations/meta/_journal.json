@@ -120,6 +120,13 @@
       "when": 1794497029288,
       "tag": "0016_create_wishes",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794497413512,
+      "tag": "0017_create_gifts",
+      "breakpoints": true
     }
   ]
 }
