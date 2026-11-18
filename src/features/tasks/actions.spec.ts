@@ -138,6 +138,7 @@ describe('completeTaskAction', () => {
       ok: false,
       message: 'Tarefa não encontrada',
     });
+    expect(mocks.findActiveTaskById).toHaveBeenCalledWith('couple-1', TASK_ID);
     expect(mocks.completeTaskIfOpen).not.toHaveBeenCalled();
   });
 });
@@ -174,7 +175,34 @@ describe('createTaskAction', () => {
     });
 
     expect(result).toMatchObject({ ok: false, field: 'assigneeMemberId' });
+    expect(mocks.findCoupleMembers).toHaveBeenCalledWith('couple-1');
     expect(mocks.insertTask).not.toHaveBeenCalled();
+  });
+
+  it('recorrência sem prazo volta com o campo do prazo e a mensagem em português', async () => {
+    const result = await createTaskAction({
+      title: 'Regar as plantas',
+      assigneeMemberId: null,
+      recurrence: { kind: 'daily', interval: 1 },
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      code: 'invalid_input',
+      message: 'Tarefa recorrente precisa de prazo',
+      field: 'dueOn',
+    });
+    expect(mocks.insertTask).not.toHaveBeenCalled();
+  });
+
+  it('grava a tarefa sempre no casal do membro', async () => {
+    mocks.insertTask.mockImplementation(async (data: Record<string, unknown>) => openTask(data));
+
+    await createTaskAction({ title: 'Comprar pão', assigneeMemberId: MEMBER_ID });
+
+    expect(mocks.insertTask).toHaveBeenCalledWith(
+      expect.objectContaining({ coupleId: 'couple-1' }),
+    );
   });
 
   it('recusa horário sem prazo, no campo do horário', async () => {
@@ -200,6 +228,50 @@ describe('updateTaskAction', () => {
     expect(await updateTaskAction({ id: TASK_ID, patch: { notes: 'com água' } })).toMatchObject({
       ok: true,
     });
+  });
+
+  it('recusa responsável de outro casal na edição, conferindo o casal do membro', async () => {
+    const result = await updateTaskAction({
+      id: TASK_ID,
+      patch: { assigneeMemberId: '0194c5e0-0000-7000-8000-0000000000ff' },
+    });
+
+    expect(result).toMatchObject({ ok: false, field: 'assigneeMemberId' });
+    expect(mocks.findCoupleMembers).toHaveBeenCalledWith('couple-1');
+    expect(mocks.updateTask).not.toHaveBeenCalled();
+  });
+
+  it('responsável nulo na edição é aceito e gravado como "nós"', async () => {
+    mocks.updateTask.mockResolvedValue(openTask());
+
+    await updateTaskAction({ id: TASK_ID, patch: { assigneeMemberId: null } });
+
+    expect(mocks.findCoupleMembers).not.toHaveBeenCalled();
+    expect(mocks.updateTask).toHaveBeenCalledWith(
+      'couple-1',
+      TASK_ID,
+      expect.objectContaining({ assigneeMemberId: null }),
+    );
+  });
+
+  it('limpar o prazo de uma tarefa recorrente é recusado, no campo do prazo', async () => {
+    mocks.findActiveTaskById.mockResolvedValue(
+      openTask({ recurrenceKind: 'weekly', recurrenceAnchorOn: '2026-10-10' }),
+    );
+
+    const result = await updateTaskAction({ id: TASK_ID, patch: { dueOn: null } });
+
+    expect(result).toMatchObject({ ok: false, field: 'dueOn' });
+    expect(mocks.updateTask).not.toHaveBeenCalled();
+  });
+
+  it('horário em tarefa sem prazo é recusado, no campo do horário', async () => {
+    mocks.findActiveTaskById.mockResolvedValue(openTask({ dueOn: null }));
+
+    const result = await updateTaskAction({ id: TASK_ID, patch: { dueTime: '09:00' } });
+
+    expect(result).toMatchObject({ ok: false, field: 'dueTime' });
+    expect(mocks.updateTask).not.toHaveBeenCalled();
   });
 
   it('limpar o prazo de uma tarefa com horário limpa o horário junto', async () => {

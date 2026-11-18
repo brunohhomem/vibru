@@ -27,6 +27,26 @@ export function toFailureResult(error: unknown): Extract<ActionResult<never>, { 
   return { ok: false, code: 'failed', message: 'Não foi possível concluir a ação.' };
 }
 
+const INVALID_INPUT_MESSAGE = 'Dados inválidos.';
+
+/**
+ * Resultado para dado que não passou no zod. Aponta o campo do primeiro problema;
+ * a mensagem do schema só vale quando é de uma regra própria (`custom`), porque as
+ * mensagens padrão do zod são em inglês e técnicas demais para o usuário.
+ */
+export function toInvalidInputResult(
+  error: z.ZodError,
+): Extract<ActionResult<never>, { ok: false }> {
+  const [issue] = error.issues;
+  const [firstPathSegment] = issue?.path ?? [];
+  return {
+    ok: false,
+    code: 'invalid_input',
+    message: issue?.code === 'custom' ? issue.message : INVALID_INPUT_MESSAGE,
+    field: typeof firstPathSegment === 'string' ? firstPathSegment : undefined,
+  };
+}
+
 type ActionConfig<TInput, TData> = {
   schema: z.ZodType<TInput>;
   handler: (context: { input: TInput; userId: string }) => Promise<TData>;
@@ -43,7 +63,7 @@ export function defineAction<TInput, TData>(config: ActionConfig<TInput, TData>)
     if (!userId) return { ok: false, code: 'unauthenticated', message: 'Sessão expirada.' };
 
     const parsed = config.schema.safeParse(rawInput);
-    if (!parsed.success) return { ok: false, code: 'invalid_input', message: 'Dados inválidos.' };
+    if (!parsed.success) return toInvalidInputResult(parsed.error);
 
     try {
       return { ok: true, data: await config.handler({ input: parsed.data, userId }) };

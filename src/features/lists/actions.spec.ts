@@ -101,6 +101,8 @@ describe('checkListItemAction', () => {
       ok: false,
       message: 'Item não encontrado',
     });
+    expect(mocks.findActiveList).toHaveBeenCalledWith('couple-1', LIST_ID);
+    expect(mocks.findActiveListItem).toHaveBeenCalledWith('couple-1', LIST_ID, ITEM_ID);
     expect(mocks.checkListItemIfOpen).not.toHaveBeenCalled();
   });
 });
