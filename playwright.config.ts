@@ -6,7 +6,7 @@ function readWorkspaceEmail(key: string, fallback: string): string {
   const fromProcess = process.env[key]?.trim();
   if (fromProcess) return fromProcess;
 
-  const envPath = path.resolve(__dirname, '../../.env');
+  const envPath = path.resolve(__dirname, '.env');
   if (!existsSync(envPath)) return fallback;
 
   const prefix = `${key}=`;
@@ -45,7 +45,7 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: 'node ../../packages/scripts/e2e-up.mjs',
+      command: 'node ./legacy/scripts/e2e-up.mjs',
       cwd: '.',
       url: 'http://127.0.0.1:3101/api/health',
       timeout: 120_000,

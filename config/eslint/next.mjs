@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import nextConfig from 'eslint-config-next';
 import baseConfig from './base.mjs';
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
 const useClientRestriction = {
   selector: 'ExpressionStatement[directive="use client"]',
@@ -28,11 +28,6 @@ const webBoundaries = [
         '!src/**/hooks/**',
         '!src/**/components/ui/**',
       ]),
-      group('apps/web/src/**/*.tsx', [
-        '!apps/web/src/**/*.client.tsx',
-        '!apps/web/src/**/hooks/**',
-        '!apps/web/src/**/components/ui/**',
-      ]),
     ],
     rules: {
       'no-restricted-syntax': ['error', useClientRestriction, hookRestriction],
@@ -46,15 +41,6 @@ const webBoundaries = [
         '!src/**/components/ui/**',
       ]),
       group('src/**/hooks/**/*.tsx', ['!src/**/*.client.tsx', '!src/**/components/ui/**']),
-      group('apps/web/src/**/hooks/**/*.ts', [
-        '!apps/web/src/**/*.tsx',
-        '!apps/web/src/**/*.client.ts',
-        '!apps/web/src/**/components/ui/**',
-      ]),
-      group('apps/web/src/**/hooks/**/*.tsx', [
-        '!apps/web/src/**/*.client.tsx',
-        '!apps/web/src/**/components/ui/**',
-      ]),
     ],
     rules: {
       'no-restricted-syntax': ['error', useClientRestriction],
@@ -67,12 +53,6 @@ const webBoundaries = [
         '!src/**/*.client.ts',
         '!src/**/hooks/**',
         '!src/**/components/ui/**',
-      ]),
-      group('apps/web/src/**/*.ts', [
-        '!apps/web/src/**/*.tsx',
-        '!apps/web/src/**/*.client.ts',
-        '!apps/web/src/**/hooks/**',
-        '!apps/web/src/**/components/ui/**',
       ]),
     ],
     rules: {
@@ -89,7 +69,7 @@ const webConfig = [
   {
     settings: {
       next: {
-        rootDir: path.join(repoRoot, 'apps/web'),
+        rootDir: repoRoot,
       },
     },
   },

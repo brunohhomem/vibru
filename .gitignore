@@ -6,7 +6,7 @@ coverage/
 *.tsbuildinfo
 
 # Amostras geradas pelo teste de lint. O diretório é recriado a cada execução.
-packages/config/eslint/fixtures/apps/
+config/eslint/fixtures/apps/
 
 .env*
 !.env.example
@@ -20,7 +20,7 @@ test-output.txt
 test-results/
 playwright-report/
 blob-report/
-apps/web/screenshots/
+screenshots/
 
 # Workspace de execução de planos
 .superpowers/
