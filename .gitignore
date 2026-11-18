@@ -21,3 +21,6 @@ test-results/
 playwright-report/
 blob-report/
 apps/web/screenshots/
+
+# Workspace de execução de planos
+.superpowers/
