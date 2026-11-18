@@ -12,8 +12,14 @@ const mocks = vi.hoisted(() => ({
   clearTaskCompletion: vi.fn(),
   findOpenGeneratedChild: vi.fn(),
   hardDeleteTask: vi.fn(),
+  consumeDose: vi.fn(),
+  returnDose: vi.fn(),
 }));
 
+vi.mock('@/features/health/medication-stock-operations', () => ({
+  consumeDose: mocks.consumeDose,
+  returnDose: mocks.returnDose,
+}));
 vi.mock('@/lib/session', () => ({ readSessionUserId: mocks.readSessionUserId }));
 vi.mock('@/features/couple/membership', () => ({
   findMemberContextByUserId: mocks.findMemberContextByUserId,
@@ -140,6 +146,54 @@ describe('completeTaskAction', () => {
     });
     expect(mocks.findActiveTaskById).toHaveBeenCalledWith('couple-1', TASK_ID);
     expect(mocks.completeTaskIfOpen).not.toHaveBeenCalled();
+  });
+});
+
+describe('estoque de remédio ao concluir', () => {
+  it('concluir tarefa de remédio desconta a dose na mesma transação e devolve o aviso', async () => {
+    mocks.completeTaskIfOpen.mockResolvedValue(
+      openTask({ medicationId: 'med-1', completedAt: new Date() }),
+    );
+    mocks.consumeDose.mockResolvedValue({ medicationId: 'med-1', name: 'Dipirona', daysLeft: 3 });
+
+    const result = await completeTaskAction({ id: TASK_ID });
+
+    expect(mocks.consumeDose).toHaveBeenCalledWith('couple-1', 'med-1', expect.anything());
+    expect(result).toMatchObject({
+      ok: true,
+      data: { lowStock: { medicationId: 'med-1', name: 'Dipirona', daysLeft: 3 } },
+    });
+  });
+
+  it('concluir tarefa comum não toca no estoque', async () => {
+    mocks.completeTaskIfOpen.mockResolvedValue(openTask({ completedAt: new Date() }));
+
+    await completeTaskAction({ id: TASK_ID });
+
+    expect(mocks.consumeDose).not.toHaveBeenCalled();
+  });
+
+  it('concluir pela segunda vez não desconta de novo', async () => {
+    mocks.completeTaskIfOpen.mockResolvedValue(null);
+
+    await completeTaskAction({ id: TASK_ID });
+
+    expect(mocks.consumeDose).not.toHaveBeenCalled();
+  });
+
+  it('reabrir tarefa de remédio devolve a dose; reabrir tarefa comum não', async () => {
+    mocks.findActiveTaskById.mockResolvedValue(
+      openTask({ medicationId: 'med-1', completedAt: new Date() }),
+    );
+    mocks.clearTaskCompletion.mockResolvedValue(openTask({ medicationId: 'med-1' }));
+    await reopenTaskAction({ id: TASK_ID });
+    expect(mocks.returnDose).toHaveBeenCalledWith('couple-1', 'med-1', expect.anything());
+
+    mocks.returnDose.mockReset();
+    mocks.findActiveTaskById.mockResolvedValue(openTask({ completedAt: new Date() }));
+    mocks.clearTaskCompletion.mockResolvedValue(openTask());
+    await reopenTaskAction({ id: TASK_ID });
+    expect(mocks.returnDose).not.toHaveBeenCalled();
   });
 });
 
