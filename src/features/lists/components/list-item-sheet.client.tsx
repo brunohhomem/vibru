@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { ListItem } from '@vibru/shared';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -14,6 +13,7 @@ import { applyApiError } from '@/lib/api-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useDeleteListItem, useUpdateListItem } from '../hooks/use-lists';
 import { listItemFormSchema, type ListItemFormValues } from '../schemas/forms';
+import type { ListItem } from '@/features/lists/list-schemas';
 
 type ListItemSheetProps = {
   listId: string;

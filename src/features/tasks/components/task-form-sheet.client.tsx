@@ -1,14 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { CoupleMember, Task } from '@vibru/shared';
-import {
-  DEFAULT_TASK_CATEGORY,
-  TASK_CATEGORIES,
-  TASK_CATEGORY_LABELS,
-  addCalendarDays,
-  type CalendarDate,
-} from '@vibru/shared';
+import type { CoupleMember } from '@vibru/shared';
+import { type CalendarDate } from '@vibru/shared';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -26,6 +20,13 @@ import { taskFormSchema, type TaskFormValues } from '../schemas/forms';
 import { cn } from '@/lib/cn';
 import { applyApiError } from '@/lib/api-error';
 import { onFormSubmit } from '@/lib/submit-form';
+import type { Task } from '@/features/tasks/task-schemas';
+import {
+  DEFAULT_TASK_CATEGORY,
+  TASK_CATEGORIES,
+  TASK_CATEGORY_LABELS,
+} from '@/features/tasks/categories';
+import { addCalendarDays } from '@/features/tasks/recurrence';
 
 const ASSIGNEE_NONE = 'nos';
 

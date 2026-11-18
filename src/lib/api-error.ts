@@ -8,6 +8,7 @@ import {
 import axios from 'axios';
 import type { FieldValues, Path, UseFormSetError } from 'react-hook-form';
 import { toast } from 'sonner';
+import { ActionResultError } from './unwrap-action-result';
 
 const CODE_MESSAGES: Record<string, string> = {
   ...AUTH_ERROR_MESSAGES,
@@ -40,10 +41,27 @@ function applyConflictField<T extends FieldValues>(
   return true;
 }
 
+// Falha de server action: a mensagem já vem pronta e, se apontar um campo, vai para ele.
+function applyActionError<T extends FieldValues>(
+  error: ActionResultError,
+  setError?: UseFormSetError<T>,
+): void {
+  if (error.field && setError) {
+    setError(error.field as Path<T>, { message: error.message });
+    return;
+  }
+  toast.error(error.message);
+}
+
 export function applyApiError<T extends FieldValues>(
   error: unknown,
   setError?: UseFormSetError<T>,
 ): void {
+  if (error instanceof ActionResultError) {
+    applyActionError(error, setError);
+    return;
+  }
+
   const body = readErrorBody(error);
   const details = body?.details ?? [];
   let appliedField = false;

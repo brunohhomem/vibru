@@ -53,6 +53,45 @@ describe('defineMemberAction', () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
+  it('aponta o campo e usa a mensagem de uma regra própria do schema', async () => {
+    readSessionUserId.mockResolvedValue('user-1');
+    findMemberContextByUserId.mockResolvedValue(memberContext);
+    const schemaWithRule = z
+      .object({ dueOn: z.string().nullable() })
+      .superRefine((data, context) => {
+        if (data.dueOn === null) {
+          context.addIssue({ code: 'custom', path: ['dueOn'], message: 'Informe o prazo' });
+        }
+      });
+
+    const result = await defineMemberAction({ schema: schemaWithRule, handler: vi.fn() })({
+      dueOn: null,
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      code: 'invalid_input',
+      message: 'Informe o prazo',
+      field: 'dueOn',
+    });
+  });
+
+  it('aponta o campo mas não vaza mensagem padrão do zod', async () => {
+    readSessionUserId.mockResolvedValue('user-1');
+    findMemberContextByUserId.mockResolvedValue(memberContext);
+
+    const result = await defineMemberAction({ schema: inputSchema, handler: vi.fn() })({
+      title: '',
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      code: 'invalid_input',
+      message: 'Dados inválidos.',
+      field: 'title',
+    });
+  });
+
   it('entrega input, userId e member ao handler e devolve ok', async () => {
     readSessionUserId.mockResolvedValue('user-1');
     findMemberContextByUserId.mockResolvedValue(memberContext);

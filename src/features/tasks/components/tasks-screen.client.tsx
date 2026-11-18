@@ -1,7 +1,6 @@
 'use client';
 
-import type { CoupleMember, Task, TaskCategory, TaskGroups, TaskLowStock } from '@vibru/shared';
-import { TASK_CATEGORIES, groupTasks } from '@vibru/shared';
+import type { CoupleMember } from '@vibru/shared';
 import { Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -19,6 +18,11 @@ import { TaskNotesSheet } from './task-notes-sheet.client';
 import { CompletedTaskItem, TaskItem } from './task-item';
 import { useCompleteTask, useReopenTask, useTasks } from '../hooks/use-tasks';
 import { applyApiError } from '@/lib/api-error';
+import type { Task, TaskLowStock } from '@/features/tasks/task-schemas';
+import type { TaskCategory } from '@/features/tasks/categories';
+import type { TaskGroups } from '@/features/tasks/grouping';
+import { TASK_CATEGORIES } from '@/features/tasks/categories';
+import { groupTasks } from '@/features/tasks/grouping';
 
 const FILTER_NONE = 'nos';
 const FILTER_ALL = 'all';

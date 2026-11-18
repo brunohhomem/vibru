@@ -1,7 +1,11 @@
-import { TASK_CATEGORIES, TASK_CATEGORY_LABELS, type TaskCategory } from '@vibru/shared';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { FilterChip } from './filter-chip';
+import {
+  TASK_CATEGORIES,
+  TASK_CATEGORY_LABELS,
+  type TaskCategory,
+} from '@/features/tasks/categories';
 
 export const CATEGORY_ALL = 'all';
 

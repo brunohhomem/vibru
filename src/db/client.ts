@@ -6,6 +6,11 @@ import * as schema from './schema';
 
 type Database = NodePgDatabase<typeof schema>;
 
+export type DatabaseTransaction = Parameters<Parameters<Database['transaction']>[0]>[0];
+
+/** O que as consultas aceitam: o próprio banco ou uma transação aberta. */
+export type DatabaseExecutor = Database | DatabaseTransaction;
+
 // globalThis sobrevive ao hot reload do dev e evita um pool novo a cada recarga.
 const globalForDatabase = globalThis as typeof globalThis & { vibruDatabase?: Database };
 

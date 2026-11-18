@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Task } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -13,6 +12,7 @@ import { applyApiError } from '@/lib/api-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useUpdateTask } from '../hooks/use-tasks';
 import { taskNotesFormSchema, type TaskNotesFormValues } from '../schemas/forms';
+import type { Task } from '@/features/tasks/task-schemas';
 
 type TaskNotesSheetProps = {
   task: Task | null;

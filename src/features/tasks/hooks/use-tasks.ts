@@ -1,13 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type {
-  CompleteTaskResponse,
-  Task,
-  TaskCategory,
-  TaskRecurrenceKind,
-  TasksResponse,
-} from '@vibru/shared';
 import { HEALTH_QUERY_KEY } from '@/features/health/lib/query-keys';
-import { api } from '@/lib/api';
+import type { TaskCategory } from '@/features/tasks/categories';
+import type { TaskRecurrenceKind } from '@/features/tasks/recurrence';
+import type { TasksResponse } from '@/features/tasks/task-schemas';
+import { unwrapActionResult } from '@/lib/unwrap-action-result';
+import {
+  completeTaskAction,
+  createTaskAction,
+  listTasksAction,
+  removeTaskAction,
+  reopenTaskAction,
+  updateTaskAction,
+} from '../actions';
 
 export const TASKS_QUERY_KEY = ['tasks'] as const;
 
@@ -32,10 +36,7 @@ export type CompleteTaskVariables = {
 export function useTasks() {
   return useQuery({
     queryKey: TASKS_QUERY_KEY,
-    queryFn: async () => {
-      const response = await api.get<TasksResponse>('/tasks');
-      return response.data;
-    },
+    queryFn: async () => unwrapActionResult(await listTasksAction(undefined)),
   });
 }
 
@@ -43,10 +44,7 @@ export function useCreateTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: TaskPayload) => {
-      const response = await api.post<Task>('/tasks', payload);
-      return response.data;
-    },
+    mutationFn: async (payload: TaskPayload) => unwrapActionResult(await createTaskAction(payload)),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY }),
   });
 }
@@ -55,10 +53,8 @@ export function useUpdateTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, payload }: { id: string; payload: TaskUpdatePayload }) => {
-      const response = await api.patch<Task>(`/tasks/${id}`, payload);
-      return response.data;
-    },
+    mutationFn: async ({ id, payload }: { id: string; payload: TaskUpdatePayload }) =>
+      unwrapActionResult(await updateTaskAction({ id, patch: payload })),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY }),
   });
 }
@@ -68,7 +64,7 @@ export function useDeleteTask() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/tasks/${id}`);
+      unwrapActionResult(await removeTaskAction({ id }));
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: TASKS_QUERY_KEY }),
   });
@@ -78,10 +74,7 @@ export function useReopenTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      const response = await api.post<Task>(`/tasks/${id}/reopen`);
-      return response.data;
-    },
+    mutationFn: async (id: string) => unwrapActionResult(await reopenTaskAction({ id })),
     onSuccess: () => {
       // Reabrir tarefa de remédio devolve estoque.
       void queryClient.invalidateQueries({ queryKey: HEALTH_QUERY_KEY });
@@ -94,10 +87,8 @@ export function useCompleteTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id }: CompleteTaskVariables) => {
-      const response = await api.post<CompleteTaskResponse>(`/tasks/${id}/complete`);
-      return response.data;
-    },
+    mutationFn: async ({ id }: CompleteTaskVariables) =>
+      unwrapActionResult(await completeTaskAction({ id })),
     onMutate: async ({ id, completedByMemberId }: CompleteTaskVariables) => {
       await queryClient.cancelQueries({ queryKey: TASKS_QUERY_KEY });
       const previous = queryClient.getQueryData<TasksResponse>(TASKS_QUERY_KEY);

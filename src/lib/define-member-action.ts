@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 import { findMemberContextByUserId, type MemberContext } from '@/features/couple/membership';
-import { toFailureResult, type ActionResult } from './define-action';
+import { toFailureResult, toInvalidInputResult, type ActionResult } from './define-action';
 import { readSessionUserId } from './session';
 
 type MemberActionConfig<TInput, TData> = {
@@ -27,7 +27,7 @@ export function defineMemberAction<TInput, TData>(config: MemberActionConfig<TIn
     }
 
     const parsed = config.schema.safeParse(rawInput);
-    if (!parsed.success) return { ok: false, code: 'invalid_input', message: 'Dados inválidos.' };
+    if (!parsed.success) return toInvalidInputResult(parsed.error);
 
     try {
       return { ok: true, data: await config.handler({ input: parsed.data, userId, member }) };

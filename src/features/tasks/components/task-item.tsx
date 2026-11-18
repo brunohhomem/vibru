@@ -1,9 +1,11 @@
-import { TASK_CATEGORY_LABELS, type CoupleMember, type Task } from '@vibru/shared';
+import { type CoupleMember } from '@vibru/shared';
 import type { CalendarDate } from '@vibru/shared';
 import { Check, Repeat } from 'lucide-react';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
 import { dueLabel, isOverdue } from '../lib/task-format';
 import { cn } from '@/lib/cn';
+import { TASK_CATEGORY_LABELS } from '@/features/tasks/categories';
+import { type Task } from '@/features/tasks/task-schemas';
 
 type TaskItemProps = {
   task: Task;
