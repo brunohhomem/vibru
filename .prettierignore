@@ -8,3 +8,4 @@ next-env.d.ts
 config/eslint/fixtures/apps/
 .superpowers
 legacy
+src/db/migrations

@@ -13,6 +13,7 @@
     "src/**/*.tsx",
     "next.config.ts",
     "neon.ts",
+    "drizzle.config.ts",
     "playwright.config.ts",
     "e2e/**/*.ts"
   ],
