@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { getDatabase } from './client';
 
 describe('database client', () => {
@@ -9,7 +9,8 @@ describe('database client', () => {
   });
 
   it('devolve a mesma instância ao reimportar o módulo (singleton)', async () => {
-    const reimported = await import('./client?again');
+    vi.resetModules();
+    const reimported = await import('./client');
     expect(reimported.getDatabase()).toBe(getDatabase());
   });
 

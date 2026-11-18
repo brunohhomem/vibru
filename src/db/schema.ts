@@ -4,3 +4,4 @@
  */
 export { systemSettings } from './system-settings';
 export type { SystemSetting, NewSystemSetting } from './system-settings';
+export * from './auth-schema';
