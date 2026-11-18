@@ -21,7 +21,8 @@ async function expectNoHorizontalScroll(page: Page): Promise<void> {
   expect(overflow).toBeLessThanOrEqual(1);
 }
 
-test('admin entra, vê a home do casal, navega e salva o próprio nome', async ({ page }) => {
+// Volta na Fase 2/3: depende da API legada (casal, tarefas, listas...).
+test.fixme('admin entra, vê a home do casal, navega e salva o próprio nome', async ({ page }) => {
   test.setTimeout(90_000);
   const adminEmail = process.env.E2E_ADMIN_EMAIL ?? 'admin@example.com';
 

@@ -1,37 +1,14 @@
-import { existsSync, readFileSync } from 'node:fs';
-import path from 'node:path';
+import 'dotenv/config';
 import { defineConfig } from '@playwright/test';
 
-function readWorkspaceEmail(key: string, fallback: string): string {
-  const fromProcess = process.env[key]?.trim();
-  if (fromProcess) return fromProcess;
+const e2eEmail = process.env.E2E_USER_EMAIL ?? 'e2e-um@example.com';
+const e2ePassword = process.env.E2E_USER_PASSWORD ?? 'senha-e2e-12345';
 
-  const envPath = path.resolve(__dirname, '.env');
-  if (!existsSync(envPath)) return fallback;
-
-  const prefix = `${key}=`;
-  for (const line of readFileSync(envPath, 'utf8').split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith(prefix)) continue;
-    const value = trimmed.slice(prefix.length).trim();
-    if (value) return value;
-  }
-
-  return fallback;
+// O build de produção sobe contra a branch de TESTE do Neon, nunca a production.
+const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+if (!testDatabaseUrl) {
+  throw new Error('TEST_DATABASE_URL ausente: o e2e não roda contra a production.');
 }
-
-const adminEmail = readWorkspaceEmail('ADMIN_EMAIL', 'admin@example.com');
-const partnerEmail = readWorkspaceEmail('PARTNER_EMAIL', 'parceira@example.com');
-process.env.E2E_ADMIN_EMAIL = adminEmail;
-process.env.E2E_PARTNER_EMAIL = partnerEmail;
-
-const sharedEnv = {
-  ...process.env,
-  DB_NAME: 'app_e2e',
-  NODE_ENV: 'development',
-  E2E_ADMIN_EMAIL: adminEmail,
-  E2E_PARTNER_EMAIL: partnerEmail,
-};
 
 export default defineConfig({
   testDir: './e2e',
@@ -43,26 +20,20 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:3100',
     viewport: { width: 390, height: 844 },
   },
-  webServer: [
-    {
-      command: 'node ./legacy/scripts/e2e-up.mjs',
-      cwd: '.',
-      url: 'http://127.0.0.1:3101/api/health',
-      timeout: 120_000,
-      reuseExistingServer: false,
-      env: sharedEnv,
+  webServer: {
+    command: 'pnpm db:seed && pnpm start',
+    url: 'http://127.0.0.1:3100/login',
+    timeout: 120_000,
+    reuseExistingServer: false,
+    env: {
+      ...process.env,
+      DATABASE_URL: testDatabaseUrl,
+      BETTER_AUTH_URL: 'http://127.0.0.1:3100',
+      NODE_ENV: 'production',
+      SEED_USER_ONE_EMAIL: e2eEmail,
+      SEED_USER_ONE_PASSWORD: e2ePassword,
+      SEED_USER_TWO_EMAIL: 'e2e-dois@example.com',
+      SEED_USER_TWO_PASSWORD: 'senha-e2e-dois-12345',
     },
-    {
-      command: 'node ./node_modules/next/dist/bin/next start --port 3100',
-      cwd: '.',
-      url: 'http://127.0.0.1:3100',
-      timeout: 120_000,
-      reuseExistingServer: false,
-      env: {
-        ...sharedEnv,
-        NODE_ENV: 'production',
-        API_ORIGIN: process.env.API_ORIGIN ?? 'http://127.0.0.1:3101',
-      },
-    },
-  ],
+  },
 });
