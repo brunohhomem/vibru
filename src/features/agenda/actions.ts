@@ -1,6 +1,5 @@
 'use server';
 
-import { todayInSaoPaulo } from '@vibru/shared';
 import { z } from 'zod';
 import { findCoupleMembers, updateMemberIcsTokenHash } from '@/features/couple/couple-repository';
 import { ActionFailure } from '@/lib/define-action';
@@ -23,6 +22,7 @@ import {
 import { findActiveEvent, insertEvent, softDeleteEvent, updateEvent } from './agenda-repository';
 import { loadCalendarEntries } from './calendar-source';
 import { generateFeedToken, hashFeedToken } from './ics-feed-rules';
+import { todayInSaoPaulo } from '@/lib/calendar-date';
 import {
   findActiveImportantDate,
   insertImportantDate,

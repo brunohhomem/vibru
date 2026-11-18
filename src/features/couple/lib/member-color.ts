@@ -1,4 +1,4 @@
-import type { MemberColor } from '@vibru/shared';
+import type { MemberColor } from '@/features/couple/couple-schemas';
 
 export type MemberColorClasses = {
   tile: string;

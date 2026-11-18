@@ -1,125 +1,29 @@
 # Autenticação
 
+Better Auth 1.7 com e-mail e senha, sem plugins e sem papéis. Os 2 usuários vêm do seed; não existe cadastro, convite, confirmação de e-mail nem "esqueci a senha" por e-mail.
+
 ## Fluxo
 
-1. **Cadastro** (`POST /api/auth/register`): cria usuário com `role=user`, inicia sessão, seta cookies.
-2. **Login** (`POST /api/auth/login`): valida credenciais, cria nova sessão (nova `family_id`), seta cookies.
-3. **Uso autenticado**: enviar cookie `access_token` automaticamente (httpOnly — gerenciado pelo browser).
-4. **Renovação** (`POST /api/auth/refresh`): quando o access expirar (15 min), usar o `refresh_token` para obter novos cookies.
-5. **Logout** (`POST /api/auth/logout`): revoga a sessão. Sempre retorna 204.
+1. **Login** (`loginAction`, `src/features/auth/actions.ts`): monta a requisição para `/api/auth/sign-in/email` e passa pelo roteador do Better Auth (`auth.handler`), repassando o IP do cliente. É assim que o limite de tentativas vale: o rate limit só roda no roteador HTTP, não em `auth.api.*`. Os cookies da resposta são copiados para o `cookies()` da action.
+2. **Sessão**: cookie com validade de 90 dias. `proxy.ts` só redireciona `/app` sem cookie para `/login?next=…`; a checagem real é o layout do servidor (`src/app/app/layout.tsx`, via `readSession`).
+3. **Logout** (`logoutAction`): revoga a sessão e o cliente limpa o cache do TanStack Query.
+4. **Sessão expirada no meio do uso**: qualquer query ou mutation que volte `unauthenticated` limpa o cache e recarrega no `/login` (`src/lib/query-client.ts`).
 
-## Cookies
+## Limite de tentativas
 
-| Cookie          | Path        | Duração                           | Flags                             |
-| --------------- | ----------- | --------------------------------- | --------------------------------- |
-| `access_token`  | `/`         | `AUTH_REFRESH_TTL_DAYS` (90 dias) | `HttpOnly; SameSite=Lax; Secure`* |
-| `refresh_token` | `/api/auth` | `AUTH_REFRESH_TTL_DAYS` (90 dias) | `HttpOnly; SameSite=Lax; Secure`* |
+`/sign-in/email`: 5 por 60 s por IP (regra própria); demais rotas do Better Auth: 100 por 60 s. O contador fica no banco (tabela `rate_limit`, chave única). O IP vem de `x-vercel-forwarded-for` ou `x-forwarded-for`, que a Vercel sobrescreve com o IP real do cliente. Resposta 429 vira a mensagem "Muitas tentativas. Aguarde um minuto e tente de novo."
 
-*`Secure` ativo quando `COOKIE_SECURE=true` (padrão em produção, desativado em dev/teste).
+## Senha
 
-O JWT dentro do `access_token` continua expirando em `AUTH_ACCESS_TTL_MINUTES` (15 min); só o cookie vive o prazo da sessão. O middleware do web enxerga apenas esse cookie: se ele sumisse em 15 min, a navegação cairia no login com a sessão ainda válida. O JWT expirado responde 401, e o cliente renova pelo refresh e repete a chamada.
+- Regras (`src/features/profile/schemas.ts`): 10 a 72 bytes, ao menos uma letra e um dígito. Hash padrão do Better Auth (scrypt).
+- **Troca da própria senha** (`changePasswordAction`): pede a senha atual (erro no campo `currentPassword`), derruba as outras sessões e limpa `mustChangePassword`.
+- **Redefinir a senha do outro** (`resetPartnerPasswordAction`, na tela de perfil): pede a **sua** senha atual, grava a nova como provisória, marca `mustChangePassword` no outro e derruba as sessões dele. Sem e-mail, é assim que se resolve um esquecimento.
+- **`mustChangePassword`**: no próximo acesso o shell do `/app` redireciona para `/change-password` até a troca.
 
-Limpar cookies = mesmo nome, path e flags com `Max-Age=0`. Sem atributo `Domain` (host-only).
+## Seed
 
-## Rotação e detecção de reuso do refresh token
+`pnpm db:seed` lê `SEED_USER_ONE_*` e `SEED_USER_TWO_*` (e `COUPLE_*`), grava os usuários direto no banco usando o hash de senha do Better Auth, cria o casal e liga os dois (cores `blue` e `purple`). É idempotente: rodar de novo nunca troca a senha de quem já existe.
 
-- Cada `POST /auth/refresh` **revoga a sessão antiga** (`replaced_by_session_id`) e cria uma nova com a mesma `family_id`.
-- **Reuso fora da janela de tolerância (10 s)**: revoga toda a família → `AUTH_REFRESH_REUSED`.
-- **Reuso dentro da janela (10 s)**: apenas 401 sem revogar a família — evita falso positivo com múltiplas abas abrindo simultaneamente.
+## Ids e ambiente
 
-## Throttler
-
-| Endpoint                        | Limite | Janela | Bloqueio | Chave       |
-| ------------------------------- | ------ | ------ | -------- | ----------- |
-| Todas as rotas (`default`)      | 120    | 60 s   | —        | IP          |
-| `POST /auth/login`              | 5      | 15 min | 15 min   | IP + e-mail |
-| `POST /auth/register`           | 5      | 60 min | 60 min   | IP          |
-| `POST /auth/refresh`            | 30     | 60 s   | —        | IP          |
-| `POST /auth/change-password`    | 5      | 15 min | 15 min   | userId      |
-| `POST /auth/password/forgot`    | 3      | 60 min | 60 min   | IP + e-mail |
-| `POST /auth/email/confirm`      | 10     | 15 min | 15 min   | IP          |
-| `POST /auth/password/reset`     | 10     | 15 min | 15 min   | IP          |
-| `POST /auth/invitations/accept` | 10     | 15 min | 15 min   | IP          |
-| `POST /auth/email/resend`       | 3      | 60 min | 60 min   | userId      |
-| `POST /auth/invitations`        | 20     | 60 min | —        | userId      |
-
-Resposta 429 inclui header `Retry-After` (segundos) e `code: RATE_LIMITED`.
-Redis indisponível: falha aberta — a requisição é permitida e um `warn` é logado.
-
-## Seed do admin
-
-```bash
-pnpm db:seed
-```
-
-Comportamento idempotente:
-
-- **Admin já existe**: não faz nada (não sobrescreve senha).
-- **Admin não existe**: cria com `role=admin`, `must_change_password=true`, `email_verified_at=now()`.
-  - `ADMIN_INITIAL_PASSWORD` definida: usa essa senha em qualquer ambiente.
-  - Sem ela, em `NODE_ENV=development`: senha fixa `Admin@12345`.
-  - Sem ela, nos outros ambientes: gera 24 chars aleatórios e **imprime uma única vez** no stdout.
-  - A parceira segue a mesma regra com `PARTNER_INITIAL_PASSWORD`. Os testes de integração e o smoke E2E fixam `Admin@12345`, sem depender do `.env` pessoal.
-- Insere `registration_enabled` em `system_settings` (`true` em dev/test, `false` em produção) **somente se não existir**.
-
-## Variáveis de ambiente
-
-| Variável                           | Obrigatório | Padrão                  | Descrição                                                                                                        |
-| ---------------------------------- | ----------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `JWT_ACCESS_SECRET`                | sim         | —                       | Segredo HS256 ≥ 32 chars. `pnpm keys:generate` cria se ausente. **Rotacionar invalida todas as sessões ativas.** |
-| `ADMIN_EMAIL`                      | sim         | —                       | E-mail do administrador inicial                                                                                  |
-| `WEB_ORIGIN`                       | sim         | `http://localhost:3100` | Origin permitida para verificação CSRF. Sem barra final.                                                         |
-| `ADMIN_INITIAL_PASSWORD`           | não         | —                       | Senha inicial do admin; vale em qualquer ambiente                                                                |
-| `COOKIE_SECURE`                    | não         | `true` em prod          | Ativa flag `Secure` nos cookies                                                                                  |
-| `TRUST_PROXY_HOPS`                 | não         | `0`                     | Número de proxies reversos confiáveis (1 atrás do Nginx)                                                         |
-| `AUTH_ACCESS_TTL_MINUTES`          | não         | `15`                    | TTL do access token (1–120)                                                                                      |
-| `AUTH_REFRESH_TTL_DAYS`            | não         | `7`                     | TTL do refresh token (1–90)                                                                                      |
-| `AUTH_REFRESH_REUSE_GRACE_SECONDS` | não         | `10`                    | Janela de tolerância para reuso (0–60)                                                                           |
-| `AUTH_BCRYPT_ROUNDS`               | não         | `12`                    | Rounds do bcrypt (use `4` em testes)                                                                             |
-
-## Como proteger uma rota nova
-
-Por padrão, **toda rota é protegida** pelo `JwtAuthGuard` global. Não é necessário nenhum decorator adicional.
-
-**Exigir papel específico:**
-
-```ts
-@Roles('admin')
-@Get('admin-only')
-async adminRoute() { ... }
-```
-
-**Tornar pública (sem autenticação):**
-
-```ts
-// endpoint público: health check, não carrega dados sensíveis
-@Public()
-@Get('health')
-async health() { ... }
-```
-
-> **Regra:** `@Public()` exige justificativa em comentário de uma linha imediatamente acima do decorator. Toda rota nova é protegida por padrão.
-
-## Rotas de e-mail e convite (F3)
-
-| Rota                            | Acesso      | HTTP | Descrição                                                   |
-| ------------------------------- | ----------- | ---: | ----------------------------------------------------------- |
-| `POST /auth/email/confirm`      | público     |  204 | Confirma o e-mail com o token do link                       |
-| `POST /auth/email/resend`       | autenticado |  202 | Reenvia e-mail de confirmação (erro 409 se já confirmado)   |
-| `POST /auth/password/forgot`    | público     |  202 | Solicita link de reset (sempre 202 — anti-enumeração)       |
-| `POST /auth/password/reset`     | público     |  204 | Redefine a senha; revoga todas as sessões                   |
-| `POST /auth/invitations`        | admin       |  201 | Convida um e-mail; retorna `{ id, email, role, expiresAt }` |
-| `POST /auth/invitations/accept` | público     |  200 | Aceita o convite, define senha, inicia sessão               |
-
-## Configurações (`/settings`)
-
-| Rota                   | Acesso  | HTTP | Descrição                                        |
-| ---------------------- | ------- | ---: | ------------------------------------------------ |
-| `GET /settings/public` | público |  200 | `{ registrationEnabled }` — usado pelo frontend  |
-| `GET /settings`        | admin   |  200 | Todas as configurações                           |
-| `PATCH /settings`      | admin   |  200 | Atualiza `registrationEnabled`; audita a mudança |
-
-## Limitações aceitas
-
-- Mudança de papel ou desativação de usuário vale no **próximo refresh** (≤ 15 min) — o access token já emitido permanece válido.
-- O token de e-mail trafega no payload da fila BullMQ e no link do e-mail — risco aceito; veja `docs/email.md`.
+Ids do Better Auth são `text`; os das tabelas de domínio são `uuid` (v7). Em produção na Vercel o `BETTER_AUTH_URL` precisa ser `https` (a validação de ambiente recusa o contrário).

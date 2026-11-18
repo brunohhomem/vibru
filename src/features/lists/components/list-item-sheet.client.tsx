@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useDeleteListItem, useUpdateListItem } from '../hooks/use-lists';
 import { listItemFormSchema, type ListItemFormValues } from '../schemas/forms';
@@ -43,7 +43,7 @@ export function ListItemSheet({ listId, item, onOpenChange }: ListItemSheetProps
       toast.success('Item atualizado');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -58,7 +58,7 @@ export function ListItemSheet({ listId, item, onOpenChange }: ListItemSheetProps
           onOpenChange(false);
           toast.success('Item removido');
         },
-        onError: (error) => applyApiError(error),
+        onError: (error) => applyActionError(error),
       },
     );
   }

@@ -1,8 +1,8 @@
-import { parseCalendarDate, todayInSaoPaulo } from '@vibru/shared';
 import { findMemberByIcsTokenHash } from '@/features/couple/couple-repository';
 import { loadCalendarEntries } from './calendar-source';
 import { buildIcsCalendar } from './ics-calendar';
 import { hashFeedToken, parseFeedFile, toIcsEntries } from './ics-feed-rules';
+import { parseCalendarDate, todayInSaoPaulo } from '@/lib/calendar-date';
 
 /**
  * Calendário ICS do casal dono do token, ou nulo. Token inexistente, revogado ou

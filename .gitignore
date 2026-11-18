@@ -5,8 +5,6 @@ dist/
 coverage/
 *.tsbuildinfo
 
-# Amostras geradas pelo teste de lint. O diretório é recriado a cada execução.
-config/eslint/fixtures/apps/
 
 .env*
 !.env.example

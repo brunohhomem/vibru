@@ -1,4 +1,4 @@
-import { daysInMonth, formatCalendarDate, type CalendarDate } from '@vibru/shared';
+import { daysInMonth, formatCalendarDate, type CalendarDate } from '@/lib/calendar-date';
 import {
   type AgendaEvent,
   type AgendaResponse,

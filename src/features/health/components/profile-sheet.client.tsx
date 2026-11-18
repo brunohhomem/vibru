@@ -8,7 +8,7 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useUpdateHealthProfile } from '../hooks/use-health';
 import { bloodTypeLabel } from '../lib/health-format';
@@ -71,7 +71,7 @@ export function ProfileSheet({ memberId, open, profile, onOpenChange }: ProfileS
       toast.success('Ficha atualizada');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 

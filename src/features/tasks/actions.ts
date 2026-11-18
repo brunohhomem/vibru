@@ -1,7 +1,6 @@
 'use server';
 
 import { addCalendarDays, startOfWeek } from '@/features/tasks/recurrence';
-import { todayInSaoPaulo } from '@vibru/shared';
 import { z } from 'zod';
 import { getDatabase } from '@/db/client';
 import type { NewTaskRow, TaskRow } from '@/db/tasks-schema';
@@ -9,6 +8,7 @@ import { findCoupleMembers } from '@/features/couple/couple-repository';
 import { consumeDose, returnDose } from '@/features/health/medication-stock-operations';
 import { ActionFailure } from '@/lib/define-action';
 import { defineMemberAction } from '@/lib/define-member-action';
+import { todayInSaoPaulo } from '@/lib/calendar-date';
 import {
   clearTaskCompletion,
   completeTaskIfOpen,
@@ -201,6 +201,7 @@ export const reopenTaskAction = defineMemberAction({
 
     const reopened = await getDatabase().transaction(async (transaction) => {
       const row = await clearTaskCompletion(member.coupleId, input.id, transaction);
+      if (!row) throw new ActionFailure('failed', 'Tarefa não está concluída');
       if (existing.medicationId) {
         await returnDose(member.coupleId, existing.medicationId, transaction);
       }

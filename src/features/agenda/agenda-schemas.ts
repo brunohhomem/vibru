@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { calendarDateSchema } from '@vibru/shared';
 import { taskDueTimeSchema } from '@/features/tasks/task-schemas';
+import { calendarDateSchema } from '@/features/couple/couple-schemas';
 
 export const AGENDA_ERROR_CODES = {
   AGENDA_ITEM_NOT_FOUND: 'AGENDA_ITEM_NOT_FOUND',

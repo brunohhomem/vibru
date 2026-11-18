@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { CalendarDate } from '@vibru/shared';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -10,11 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { HealthSheet } from '@/features/health/components/health-sheet.client';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateAgendaItem, useDeleteAgendaItem, useUpdateAgendaItem } from '../hooks/use-agenda';
 import { importantDateFormSchema, type ImportantDateFormValues } from '../schemas/forms';
 import type { ImportantDate } from '@/features/agenda/agenda-schemas';
+import type { CalendarDate } from '@/lib/calendar-date';
 
 type ImportantDateSheetProps = {
   open: boolean;
@@ -62,7 +62,7 @@ export function ImportantDateSheet({
       toast.success(importantDate ? 'Data atualizada' : 'Data adicionada');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -74,7 +74,7 @@ export function ImportantDateSheet({
         onOpenChange(false);
         toast.success('Data removida');
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 

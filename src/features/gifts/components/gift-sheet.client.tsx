@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
 import { HealthSheet } from '@/features/health/components/health-sheet.client';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { formatCents, parseReaisToCents } from '@/lib/money';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateGift, useDeleteGift, useUpdateGift } from '../hooks/use-gifts';
@@ -76,7 +76,7 @@ export function GiftSheet({ ownerId, open, gift, onOpenChange }: GiftSheetProps)
       toast.success(gift ? 'Presente atualizado' : 'Presente adicionado');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -88,7 +88,7 @@ export function GiftSheet({ ownerId, open, gift, onOpenChange }: GiftSheetProps)
         onOpenChange(false);
         toast.success('Presente removido');
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 

@@ -1,8 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { CoupleMember } from '@vibru/shared';
-import { type CalendarDate } from '@vibru/shared';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -18,7 +16,7 @@ import { useCreateTask, useDeleteTask, useUpdateTask, type TaskPayload } from '.
 import { RECURRENCE_OPTIONS } from '../lib/task-format';
 import { taskFormSchema, type TaskFormValues } from '../schemas/forms';
 import { cn } from '@/lib/cn';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import type { Task } from '@/features/tasks/task-schemas';
 import {
@@ -27,6 +25,8 @@ import {
   TASK_CATEGORY_LABELS,
 } from '@/features/tasks/categories';
 import { addCalendarDays } from '@/features/tasks/recurrence';
+import type { CoupleMember } from '@/features/couple/couple-schemas';
+import { type CalendarDate } from '@/lib/calendar-date';
 
 const ASSIGNEE_NONE = 'nos';
 
@@ -166,7 +166,7 @@ export function TaskFormSheet({ open, onOpenChange, task, members, today }: Task
       }
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -179,7 +179,7 @@ export function TaskFormSheet({ open, onOpenChange, task, members, today }: Task
         onOpenChange(false);
         toast.success('Tarefa excluída');
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 

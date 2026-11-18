@@ -1,4 +1,3 @@
-import { todayInSaoPaulo } from '@vibru/shared';
 import type { DatabaseExecutor } from '@/db/client';
 import type { MedicationRow } from '@/db/medications-schema';
 import {
@@ -8,6 +7,7 @@ import {
   updateTask,
 } from '@/features/tasks/tasks-repository';
 import { medicationTaskTitle, planMedicationTaskSync } from './medication-rules';
+import { todayInSaoPaulo } from '@/lib/calendar-date';
 
 /**
  * Tarefas geradas pelos remédios: uma diária por horário. Só a ficha de saúde chama

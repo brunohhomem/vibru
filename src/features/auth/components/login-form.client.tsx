@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginRequestSchema } from '@vibru/shared';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,7 @@ import { queryClient } from '@/lib/query-client';
 import { ME_QUERY_KEY } from '../hooks/use-me';
 import { safeAppPath } from '../lib/next-path';
 import { loginAction } from '../actions';
+import { loginRequestSchema } from '@/features/auth/login-schema';
 
 type LoginValues = {
   email: string;

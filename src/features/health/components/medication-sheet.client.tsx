@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateMedication, useDeleteMedication, useUpdateMedication } from '../hooks/use-health';
 import { medicationFormSchema, type MedicationFormValues } from '../schemas/forms';
@@ -160,7 +160,7 @@ export function MedicationSheet({
       toast.success(medication ? 'Remédio atualizado' : 'Remédio adicionado');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -172,7 +172,7 @@ export function MedicationSheet({
         onOpenChange(false);
         toast.success('Remédio removido');
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 

@@ -1,5 +1,5 @@
-import type { CalendarDate } from '@vibru/shared';
 import { addCalendarDays, startOfWeek } from './recurrence';
+import type { CalendarDate } from '@/lib/calendar-date';
 
 export type TaskGroupable = {
   dueOn: CalendarDate | null;

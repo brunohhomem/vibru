@@ -1,11 +1,5 @@
 'use server';
 
-import {
-  todayInSaoPaulo,
-  updateCoupleRequestSchema,
-  updateMyMemberRequestSchema,
-  type CoupleResponse,
-} from '@vibru/shared';
 import { z } from 'zod';
 import { defineMemberAction } from '@/lib/define-member-action';
 import { ActionFailure } from '@/lib/define-action';
@@ -17,6 +11,12 @@ import {
   updateMemberDisplayName,
 } from './couple-repository';
 import { buildCoupleResponse } from './couple-response';
+import { todayInSaoPaulo } from '@/lib/calendar-date';
+import {
+  updateCoupleRequestSchema,
+  updateMyMemberRequestSchema,
+  type CoupleResponse,
+} from '@/features/couple/couple-schemas';
 
 async function loadCoupleResponse(coupleId: string, memberId: string): Promise<CoupleResponse> {
   const couple = await findCoupleById(coupleId);

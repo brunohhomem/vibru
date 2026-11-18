@@ -1,14 +1,14 @@
+import type { AgendaEventRow, ImportantDateRow } from '@/db/agenda-schema';
+import { toAgendaEvent, toImportantDate } from './agenda-mappers';
 import {
   addDays,
   annualOccurrenceInYear,
-  bodasName,
   daysBetween,
   daysInMonth,
   parseCalendarDate,
   type CalendarDate,
-} from '@vibru/shared';
-import type { AgendaEventRow, ImportantDateRow } from '@/db/agenda-schema';
-import { toAgendaEvent, toImportantDate } from './agenda-mappers';
+} from '@/lib/calendar-date';
+import { bodasName } from '@/features/couple/bodas';
 import type {
   AgendaAnniversary,
   AgendaEvent,

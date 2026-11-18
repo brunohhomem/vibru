@@ -22,8 +22,6 @@ const metricExceptions = [
   '**/*.config.*',
 ];
 
-const envAllowedPaths = ['apps/api/src/config/**/*.ts', 'packages/scripts/**/*.ts'];
-
 const baseConfig = tseslint.config(
   {
     ignores: ['**/dist/**', '**/.next/**', '**/coverage/**', '**/.turbo/**', '**/next-env.d.ts'],

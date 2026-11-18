@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { CalendarDate } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -9,11 +8,12 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { HealthSheet } from '@/features/health/components/health-sheet.client';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateAgendaItem, useDeleteAgendaItem, useUpdateAgendaItem } from '../hooks/use-agenda';
 import { eventFormSchema, type EventFormValues } from '../schemas/forms';
 import type { AgendaEvent } from '@/features/agenda/agenda-schemas';
+import type { CalendarDate } from '@/lib/calendar-date';
 
 type EventSheetProps = {
   open: boolean;
@@ -61,7 +61,7 @@ export function EventSheet({ open, event, defaultDate, onOpenChange }: EventShee
       toast.success(event ? 'Evento atualizado' : 'Evento criado');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -73,7 +73,7 @@ export function EventSheet({ open, event, defaultDate, onOpenChange }: EventShee
         onOpenChange(false);
         toast.success('Evento removido');
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 

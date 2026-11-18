@@ -1,11 +1,6 @@
-import {
-  bodasName,
-  daysBetween,
-  elapsedParts,
-  nextAnnualOccurrence,
-  type CoupleResponse,
-  type MemberColor,
-} from '@vibru/shared';
+import { bodasName } from '@/features/couple/bodas';
+import { daysBetween, elapsedParts, nextAnnualOccurrence } from '@/lib/calendar-date';
+import { type CoupleResponse, type MemberColor } from '@/features/couple/couple-schemas';
 
 export type CoupleRecord = {
   id: string;

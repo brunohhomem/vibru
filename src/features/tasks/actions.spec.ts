@@ -197,6 +197,22 @@ describe('estoque de remédio ao concluir', () => {
   });
 });
 
+describe('reabrir duas vezes ao mesmo tempo', () => {
+  it('a segunda reabertura (a tarefa já voltou a abrir) falha sem devolver a dose nem apagar o filho', async () => {
+    mocks.findActiveTaskById.mockResolvedValue(
+      openTask({ medicationId: 'med-1', completedAt: new Date() }),
+    );
+    mocks.clearTaskCompletion.mockResolvedValue(null);
+
+    const result = await reopenTaskAction({ id: TASK_ID });
+
+    expect(result).toMatchObject({ ok: false, message: 'Tarefa não está concluída' });
+    expect(mocks.returnDose).not.toHaveBeenCalled();
+    expect(mocks.findOpenGeneratedChild).not.toHaveBeenCalled();
+    expect(mocks.hardDeleteTask).not.toHaveBeenCalled();
+  });
+});
+
 describe('reopenTaskAction', () => {
   it('recusa reabrir tarefa que não está concluída', async () => {
     expect(await reopenTaskAction({ id: TASK_ID })).toMatchObject({

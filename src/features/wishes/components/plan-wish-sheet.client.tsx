@@ -1,18 +1,18 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { todayInSaoPaulo } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { HealthSheet } from '@/features/health/components/health-sheet.client';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { usePlanWish } from '../hooks/use-wishes';
 import { planWishFormSchema, type PlanWishFormValues } from '../schemas/forms';
 import { type Wish } from '@/features/wishes/wish-schemas';
+import { todayInSaoPaulo } from '@/lib/calendar-date';
 
 type PlanWishSheetProps = {
   wish: Wish | null;
@@ -46,7 +46,7 @@ export function PlanWishSheet({ wish, onOpenChange }: PlanWishSheetProps) {
       toast.success('Planejado na Agenda');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 

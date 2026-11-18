@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
 import { HealthSheet } from '@/features/health/components/health-sheet.client';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { formatCents, parseReaisToCents } from '@/lib/money';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateWish, useDeleteWish, useUpdateWish } from '../hooks/use-wishes';
@@ -76,7 +76,7 @@ export function WishSheet({ open, wish, defaultCategory, onOpenChange }: WishShe
       toast.success(wish ? 'Desejo atualizado' : 'Desejo adicionado');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -88,7 +88,7 @@ export function WishSheet({ open, wish, defaultCategory, onOpenChange }: WishShe
         onOpenChange(false);
         toast.success('Desejo removido');
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 

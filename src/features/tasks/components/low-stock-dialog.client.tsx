@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 import { useAddToPharmacy } from '@/features/health/hooks/use-health';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import type { TaskLowStock } from '@/features/tasks/task-schemas';
 
 type LowStockDialogProps = {
@@ -27,7 +27,7 @@ export function LowStockDialog({ lowStock, onClose }: LowStockDialogProps) {
         toast.success('Adicionado à Farmácia');
         onClose();
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 

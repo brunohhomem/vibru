@@ -1,4 +1,4 @@
-import { z } from '@vibru/shared/zod';
+import { z } from 'zod';
 import { optionalHttpUrl, optionalPrice } from '@/features/wishes/schemas/forms';
 import { GIFT_CATEGORIES } from '@/features/gifts/gift-constants';
 

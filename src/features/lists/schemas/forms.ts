@@ -1,4 +1,4 @@
-import { z } from '@vibru/shared/zod';
+import { z } from 'zod';
 import { listItemTitleSchema, listTitleSchema } from '@/features/lists/list-schemas';
 
 export const listTitleFormSchema = z.object({ title: listTitleSchema });

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { useIcsFeedStatus, useRegenerateIcsFeed, useRevokeIcsFeed } from '../hooks/use-agenda';
 
 type PendingAction = 'regenerate' | 'revoke';
@@ -34,7 +34,7 @@ export function IcsFeedCard() {
   function generateLink() {
     regenerate.mutate(undefined, {
       onSuccess: ({ feedPath }) => setFeedUrl(`${window.location.origin}${feedPath}`),
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 
@@ -44,7 +44,7 @@ export function IcsFeedCard() {
         setFeedUrl(null);
         toast.success('Feed desligado');
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 

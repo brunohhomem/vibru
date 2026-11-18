@@ -1,4 +1,4 @@
-import { z } from '@vibru/shared/zod';
+import { z } from 'zod';
 import {
   ALLERGY_SEVERITIES,
   BLOOD_TYPES,

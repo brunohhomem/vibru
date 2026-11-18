@@ -1,6 +1,5 @@
 'use client';
 
-import type { CoupleMember } from '@vibru/shared';
 import { ChevronRight, Siren } from 'lucide-react';
 import Link from 'next/link';
 import { PageHeader } from '@/components/layout/page-header';
@@ -10,6 +9,7 @@ import { useCouple } from '@/features/couple/hooks/use-couple';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
 import { cn } from '@/lib/cn';
 import { useHealthMembers } from '../hooks/use-health';
+import type { CoupleMember } from '@/features/couple/couple-schemas';
 
 function medicationCountLabel(count: number): string {
   if (count === 0) return 'Nenhum remédio';

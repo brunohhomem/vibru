@@ -2,11 +2,11 @@
 
 import { parseSetCookieHeader, toCookieOptions } from 'better-auth/cookies';
 import { cookies, headers } from 'next/headers';
-import { loginRequestSchema, type AuthResponse } from '@vibru/shared';
 import { auth } from '@/lib/auth';
 import { getEnv } from '@/lib/env';
 import type { ActionResult } from '@/lib/define-action';
 import { readSession } from '@/lib/session';
+import { loginRequestSchema, type AuthResponse } from '@/features/auth/login-schema';
 
 // Mesma mensagem para senha errada e e-mail inexistente: não revela quem tem conta.
 const INVALID_CREDENTIALS_MESSAGE = 'E-mail ou senha incorretos.';

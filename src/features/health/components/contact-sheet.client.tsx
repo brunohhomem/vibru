@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { MaskedInput } from '@/components/ui/masked-input';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { formatPhone } from '@/lib/masks';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateHealthItem, useDeleteHealthItem, useUpdateHealthItem } from '../hooks/use-health';
@@ -59,7 +59,7 @@ export function ContactSheet({ memberId, open, contact, onOpenChange }: ContactS
       toast.success(contact ? 'Contato atualizado' : 'Contato adicionado');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -73,7 +73,7 @@ export function ContactSheet({ memberId, open, contact, onOpenChange }: ContactS
           onOpenChange(false);
           toast.success('Contato removido');
         },
-        onError: (error) => applyApiError(error),
+        onError: (error) => applyActionError(error),
       },
     );
   }

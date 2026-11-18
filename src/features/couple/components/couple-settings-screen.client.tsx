@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import type { CoupleResponse } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -20,6 +19,7 @@ import { queryClient } from '@/lib/query-client';
 import { onFormSubmit } from '@/lib/submit-form';
 import { ActionResultError, unwrapActionResult } from '@/lib/unwrap-action-result';
 import { updateCoupleAction, updateMyMemberAction } from '../actions';
+import type { CoupleResponse } from '@/features/couple/couple-schemas';
 
 async function saveCouple(values: CoupleFormValues): Promise<CoupleResponse> {
   unwrapActionResult(

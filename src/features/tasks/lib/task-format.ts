@@ -1,5 +1,5 @@
-import { daysBetween, parseCalendarDate, type CalendarDate } from '@vibru/shared';
 import { type TaskRecurrenceKind } from '@/features/tasks/recurrence';
+import { daysBetween, parseCalendarDate, type CalendarDate } from '@/lib/calendar-date';
 
 const WEEKDAYS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'] as const;
 const MONTHS = [

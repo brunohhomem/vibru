@@ -1,4 +1,4 @@
-import { z } from '@vibru/shared/zod';
+import { z } from 'zod';
 import { TASK_CATEGORIES } from '@/features/tasks/categories';
 import { TASK_RECURRENCE_KINDS } from '@/features/tasks/recurrence';
 

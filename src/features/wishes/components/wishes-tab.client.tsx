@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { FilterChip } from '@/features/tasks/components/filter-chip';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { useSetWishDone, useWishes } from '../hooks/use-wishes';
 import { wishCategoryLabel } from '../lib/wish-format';
 import { PlanWishSheet } from './plan-wish-sheet.client';
@@ -56,7 +56,7 @@ export function WishesTab({ category, onCategoryChange }: WishesTabProps) {
       { wishId: wish.id, done: markDone },
       {
         onSuccess: () => toast.success(markDone ? 'Desejo feito' : 'Desejo de volta à lista'),
-        onError: (error) => applyApiError(error),
+        onError: (error) => applyActionError(error),
       },
     );
   }

@@ -1,6 +1,6 @@
-import type { MemberColor } from '@vibru/shared';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
 import { cn } from '@/lib/cn';
+import type { MemberColor } from '@/features/couple/couple-schemas';
 
 type FilterChipProps = {
   active: boolean;

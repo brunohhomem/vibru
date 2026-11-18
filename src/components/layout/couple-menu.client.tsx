@@ -3,7 +3,6 @@
 import { Check, HeartPulse, Palette, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
-import type { CoupleMember } from '@vibru/shared';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
 import { cn } from '@/lib/cn';
+import type { CoupleMember } from '@/features/couple/couple-schemas';
 
 const THEME_OPTIONS = [
   { value: 'light', label: 'Claro' },

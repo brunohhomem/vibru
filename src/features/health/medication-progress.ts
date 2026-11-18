@@ -1,4 +1,4 @@
-import { todayInSaoPaulo, type CalendarDate } from '@vibru/shared';
+import { todayInSaoPaulo, type CalendarDate } from '@/lib/calendar-date';
 
 export type MedicationProgressTask = {
   medicationId: string | null;

@@ -1,6 +1,5 @@
 'use server';
 
-import { todayInSaoPaulo } from '@vibru/shared';
 import { z } from 'zod';
 import { detachWishFromEvents, insertEvent } from '@/features/agenda/agenda-repository';
 import { toAgendaEvent } from '@/features/agenda/agenda-mappers';
@@ -10,6 +9,7 @@ import { findOgImageUrl } from '@/features/link-preview/og-image-service';
 import { ActionFailure } from '@/lib/define-action';
 import { defineMemberAction } from '@/lib/define-member-action';
 import { toWish, type WishWithPlan } from './wish-mappers';
+import { todayInSaoPaulo } from '@/lib/calendar-date';
 import {
   createWishRequestSchema,
   planWishRequestSchema,

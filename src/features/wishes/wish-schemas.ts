@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { calendarDateSchema } from '@vibru/shared';
 import { taskDueTimeSchema } from '@/features/tasks/task-schemas';
 import { WISH_CATEGORIES, WISH_STATUSES } from './wish-constants';
+import { calendarDateSchema } from '@/features/couple/couple-schemas';
 
 function hasAtLeastOneField(data: Record<string, unknown>): boolean {
   return Object.values(data).some((value) => value !== undefined);

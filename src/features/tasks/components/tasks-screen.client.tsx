@@ -1,6 +1,5 @@
 'use client';
 
-import type { CoupleMember } from '@vibru/shared';
 import { Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -17,12 +16,13 @@ import { TaskFormSheet } from './task-form-sheet.client';
 import { TaskNotesSheet } from './task-notes-sheet.client';
 import { CompletedTaskItem, TaskItem } from './task-item';
 import { useCompleteTask, useReopenTask, useTasks } from '../hooks/use-tasks';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import type { Task, TaskLowStock } from '@/features/tasks/task-schemas';
 import type { TaskCategory } from '@/features/tasks/categories';
 import type { TaskGroups } from '@/features/tasks/grouping';
 import { TASK_CATEGORIES } from '@/features/tasks/categories';
 import { groupTasks } from '@/features/tasks/grouping';
+import type { CoupleMember } from '@/features/couple/couple-schemas';
 
 const FILTER_NONE = 'nos';
 const FILTER_ALL = 'all';
@@ -179,11 +179,11 @@ export function TasksScreen() {
             action: {
               label: 'Desfazer',
               onClick: () =>
-                reopenTask.mutate(task.id, { onError: (error) => applyApiError(error) }),
+                reopenTask.mutate(task.id, { onError: (error) => applyActionError(error) }),
             },
           });
         },
-        onError: (error) => applyApiError(error),
+        onError: (error) => applyActionError(error),
       },
     );
   }
@@ -191,7 +191,7 @@ export function TasksScreen() {
   function handleReopen(task: Task) {
     reopenTask.mutate(task.id, {
       onSuccess: () => toast.success('Tarefa reaberta'),
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 
