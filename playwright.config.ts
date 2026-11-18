@@ -13,6 +13,8 @@ if (!testDatabaseUrl) {
 export default defineConfig({
   testDir: './e2e',
   testMatch: '**/*.e2e.ts',
+  // Depende da API NestJS (casal, tarefas, listas, saúde). Volta quando a Fase 2 portar os domínios.
+  testIgnore: '**/vibru-smoke.e2e.ts',
   workers: 1,
   retries: process.env.CI ? 2 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],
