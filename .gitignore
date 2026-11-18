@@ -24,3 +24,4 @@ screenshots/
 
 # Workspace de execução de planos
 .superpowers/
+.neon
