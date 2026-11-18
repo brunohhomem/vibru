@@ -40,3 +40,27 @@ export async function updateMemberDisplayName(
     .returning({ id: coupleMembers.id });
   if (updatedRows.length === 0) throw new Error('Couple member not found');
 }
+
+/** Dono do feed ICS: o token da URL é a credencial, então a busca é pelo hash dele. */
+export async function findMemberByIcsTokenHash(tokenHash: string): Promise<CoupleMemberRow | null> {
+  const [member] = await getDatabase()
+    .select()
+    .from(coupleMembers)
+    .where(eq(coupleMembers.icsTokenHash, tokenHash))
+    .limit(1);
+  return member ?? null;
+}
+
+/** Trocar o hash invalida o token anterior na mesma escrita; nulo desliga o feed. */
+export async function updateMemberIcsTokenHash(
+  coupleId: string,
+  memberId: string,
+  tokenHash: string | null,
+): Promise<void> {
+  const updatedRows = await getDatabase()
+    .update(coupleMembers)
+    .set({ icsTokenHash: tokenHash })
+    .where(and(eq(coupleMembers.coupleId, coupleId), eq(coupleMembers.id, memberId)))
+    .returning({ id: coupleMembers.id });
+  if (updatedRows.length === 0) throw new Error('Couple member not found');
+}

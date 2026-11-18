@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { todayInSaoPaulo, type Wish } from '@vibru/shared';
+import { todayInSaoPaulo } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ import { applyApiError } from '@/lib/api-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { usePlanWish } from '../hooks/use-wishes';
 import { planWishFormSchema, type PlanWishFormValues } from '../schemas/forms';
+import { type Wish } from '@/features/wishes/wish-schemas';
 
 type PlanWishSheetProps = {
   wish: Wish | null;

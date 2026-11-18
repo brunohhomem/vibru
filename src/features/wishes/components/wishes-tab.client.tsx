@@ -1,6 +1,5 @@
 'use client';
 
-import { WISH_CATEGORIES, type Wish, type WishCategory } from '@vibru/shared';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -13,6 +12,8 @@ import { wishCategoryLabel } from '../lib/wish-format';
 import { PlanWishSheet } from './plan-wish-sheet.client';
 import { WishCard } from './wish-card';
 import { WishSheet } from './wish-sheet.client';
+import { WISH_CATEGORIES, type WishCategory } from '@/features/wishes/wish-constants';
+import { type Wish } from '@/features/wishes/wish-schemas';
 
 type WishesTabProps = {
   category: WishCategory | null;

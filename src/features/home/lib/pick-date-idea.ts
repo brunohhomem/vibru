@@ -1,4 +1,4 @@
-import type { Wish } from '@vibru/shared';
+import type { Wish } from '@/features/wishes/wish-schemas';
 
 /**
  * Ideia de rolê da home: a aberta, sem plano, mais antiga. A escolha é fixa

@@ -1,6 +1,6 @@
-import type { Wish } from '@vibru/shared';
 import { describe, expect, it } from 'vitest';
 import { pickDateIdea } from './pick-date-idea';
+import type { Wish } from '@/features/wishes/wish-schemas';
 
 function wish(overrides: Partial<Wish>): Wish {
   return {

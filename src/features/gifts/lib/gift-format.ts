@@ -1,4 +1,5 @@
-import type { GiftCategory, GiftForPartner, GiftResponse } from '@vibru/shared';
+import type { GiftCategory } from '@/features/gifts/gift-constants';
+import type { GiftForPartner, GiftResponse } from '@/features/gifts/gift-schemas';
 
 export function giftCategoryLabel(category: GiftCategory): string {
   switch (category) {

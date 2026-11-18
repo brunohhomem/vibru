@@ -1,5 +1,5 @@
-import type { WishCategory } from '@vibru/shared';
 import { Film, Heart, MapPin, Music, Plane, Star } from 'lucide-react';
+import type { WishCategory } from '@/features/wishes/wish-constants';
 
 type WishCategoryIconProps = { category: WishCategory; className?: string };
 

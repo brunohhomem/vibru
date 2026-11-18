@@ -1,6 +1,6 @@
-import { WISH_CATEGORIES } from '@vibru/shared';
 import { z } from '@vibru/shared/zod';
 import { parseReaisToCents } from '@/lib/money';
+import { WISH_CATEGORIES } from '@/features/wishes/wish-constants';
 
 /** Link vazio é aceito (campo opcional); preenchido, só `http` e `https`. */
 export const optionalHttpUrl = z

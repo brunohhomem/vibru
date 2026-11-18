@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { GIFT_CATEGORIES, type GiftResponse } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -16,6 +15,8 @@ import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateGift, useDeleteGift, useUpdateGift } from '../hooks/use-gifts';
 import { giftCategoryLabel } from '../lib/gift-format';
 import { giftFormSchema, type GiftFormValues } from '../schemas/forms';
+import { GIFT_CATEGORIES } from '@/features/gifts/gift-constants';
+import { type GiftResponse } from '@/features/gifts/gift-schemas';
 
 type GiftSheetProps = {
   ownerId: string;

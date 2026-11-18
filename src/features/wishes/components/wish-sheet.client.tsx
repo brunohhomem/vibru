@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { WISH_CATEGORIES, type Wish, type WishCategory } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -16,6 +15,8 @@ import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateWish, useDeleteWish, useUpdateWish } from '../hooks/use-wishes';
 import { wishCategoryLabel } from '../lib/wish-format';
 import { wishFormSchema, type WishFormValues } from '../schemas/forms';
+import { WISH_CATEGORIES, type WishCategory } from '@/features/wishes/wish-constants';
+import { type Wish } from '@/features/wishes/wish-schemas';
 
 type WishSheetProps = {
   open: boolean;

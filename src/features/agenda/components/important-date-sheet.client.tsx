@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { CalendarDate, ImportantDate } from '@vibru/shared';
+import type { CalendarDate } from '@vibru/shared';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -14,6 +14,7 @@ import { applyApiError } from '@/lib/api-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateAgendaItem, useDeleteAgendaItem, useUpdateAgendaItem } from '../hooks/use-agenda';
 import { importantDateFormSchema, type ImportantDateFormValues } from '../schemas/forms';
+import type { ImportantDate } from '@/features/agenda/agenda-schemas';
 
 type ImportantDateSheetProps = {
   open: boolean;

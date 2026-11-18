@@ -1,10 +1,10 @@
-import type { Wish } from '@vibru/shared';
 import { CalendarCheck, Check, Pencil, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatSinceDate } from '@/features/home/lib/home-format';
 import { formatCents } from '@/lib/money';
 import { wishCategoryLabel } from '../lib/wish-format';
 import { WishCategoryIcon } from './wish-category-icon';
+import type { Wish } from '@/features/wishes/wish-schemas';
 
 type WishCardProps = {
   wish: Wish;

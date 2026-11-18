@@ -1,8 +1,8 @@
-import type { GiftResponse } from '@vibru/shared';
 import { Gift } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { formatCents } from '@/lib/money';
 import { giftCategoryLabel } from '../lib/gift-format';
+import type { GiftResponse } from '@/features/gifts/gift-schemas';
 
 type GiftCardProps = {
   gift: GiftResponse;

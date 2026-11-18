@@ -22,13 +22,13 @@ const apiOrigin = readApiOrigin();
 const nextConfig: NextConfig = {
   agentRules: false,
   async rewrites() {
-    return [
-      {
-        // Exclui /api/auth: essas rotas são do Better Auth (src/app/api/auth), não da API legada.
-        source: '/api/:path((?!auth(?:/|$)).*)',
-        destination: `${apiOrigin}/api/:path*`,
-      },
-    ];
+    return {
+      beforeFiles: [],
+      afterFiles: [],
+      // Fallback: só o que nenhuma rota do Next atende vai para a API legada. Rewrite comum
+      // (`afterFiles`) roda antes das rotas dinâmicas e engoliria `/api/ics/[feedFile]`.
+      fallback: [{ source: '/api/:path*', destination: `${apiOrigin}/api/:path*` }],
+    };
   },
 };
 
