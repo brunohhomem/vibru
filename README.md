@@ -14,10 +14,11 @@ O `.gitattributes` grava texto com LF.
 
 ```bash
 pnpm install
-neon deploy          # cria o banco e preenche DATABASE_URL* no .env
+cp .env.example .env   # antes do neon deploy: ele preenche DATABASE_URL* dentro deste arquivo
+neon deploy            # cria o banco e preenche DATABASE_URL* no .env
 ```
 
-Copie `.env.example` para `.env` e preencha o que o Neon não preenche:
+Depois preencha, no `.env`, o que o Neon não preenche:
 
 - `BETTER_AUTH_SECRET`: 32 caracteres ou mais (ex.: `openssl rand -hex 32`).
 - `SEED_USER_ONE_*` e `SEED_USER_TWO_*`: e-mail e senha dos 2 usuários (não existe cadastro).

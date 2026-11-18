@@ -1,6 +1,6 @@
 ---
-globs: apps/web/**
+globs: src/**
 alwaysApply: false
 ---
 
-Leia `docs/conventions/frontend.md` e `DESIGN.md` antes de alterar o web.
+Leia `docs/conventions/frontend.md` e `DESIGN.md` antes de alterar o app.
