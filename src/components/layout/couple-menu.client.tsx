@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, HeartPulse, Palette, Settings, User, Users } from 'lucide-react';
+import { Check, HeartPulse, Palette, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import type { CoupleMember } from '@vibru/shared';
@@ -49,11 +49,10 @@ function MemberAvatar({ member }: { member: CoupleMember }) {
 
 type CoupleMenuProps = {
   members: CoupleMember[];
-  isAdmin: boolean;
   onLogout: () => void;
 };
 
-export function CoupleMenu({ members, isAdmin, onLogout }: CoupleMenuProps) {
+export function CoupleMenu({ members, onLogout }: CoupleMenuProps) {
   const { theme, setTheme } = useTheme();
   const coupleNames = members.map((member) => member.displayName).join(' e ');
 
@@ -91,22 +90,6 @@ export function CoupleMenu({ members, isAdmin, onLogout }: CoupleMenuProps) {
             Saúde
           </Link>
         </DropdownMenuItem>
-        {isAdmin ? (
-          <>
-            <DropdownMenuItem asChild>
-              <Link href="/app/users">
-                <Users className={MENU_ICON_CLASSES} aria-hidden />
-                Usuários
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/app/settings">
-                <Settings className={MENU_ICON_CLASSES} aria-hidden />
-                Configurações
-              </Link>
-            </DropdownMenuItem>
-          </>
-        ) : null}
         <DropdownMenuSeparator />
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
