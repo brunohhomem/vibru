@@ -14,6 +14,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { coreColumns } from './core-columns';
 import { coupleMembers, couples } from './couple-schema';
+import { medications } from './medications-schema';
 
 export const taskRecurrenceEnum = pgEnum('task_recurrence', [
   'none',
@@ -34,7 +35,7 @@ export const taskCategoryEnum = pgEnum('task_category', [
 /**
  * Tarefa de um casal. `assignee_member_id` nulo significa "nós". Recorrência é
  * ancorada no primeiro prazo: as ocorrências são `recurrence_anchor_on + k × intervalo`.
- * `medication_id` ainda não tem FK: a tabela de remédios chega com o lote D.
+ * `medication_id` liga a tarefa ao remédio que a gerou.
  */
 export const tasks = pgTable(
   'tasks',
@@ -51,7 +52,9 @@ export const tasks = pgTable(
     dueOn: date('due_on', { mode: 'string' }),
     dueTime: time('due_time'),
     category: taskCategoryEnum('category').notNull().default('other'),
-    medicationId: uuid('medication_id'),
+    medicationId: uuid('medication_id').references(() => medications.id, {
+      onDelete: 'set null',
+    }),
     recurrenceKind: taskRecurrenceEnum('recurrence_kind').notNull().default('none'),
     recurrenceInterval: integer('recurrence_interval').notNull().default(1),
     recurrenceAnchorOn: date('recurrence_anchor_on', { mode: 'string' }),
