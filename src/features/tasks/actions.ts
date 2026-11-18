@@ -201,6 +201,7 @@ export const reopenTaskAction = defineMemberAction({
 
     const reopened = await getDatabase().transaction(async (transaction) => {
       const row = await clearTaskCompletion(member.coupleId, input.id, transaction);
+      if (!row) throw new ActionFailure('failed', 'Tarefa não está concluída');
       if (existing.medicationId) {
         await returnDose(member.coupleId, existing.medicationId, transaction);
       }

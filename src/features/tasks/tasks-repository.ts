@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNotNull, isNull, sql } from 'drizzle-orm';
 import { getDatabase, type DatabaseExecutor } from '@/db/client';
 import { tasks, type NewTaskRow, type TaskRow } from '@/db/tasks-schema';
 import type { CalendarDate } from '@/lib/calendar-date';
@@ -100,18 +100,29 @@ export async function completeTaskIfOpen(
   return row ?? null;
 }
 
+/**
+ * Reabre somente se a tarefa ainda estiver concluída. O `WHERE` condicional serializa duas
+ * reaberturas simultâneas: a segunda não acha a linha e a action responde conflito, em vez
+ * de devolver a dose do remédio duas vezes.
+ */
 export async function clearTaskCompletion(
   coupleId: string,
   taskId: string,
   executor: DatabaseExecutor,
-): Promise<TaskRow> {
+): Promise<TaskRow | null> {
   const [row] = await executor
     .update(tasks)
     .set({ completedAt: null, completedByMemberId: null, updatedAt: new Date() })
-    .where(and(eq(tasks.coupleId, coupleId), eq(tasks.id, taskId), eq(tasks.isActive, true)))
+    .where(
+      and(
+        eq(tasks.coupleId, coupleId),
+        eq(tasks.id, taskId),
+        eq(tasks.isActive, true),
+        isNotNull(tasks.completedAt),
+      ),
+    )
     .returning();
-  if (!row) throw new Error('Tarefa não encontrada para reabrir');
-  return row;
+  return row ?? null;
 }
 
 export async function findOpenGeneratedChild(
