@@ -18,7 +18,7 @@ export function unwrapActionResult<TData>(result: ActionResult<TData>): TData {
 
 export type LoadFailureKind = 'couple-required' | 'redirect-to-login' | 'retry';
 
-// Substitui o antigo statusOf(error) 403/401 do axios no shell do /app.
+// Decide, no shell do /app, o que fazer com a falha ao carregar a sessão ou o casal.
 export function describeActionFailure(error: unknown): LoadFailureKind {
   if (!(error instanceof ActionResultError)) return 'retry';
   if (error.code === 'couple_required') return 'couple-required';

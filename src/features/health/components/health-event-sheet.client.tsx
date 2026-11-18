@@ -8,7 +8,7 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Textarea } from '@/components/ui/textarea';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateHealthItem, useDeleteHealthItem, useUpdateHealthItem } from '../hooks/use-health';
 import { HEALTH_EVENT_KIND_LABELS } from '../lib/health-format';
@@ -76,7 +76,7 @@ export function HealthEventSheet({
       toast.success(event ? 'Evento atualizado' : 'Evento registrado');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -90,7 +90,7 @@ export function HealthEventSheet({
           onOpenChange(false);
           toast.success('Evento removido');
         },
-        onError: (error) => applyApiError(error),
+        onError: (error) => applyActionError(error),
       },
     );
   }

@@ -16,7 +16,7 @@ import { useCreateTask, useDeleteTask, useUpdateTask, type TaskPayload } from '.
 import { RECURRENCE_OPTIONS } from '../lib/task-format';
 import { taskFormSchema, type TaskFormValues } from '../schemas/forms';
 import { cn } from '@/lib/cn';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import type { Task } from '@/features/tasks/task-schemas';
 import {
@@ -166,7 +166,7 @@ export function TaskFormSheet({ open, onOpenChange, task, members, today }: Task
       }
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -179,7 +179,7 @@ export function TaskFormSheet({ open, onOpenChange, task, members, today }: Task
         onOpenChange(false);
         toast.success('Tarefa excluída');
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 

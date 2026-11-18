@@ -23,7 +23,7 @@ export function createQueryClient(onUnauthenticated: () => void): QueryClient {
 }
 
 // Sessão expirada no meio do uso: limpa o cache (para o próximo usuário do aparelho não ver
-// dados do anterior) e recarrega no /login, como fazia o interceptor de 401 do axios.
+// dados do anterior) e recarrega no /login.
 function redirectToLoginClearingCache(): void {
   queryClient.clear();
   if (typeof window === 'undefined' || window.location.pathname === '/login') return;

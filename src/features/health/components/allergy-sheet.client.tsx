@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateHealthItem, useDeleteHealthItem, useUpdateHealthItem } from '../hooks/use-health';
 import { SEVERITY_LABELS } from '../lib/health-format';
@@ -60,7 +60,7 @@ export function AllergySheet({ memberId, open, allergy, onOpenChange }: AllergyS
       toast.success(allergy ? 'Alergia atualizada' : 'Alergia adicionada');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -74,7 +74,7 @@ export function AllergySheet({ memberId, open, allergy, onOpenChange }: AllergyS
           onOpenChange(false);
           toast.success('Alergia removida');
         },
-        onError: (error) => applyApiError(error),
+        onError: (error) => applyActionError(error),
       },
     );
   }

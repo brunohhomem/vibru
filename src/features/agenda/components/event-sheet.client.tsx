@@ -8,7 +8,7 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { HealthSheet } from '@/features/health/components/health-sheet.client';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateAgendaItem, useDeleteAgendaItem, useUpdateAgendaItem } from '../hooks/use-agenda';
 import { eventFormSchema, type EventFormValues } from '../schemas/forms';
@@ -61,7 +61,7 @@ export function EventSheet({ open, event, defaultDate, onOpenChange }: EventShee
       toast.success(event ? 'Evento atualizado' : 'Evento criado');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -73,7 +73,7 @@ export function EventSheet({ open, event, defaultDate, onOpenChange }: EventShee
         onOpenChange(false);
         toast.success('Evento removido');
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 

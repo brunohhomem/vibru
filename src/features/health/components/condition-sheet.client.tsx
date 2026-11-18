@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateHealthItem, useDeleteHealthItem, useUpdateHealthItem } from '../hooks/use-health';
 import { conditionFormSchema, type ConditionFormValues } from '../schemas/forms';
@@ -58,7 +58,7 @@ export function ConditionSheet({ memberId, open, condition, onOpenChange }: Cond
       toast.success(condition ? 'Condição atualizada' : 'Condição adicionada');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -72,7 +72,7 @@ export function ConditionSheet({ memberId, open, condition, onOpenChange }: Cond
           onOpenChange(false);
           toast.success('Condição removida');
         },
-        onError: (error) => applyApiError(error),
+        onError: (error) => applyActionError(error),
       },
     );
   }

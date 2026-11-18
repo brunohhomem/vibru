@@ -8,7 +8,7 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { MaskedInput } from '@/components/ui/masked-input';
 import { Textarea } from '@/components/ui/textarea';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { formatPhone } from '@/lib/masks';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateHealthItem, useDeleteHealthItem, useUpdateHealthItem } from '../hooks/use-health';
@@ -63,7 +63,7 @@ export function DoctorSheet({ memberId, open, doctor, onOpenChange }: DoctorShee
       toast.success(doctor ? 'Médico atualizado' : 'Médico adicionado');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 
@@ -77,7 +77,7 @@ export function DoctorSheet({ memberId, open, doctor, onOpenChange }: DoctorShee
           onOpenChange(false);
           toast.success('Médico removido');
         },
-        onError: (error) => applyApiError(error),
+        onError: (error) => applyActionError(error),
       },
     );
   }

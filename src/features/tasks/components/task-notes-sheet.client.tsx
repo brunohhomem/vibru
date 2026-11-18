@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useUpdateTask } from '../hooks/use-tasks';
 import { taskNotesFormSchema, type TaskNotesFormValues } from '../schemas/forms';
@@ -44,7 +44,7 @@ export function TaskNotesSheet({ task, onOpenChange }: TaskNotesSheetProps) {
       toast.success('Tarefa atualizada');
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 

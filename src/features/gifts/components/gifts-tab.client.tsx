@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { useCouple } from '@/features/couple/hooks/use-couple';
 import { FilterChip } from '@/features/tasks/components/filter-chip';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { useGifts, useMarkGiftReceived, useToggleGiftReservation } from '../hooks/use-gifts';
 import { hasReservationFields } from '../lib/gift-format';
 import { GiftCard } from './gift-card';
@@ -30,7 +30,7 @@ function OwnGiftActions({ gift, ownerId }: { gift: GiftResponse; ownerId: string
       onClick={() =>
         markReceived.mutate(gift.id, {
           onSuccess: () => toast.success('Presente recebido'),
-          onError: (error) => applyApiError(error),
+          onError: (error) => applyActionError(error),
         })
       }
     >
@@ -58,7 +58,7 @@ function PartnerGiftActions({ gift, owner, me }: { gift: GiftResponse } & GiftLi
           {
             onSuccess: () =>
               toast.success(reservedByMe ? 'Reserva desfeita' : 'Presente reservado'),
-            onError: (error) => applyApiError(error),
+            onError: (error) => applyActionError(error),
           },
         )
       }

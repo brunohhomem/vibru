@@ -16,7 +16,7 @@ import {
 import { EmptyState, ErrorState } from '@/components/ui/screen-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCouple } from '@/features/couple/hooks/use-couple';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import {
   useCheckListItem,
   useClearCheckedItems,
@@ -187,7 +187,7 @@ export function ListDetailScreen({ listId }: { listId: string }) {
     const variables = { listId, itemId: item.id, memberId: me?.id ?? '' };
 
     if (item.checkedAt !== null) {
-      uncheckItem.mutate(variables, { onError: (error) => applyApiError(error) });
+      uncheckItem.mutate(variables, { onError: (error) => applyActionError(error) });
       return;
     }
 
@@ -197,10 +197,10 @@ export function ListDetailScreen({ listId }: { listId: string }) {
           action: {
             label: 'Desfazer',
             onClick: () =>
-              uncheckItem.mutate(variables, { onError: (error) => applyApiError(error) }),
+              uncheckItem.mutate(variables, { onError: (error) => applyActionError(error) }),
           },
         }),
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 
@@ -210,7 +210,7 @@ export function ListDetailScreen({ listId }: { listId: string }) {
         toast.success('Lista excluída');
         router.push('/app/lists');
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 
@@ -220,7 +220,7 @@ export function ListDetailScreen({ listId }: { listId: string }) {
         setClearOpen(false);
         toast.success('Marcados removidos');
       },
-      onError: (error) => applyApiError(error),
+      onError: (error) => applyActionError(error),
     });
   }
 

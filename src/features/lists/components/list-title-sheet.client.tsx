@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateList, useRenameList } from '../hooks/use-lists';
 import { listTitleFormSchema, type ListTitleFormValues } from '../schemas/forms';
@@ -45,7 +45,7 @@ export function ListTitleSheet({ open, onOpenChange, list }: ListTitleSheetProps
       }
       onOpenChange(false);
     } catch (error) {
-      applyApiError(error, form.setError);
+      applyActionError(error, form.setError);
     }
   }
 

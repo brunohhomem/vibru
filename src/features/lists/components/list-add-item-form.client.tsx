@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { applyApiError } from '@/lib/api-error';
+import { applyActionError } from '@/lib/action-error';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useAddListItem } from '../hooks/use-lists';
 import { listItemFormSchema, type ListItemFormValues } from '../schemas/forms';
@@ -25,7 +25,7 @@ export function ListAddItemForm({ listId }: { listId: string }) {
       form.setFocus('title');
       toast.success('Item adicionado');
     } catch (apiError) {
-      applyApiError(apiError, form.setError);
+      applyActionError(apiError, form.setError);
     }
   }
 
