@@ -13,9 +13,7 @@
     "src/**/*.tsx",
     "next.config.ts",
     "neon.ts",
-    "drizzle.config.ts",
-    "playwright.config.ts",
-    "e2e/**/*.ts"
+    "drizzle.config.ts"
   ],
   "exclude": ["node_modules", "legacy"]
 }

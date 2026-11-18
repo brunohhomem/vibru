@@ -260,9 +260,6 @@ importers:
       '@eslint-community/eslint-plugin-eslint-comments':
         specifier: 4.8.1
         version: 4.8.1(eslint@9.39.5(jiti@2.7.0)(supports-color@7.2.0))
-      '@playwright/test':
-        specifier: 1.64.1
-        version: 1.64.1
       '@testing-library/react':
         specifier: 16.3.3
         version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -5683,6 +5680,7 @@ snapshots:
   '@playwright/test@1.64.1':
     dependencies:
       playwright: 1.64.1
+    optional: true
 
   '@radix-ui/primitive@1.2.0': {}
 
@@ -8082,11 +8080,13 @@ snapshots:
 
   picomatch@4.0.7: {}
 
-  playwright-core@1.64.1: {}
+  playwright-core@1.64.1:
+    optional: true
 
   playwright@1.64.1:
     dependencies:
       playwright-core: 1.64.1
+    optional: true
 
   pluralize@8.0.0: {}
 

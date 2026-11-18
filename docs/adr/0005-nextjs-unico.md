@@ -28,4 +28,5 @@ O Vibru é um app pessoal para 2 pessoas. A estrutura atual (monorepo pnpm com A
 
 - Saem: `apps/api`, `packages/*`, Redis, BullMQ, worker, Mailpit, Swagger, guards de papel.
 - Cada ação autenticada valida a sessão antes de acessar o banco (wrapper único `defineAction`).
+- **Sem banco de teste:** não há branch de teste no Neon, testes de integração nem e2e contra banco. A rede de segurança é só de testes unitários, lint, typecheck e build no CI. O CI não tem job de banco.
 - A migração é feita em 3 fases: esqueleto (N1), domínios (N2) e limpeza (N3). Entre N1 e N2 as telas de domínio ficam fora do ar; a branch só vai para a `main` depois da N2.
