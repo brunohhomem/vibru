@@ -1,5 +1,5 @@
 import type { CalendarDate } from '@vibru/shared';
-import { and, asc, desc, eq, isNull, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { getDatabase, type DatabaseExecutor } from '@/db/client';
 import { tasks, type NewTaskRow, type TaskRow } from '@/db/tasks-schema';
 
@@ -63,8 +63,9 @@ export async function updateTask(
   coupleId: string,
   taskId: string,
   data: Partial<NewTaskRow>,
+  executor: DatabaseExecutor = getDatabase(),
 ): Promise<TaskRow> {
-  const [row] = await getDatabase()
+  const [row] = await executor
     .update(tasks)
     .set(data)
     .where(and(eq(tasks.coupleId, coupleId), eq(tasks.id, taskId), eq(tasks.isActive, true)))
@@ -139,6 +140,39 @@ export async function hardDeleteTask(
   executor: DatabaseExecutor,
 ): Promise<void> {
   await executor.delete(tasks).where(and(eq(tasks.coupleId, coupleId), eq(tasks.id, taskId)));
+}
+
+/** Tarefas abertas geradas por um remédio, por horário. */
+export async function listOpenTasksByMedication(
+  coupleId: string,
+  medicationId: string,
+  executor: DatabaseExecutor,
+): Promise<TaskRow[]> {
+  return executor
+    .select()
+    .from(tasks)
+    .where(
+      and(
+        eq(tasks.coupleId, coupleId),
+        eq(tasks.medicationId, medicationId),
+        eq(tasks.isActive, true),
+        isNull(tasks.completedAt),
+      ),
+    )
+    .orderBy(asc(tasks.dueTime), asc(tasks.createdAt));
+}
+
+export async function softDeleteTasks(
+  coupleId: string,
+  taskIds: string[],
+  executor: DatabaseExecutor,
+): Promise<void> {
+  if (taskIds.length === 0) return;
+
+  await executor
+    .update(tasks)
+    .set({ isActive: false, updatedAt: new Date() })
+    .where(and(eq(tasks.coupleId, coupleId), inArray(tasks.id, taskIds)));
 }
 
 export async function softDeleteTask(coupleId: string, taskId: string): Promise<TaskRow | null> {
