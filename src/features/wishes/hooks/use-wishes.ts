@@ -1,15 +1,16 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { AGENDA_QUERY_KEY } from '@/features/agenda/hooks/use-agenda';
-import { api } from '@/lib/api';
-import type { AgendaEvent } from '@/features/agenda/agenda-schemas';
-import type {
-  CreateWishRequest,
-  PlanWishRequest,
-  UpdateWishRequest,
-  Wish,
-  WishesResponse,
-} from '@/features/wishes/wish-schemas';
-import type { WishStatus } from '@/features/wishes/wish-constants';
+import { unwrapActionResult } from '@/lib/unwrap-action-result';
+import {
+  createWishAction,
+  listWishesAction,
+  planWishAction,
+  removeWishAction,
+  setWishDoneAction,
+  updateWishAction,
+} from '../actions';
+import type { WishStatus } from '../wish-constants';
+import type { CreateWishRequest, PlanWishRequest, UpdateWishRequest } from '../wish-schemas';
 
 export const WISHES_QUERY_KEY = ['wishes'] as const;
 
@@ -20,12 +21,7 @@ function invalidateWishes(queryClient: QueryClient) {
 export function useWishes(filters: { status: WishStatus }) {
   return useQuery({
     queryKey: [...WISHES_QUERY_KEY, filters.status],
-    queryFn: async () => {
-      const response = await api.get<WishesResponse>('/wishes', {
-        params: { status: filters.status },
-      });
-      return response.data;
-    },
+    queryFn: async () => unwrapActionResult(await listWishesAction({ status: filters.status })),
   });
 }
 
@@ -33,10 +29,8 @@ export function useCreateWish() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: CreateWishRequest) => {
-      const response = await api.post<Wish>('/wishes', payload);
-      return response.data;
-    },
+    mutationFn: async (payload: CreateWishRequest) =>
+      unwrapActionResult(await createWishAction(payload)),
     onSuccess: () => invalidateWishes(queryClient),
   });
 }
@@ -45,10 +39,8 @@ export function useUpdateWish() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ wishId, payload }: { wishId: string; payload: UpdateWishRequest }) => {
-      const response = await api.patch<Wish>(`/wishes/${wishId}`, payload);
-      return response.data;
-    },
+    mutationFn: async ({ wishId, payload }: { wishId: string; payload: UpdateWishRequest }) =>
+      unwrapActionResult(await updateWishAction({ id: wishId, data: payload })),
     onSuccess: () => invalidateWishes(queryClient),
   });
 }
@@ -58,7 +50,7 @@ export function useDeleteWish() {
 
   return useMutation({
     mutationFn: async (wishId: string) => {
-      await api.delete(`/wishes/${wishId}`);
+      unwrapActionResult(await removeWishAction({ id: wishId }));
     },
     onSuccess: () => invalidateWishes(queryClient),
   });
@@ -68,12 +60,8 @@ export function useSetWishDone() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ wishId, done }: { wishId: string; done: boolean }) => {
-      const response = done
-        ? await api.post<Wish>(`/wishes/${wishId}/done`)
-        : await api.delete<Wish>(`/wishes/${wishId}/done`);
-      return response.data;
-    },
+    mutationFn: async ({ wishId, done }: { wishId: string; done: boolean }) =>
+      unwrapActionResult(await setWishDoneAction({ id: wishId, done })),
     onSuccess: () => invalidateWishes(queryClient),
   });
 }
@@ -83,10 +71,8 @@ export function usePlanWish() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ wishId, payload }: { wishId: string; payload: PlanWishRequest }) => {
-      const response = await api.post<AgendaEvent>(`/wishes/${wishId}/plan`, payload);
-      return response.data;
-    },
+    mutationFn: async ({ wishId, payload }: { wishId: string; payload: PlanWishRequest }) =>
+      unwrapActionResult(await planWishAction({ id: wishId, data: payload })),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: AGENDA_QUERY_KEY });
       return invalidateWishes(queryClient);
