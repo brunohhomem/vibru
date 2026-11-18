@@ -74,4 +74,14 @@ describe('auth (Better Auth com e-mail e senha)', () => {
     const storedRows = await getDatabase().select().from(rateLimit).where(eq(rateLimit.count, 5));
     expect(storedRows.length).toBeGreaterThan(0);
   });
+
+  it('não aceita duas linhas de rate limit com a mesma chave (race de primeira requisição)', async () => {
+    const key = `unique-key-${randomUUID()}`;
+    const database = getDatabase();
+    await database.insert(rateLimit).values({ id: randomUUID(), key, count: 1, lastRequest: 1 });
+
+    await expect(
+      database.insert(rateLimit).values({ id: randomUUID(), key, count: 1, lastRequest: 1 }),
+    ).rejects.toThrow();
+  });
 });

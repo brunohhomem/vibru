@@ -1,15 +1,46 @@
 'use server';
 
-import { APIError } from 'better-auth/api';
-import { headers } from 'next/headers';
+import { parseSetCookieHeader, toCookieOptions } from 'better-auth/cookies';
+import { cookies, headers } from 'next/headers';
 import { loginRequestSchema, type AuthResponse } from '@vibru/shared';
 import { auth } from '@/lib/auth';
+import { getEnv } from '@/lib/env';
 import type { ActionResult } from '@/lib/define-action';
 import { readSession } from '@/lib/session';
 
 // Mesma mensagem para senha errada e e-mail inexistente: não revela quem tem conta.
 const INVALID_CREDENTIALS_MESSAGE = 'E-mail ou senha incorretos.';
 const TOO_MANY_ATTEMPTS_MESSAGE = 'Muitas tentativas. Aguarde um minuto e tente de novo.';
+
+const SIGN_IN_PATH = '/api/auth/sign-in/email';
+const FORWARDED_ADDRESS_HEADERS = ['x-vercel-forwarded-for', 'x-forwarded-for'];
+
+// O rate limit do Better Auth só roda no roteador HTTP (auth.handler); auth.api.* o ignora.
+// Por isso o login monta a requisição e passa pelo handler, repassando o IP do cliente.
+function buildSignInRequest(credentials: unknown, incomingHeaders: Headers): Request {
+  const requestHeaders = new Headers();
+  requestHeaders.set('content-type', 'application/json');
+  requestHeaders.set('origin', getEnv().BETTER_AUTH_URL);
+  for (const headerName of FORWARDED_ADDRESS_HEADERS) {
+    const value = incomingHeaders.get(headerName);
+    if (value) requestHeaders.set(headerName, value);
+  }
+  return new Request(new URL(SIGN_IN_PATH, getEnv().BETTER_AUTH_URL), {
+    method: 'POST',
+    headers: requestHeaders,
+    body: JSON.stringify(credentials),
+  });
+}
+
+async function forwardSessionCookies(response: Response): Promise<void> {
+  const setCookieHeader = response.headers.get('set-cookie');
+  if (!setCookieHeader) return;
+
+  const cookieStore = await cookies();
+  for (const [name, attributes] of parseSetCookieHeader(setCookieHeader)) {
+    cookieStore.set(name, attributes.value, toCookieOptions(attributes));
+  }
+}
 
 export async function loginAction(
   rawInput: unknown,
@@ -19,21 +50,17 @@ export async function loginAction(
     return { ok: false, code: 'invalid_input', message: INVALID_CREDENTIALS_MESSAGE };
   }
 
-  try {
-    const result = await auth.api.signInEmail({
-      body: parsed.data,
-      headers: await headers(),
-    });
-    const mustChangePassword = Boolean(
-      (result.user as { mustChangePassword?: boolean }).mustChangePassword,
-    );
-    return { ok: true, data: { mustChangePassword } };
-  } catch (error) {
-    if (error instanceof APIError && error.statusCode === 429) {
-      return { ok: false, code: 'failed', message: TOO_MANY_ATTEMPTS_MESSAGE };
-    }
+  const response = await auth.handler(buildSignInRequest(parsed.data, await headers()));
+  if (response.status === 429) {
+    return { ok: false, code: 'failed', message: TOO_MANY_ATTEMPTS_MESSAGE };
+  }
+  if (!response.ok) {
     return { ok: false, code: 'unauthenticated', message: INVALID_CREDENTIALS_MESSAGE };
   }
+
+  await forwardSessionCookies(response);
+  const payload = (await response.json()) as { user?: { mustChangePassword?: boolean } };
+  return { ok: true, data: { mustChangePassword: Boolean(payload.user?.mustChangePassword) } };
 }
 
 export async function logoutAction(): Promise<void> {

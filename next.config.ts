@@ -24,7 +24,8 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
+        // Exclui /api/auth: essas rotas são do Better Auth (src/app/api/auth), não da API legada.
+        source: '/api/:path((?!auth(?:/|$)).*)',
         destination: `${apiOrigin}/api/:path*`,
       },
     ];

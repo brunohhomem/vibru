@@ -62,3 +62,42 @@ jobs:
         run: |
           git fetch --no-tags origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
           pnpm exec commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+
+  # Precisa do secret TEST_DATABASE_URL (string de conexão da branch `test` do Neon).
+  integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    # A branch de teste é única: execuções simultâneas se atrapalhariam.
+    concurrency:
+      group: neon-test-branch
+      cancel-in-progress: false
+    env:
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      BETTER_AUTH_SECRET: ci-only-secret-ci-only-secret-ci-only-secret
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Instalar
+        run: pnpm install --frozen-lockfile
+
+      - name: Testes de integração
+        run: pnpm test:integration
+
+      - name: Build
+        run: pnpm build
+
+      - name: Navegador do Playwright
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: E2E de login
+        run: pnpm e2e

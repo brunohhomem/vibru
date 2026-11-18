@@ -72,7 +72,8 @@ export const verification = pgTable('verification', {
 // Rate limit em banco: em serverless a memória não é compartilhada entre instâncias.
 export const rateLimit = pgTable('rate_limit', {
   id: text('id').primaryKey(),
-  key: text('key').notNull(),
+  // Único: o armazenamento em banco do Better Auth depende disso para resolver a corrida da 1ª requisição.
+  key: text('key').notNull().unique(),
   count: integer('count').notNull(),
   lastRequest: bigint('last_request', { mode: 'number' }).notNull(),
 });

@@ -36,4 +36,23 @@ describe('parseEnv', () => {
   it('converte DATABASE_POOL_MAX de texto para número', () => {
     expect(parseEnv({ ...validRawEnv, DATABASE_POOL_MAX: '5' }).DATABASE_POOL_MAX).toBe(5);
   });
+
+  it('exige BETTER_AUTH_URL quando roda na Vercel', () => {
+    expect(() =>
+      parseEnv({ ...validRawEnv, BETTER_AUTH_URL: undefined, VERCEL: '1' }),
+    ).toThrowError(/BETTER_AUTH_URL/);
+  });
+
+  it('exige https em BETTER_AUTH_URL quando roda na Vercel', () => {
+    expect(() =>
+      parseEnv({ ...validRawEnv, VERCEL: '1', BETTER_AUTH_URL: 'http://meu-app.vercel.app' }),
+    ).toThrowError(/https/);
+  });
+
+  it('aceita BETTER_AUTH_URL https na Vercel', () => {
+    expect(
+      parseEnv({ ...validRawEnv, VERCEL: '1', BETTER_AUTH_URL: 'https://meu-app.vercel.app' })
+        .BETTER_AUTH_URL,
+    ).toBe('https://meu-app.vercel.app');
+  });
 });

@@ -31,3 +31,24 @@ test('login com a senha certa chega no /app e continua logado ao recarregar', as
 
   await expect(page).toHaveURL(/\/app$/);
 });
+
+test('o handler do Better Auth responde no /api/auth (sem cair na API legada)', async ({
+  request,
+}) => {
+  const response = await request.get('/api/auth/ok');
+
+  expect(response.status()).toBe(200);
+});
+
+test('cookie de sessão adulterado no /app volta para o /login sem loop nem erro', async ({
+  page,
+  context,
+}) => {
+  await context.addCookies([
+    { name: 'better-auth.session_token', value: 'adulterado.abc', url: 'http://127.0.0.1:3100' },
+  ]);
+
+  await page.goto('/app');
+
+  await expect(page).toHaveURL(/\/login/);
+});

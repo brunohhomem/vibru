@@ -41,6 +41,8 @@ function createAuth() {
       max: 100,
       customRules: Object.fromEntries([[SIGN_IN_PATH, loginAttemptRule]]),
     },
+    // O limite por IP supõe a Vercel, que sobrescreve esses cabeçalhos com o IP real do cliente.
+    advanced: { ipAddress: { ipAddressHeaders: ['x-vercel-forwarded-for', 'x-forwarded-for'] } },
     plugins: [nextCookies()],
   });
 }
@@ -57,6 +59,7 @@ function getAuth(): AuthInstance {
 
 export const auth = new Proxy({} as AuthInstance, {
   get: (_target, property) => Reflect.get(getAuth(), property),
+  has: (_target, property) => Reflect.has(getAuth(), property),
 });
 
 export type Session = AuthInstance['$Infer']['Session'];
