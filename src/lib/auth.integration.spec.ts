@@ -4,6 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { getDatabase } from '@/db/client';
 import { account, rateLimit, user } from '@/db/auth-schema';
 import { auth } from './auth';
+import { buildSignInRequest } from './sign-in-request.test-helper';
 
 const knownPassword = 'senha-correta-123';
 const knownEmail = `login-${randomUUID()}@example.com`;
@@ -23,34 +24,19 @@ async function insertKnownUser(): Promise<void> {
   });
 }
 
-function jsonHeaders(clientIp: string): Headers {
-  const headers = new Headers();
-  headers.set('content-type', 'application/json');
-  headers.set('x-forwarded-for', clientIp);
-  return headers;
-}
-
-function signInRequest(email: string, password: string, clientIp: string): Request {
-  return new Request('http://localhost:3100/api/auth/sign-in/email', {
-    method: 'POST',
-    headers: jsonHeaders(clientIp),
-    body: JSON.stringify({ email, password }),
-  });
-}
-
 describe('auth (Better Auth com e-mail e senha)', () => {
   beforeAll(insertKnownUser);
 
   it('entra com a senha correta e devolve o cookie de sessão', async () => {
-    const response = await auth.handler(signInRequest(knownEmail, knownPassword, '10.0.0.1'));
+    const response = await auth.handler(buildSignInRequest(knownEmail, knownPassword, '10.0.0.1'));
     expect(response.status).toBe(200);
     expect(response.headers.get('set-cookie')).toContain('session_token');
   });
 
   it('devolve o mesmo erro para senha errada e para e-mail inexistente', async () => {
-    const wrongPassword = await auth.handler(signInRequest(knownEmail, 'errada', '10.0.0.2'));
+    const wrongPassword = await auth.handler(buildSignInRequest(knownEmail, 'errada', '10.0.0.2'));
     const unknownEmail = await auth.handler(
-      signInRequest(`ninguem-${randomUUID()}@example.com`, 'qualquer', '10.0.0.3'),
+      buildSignInRequest(`ninguem-${randomUUID()}@example.com`, 'qualquer', '10.0.0.3'),
     );
     expect(wrongPassword.status).toBe(401);
     expect(unknownEmail.status).toBe(401);
@@ -58,10 +44,13 @@ describe('auth (Better Auth com e-mail e senha)', () => {
   });
 
   it('recusa cadastro de e-mail novo (signUp desabilitado)', async () => {
+    const headers = new Headers();
+    headers.set('content-type', 'application/json');
+    headers.set('x-forwarded-for', '10.0.0.4');
     const response = await auth.handler(
       new Request('http://localhost:3100/api/auth/sign-up/email', {
         method: 'POST',
-        headers: jsonHeaders('10.0.0.4'),
+        headers,
         body: JSON.stringify({
           email: `novo-${randomUUID()}@example.com`,
           password: 'x'.repeat(12),
@@ -76,7 +65,7 @@ describe('auth (Better Auth com e-mail e senha)', () => {
     const clientIp = `10.1.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}`;
     const statuses: number[] = [];
     for (let attempt = 0; attempt < 6; attempt += 1) {
-      const response = await auth.handler(signInRequest(knownEmail, 'errada', clientIp));
+      const response = await auth.handler(buildSignInRequest(knownEmail, 'errada', clientIp));
       statuses.push(response.status);
     }
     expect(statuses.slice(0, 5)).toEqual([401, 401, 401, 401, 401]);
