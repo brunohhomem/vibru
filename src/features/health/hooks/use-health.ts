@@ -1,4 +1,8 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { LISTS_QUERY_KEY } from '@/features/lists/hooks/use-lists';
+import { TASKS_QUERY_KEY } from '@/features/tasks/hooks/use-tasks';
+import { api } from '@/lib/api';
+import { HEALTH_QUERY_KEY } from '../lib/query-keys';
 import type {
   Allergy,
   CreateAllergyRequest,
@@ -23,11 +27,7 @@ import type {
   UpdateHealthEventRequest,
   UpdateHealthProfileRequest,
   UpdateMedicationRequest,
-} from '@vibru/shared';
-import { LISTS_QUERY_KEY } from '@/features/lists/hooks/use-lists';
-import { TASKS_QUERY_KEY } from '@/features/tasks/hooks/use-tasks';
-import { api } from '@/lib/api';
-import { HEALTH_QUERY_KEY } from '../lib/query-keys';
+} from '@/features/health/health-schemas';
 
 /** Itens da ficha que seguem o mesmo contrato: criar, editar e excluir por membro. */
 export type HealthItemKind = 'allergies' | 'conditions' | 'contacts' | 'doctors' | 'events';

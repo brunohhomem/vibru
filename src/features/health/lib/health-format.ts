@@ -1,10 +1,10 @@
+import { daysOfMedicationLeft } from '@/features/health/medication-stock';
 import {
-  daysOfMedicationLeft,
   type AllergySeverity,
   type BloodType,
   type HealthEventKind,
-  type Medication,
-} from '@vibru/shared';
+} from '@/features/health/health-constants';
+import { type Medication } from '@/features/health/health-schemas';
 
 export function bloodTypeLabel(bloodType: BloodType): string {
   return bloodType === 'unknown' ? 'Não informado' : bloodType;

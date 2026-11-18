@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Doctor } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -15,6 +14,7 @@ import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateHealthItem, useDeleteHealthItem, useUpdateHealthItem } from '../hooks/use-health';
 import { doctorFormSchema, type DoctorFormValues } from '../schemas/forms';
 import { HealthSheet } from './health-sheet.client';
+import type { Doctor } from '@/features/health/health-schemas';
 
 type DoctorSheetProps = {
   memberId: string;

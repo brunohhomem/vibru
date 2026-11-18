@@ -4,7 +4,7 @@ import {
   BLOOD_TYPES,
   HEALTH_EVENT_KINDS,
   MAX_MEDICATION_TIMES,
-} from '@vibru/shared';
+} from '@/features/health/health-constants';
 
 const ORGAN_DONOR_VALUES = ['unknown', 'yes', 'no'] as const;
 

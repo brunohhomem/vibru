@@ -1,3 +1,10 @@
+import { AlertTriangle, Pencil, Plus } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatSinceDate } from '@/features/home/lib/home-format';
+import { formatPhone } from '@/lib/masks';
 import type {
   Allergy,
   Doctor,
@@ -6,14 +13,7 @@ import type {
   HealthEvent,
   HealthProfile,
   Medication,
-} from '@vibru/shared';
-import { AlertTriangle, Pencil, Plus } from 'lucide-react';
-import type { ReactNode } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatSinceDate } from '@/features/home/lib/home-format';
-import { formatPhone } from '@/lib/masks';
+} from '@/features/health/health-schemas';
 import {
   bloodTypeLabel,
   HEALTH_EVENT_KIND_LABELS,

@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { HealthCondition } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -13,6 +12,7 @@ import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateHealthItem, useDeleteHealthItem, useUpdateHealthItem } from '../hooks/use-health';
 import { conditionFormSchema, type ConditionFormValues } from '../schemas/forms';
 import { HealthSheet } from './health-sheet.client';
+import type { HealthCondition } from '@/features/health/health-schemas';
 
 type ConditionSheetProps = {
   memberId: string;

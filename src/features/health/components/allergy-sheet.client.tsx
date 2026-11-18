@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ALLERGY_SEVERITIES, type Allergy } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -14,6 +13,8 @@ import { useCreateHealthItem, useDeleteHealthItem, useUpdateHealthItem } from '.
 import { SEVERITY_LABELS } from '../lib/health-format';
 import { allergyFormSchema, type AllergyFormValues } from '../schemas/forms';
 import { HealthSheet } from './health-sheet.client';
+import { ALLERGY_SEVERITIES } from '@/features/health/health-constants';
+import { type Allergy } from '@/features/health/health-schemas';
 
 type AllergySheetProps = {
   memberId: string;

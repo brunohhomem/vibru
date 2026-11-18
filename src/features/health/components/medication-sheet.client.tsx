@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DEFAULT_LOW_STOCK_DAYS, MAX_MEDICATION_TIMES, type Medication } from '@vibru/shared';
 import { Plus, X } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -17,6 +16,8 @@ import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateMedication, useDeleteMedication, useUpdateMedication } from '../hooks/use-health';
 import { medicationFormSchema, type MedicationFormValues } from '../schemas/forms';
 import { HealthSheet } from './health-sheet.client';
+import { DEFAULT_LOW_STOCK_DAYS, MAX_MEDICATION_TIMES } from '@/features/health/health-constants';
+import { type Medication } from '@/features/health/health-schemas';
 
 type MedicationSheetProps = {
   memberId: string;
