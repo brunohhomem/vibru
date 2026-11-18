@@ -1,5 +1,6 @@
 import { z } from '@vibru/shared/zod';
-import { TASK_CATEGORIES, TASK_RECURRENCE_KINDS } from '@vibru/shared';
+import { TASK_CATEGORIES } from '@/features/tasks/categories';
+import { TASK_RECURRENCE_KINDS } from '@/features/tasks/recurrence';
 
 export const taskFormSchema = z
   .object({

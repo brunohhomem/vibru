@@ -1,7 +1,8 @@
-import type { CoupleMember, ListItem } from '@vibru/shared';
+import type { CoupleMember } from '@vibru/shared';
 import { Check } from 'lucide-react';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
 import { cn } from '@/lib/cn';
+import type { ListItem } from '@/features/lists/list-schemas';
 
 type ListItemRowProps = {
   item: ListItem;

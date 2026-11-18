@@ -1,11 +1,11 @@
 'use client';
 
-import type { TaskLowStock } from '@vibru/shared';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 import { useAddToPharmacy } from '@/features/health/hooks/use-health';
 import { applyApiError } from '@/lib/api-error';
+import type { TaskLowStock } from '@/features/tasks/task-schemas';
 
 type LowStockDialogProps = {
   lowStock: TaskLowStock | null;

@@ -6,9 +6,7 @@ import {
   type AgendaUpcomingItem,
   type CoupleMember,
   type CoupleResponse,
-  type ListSummary,
   type MedicationProgress,
-  type TasksResponse,
   type Wish,
 } from '@vibru/shared';
 import { ChevronRight, Pill } from 'lucide-react';
@@ -32,6 +30,8 @@ import { useAgendaUpcoming } from '@/features/agenda/hooks/use-agenda-upcoming';
 import { pickDateIdea } from '@/features/home/lib/pick-date-idea';
 import { useWishes } from '@/features/wishes/hooks/use-wishes';
 import { cn } from '@/lib/cn';
+import { type ListSummary } from '@/features/lists/list-schemas';
+import { type TasksResponse } from '@/features/tasks/task-schemas';
 
 type WeddingAnniversary = NonNullable<CoupleResponse['nextWeddingAnniversary']>;
 type DatingAnniversary = NonNullable<CoupleResponse['nextDatingAnniversary']>;

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
-import type { List, ListItem, ListsResponse } from '@vibru/shared';
 import { api } from '@/lib/api';
+import type { List, ListItem, ListsResponse } from '@/features/lists/list-schemas';
 
 export const LISTS_QUERY_KEY = ['lists'] as const;
 

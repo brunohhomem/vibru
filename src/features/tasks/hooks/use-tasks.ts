@@ -1,13 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type {
-  CompleteTaskResponse,
-  Task,
-  TaskCategory,
-  TaskRecurrenceKind,
-  TasksResponse,
-} from '@vibru/shared';
 import { HEALTH_QUERY_KEY } from '@/features/health/lib/query-keys';
 import { api } from '@/lib/api';
+import type { CompleteTaskResponse, Task, TasksResponse } from '@/features/tasks/task-schemas';
+import type { TaskCategory } from '@/features/tasks/categories';
+import type { TaskRecurrenceKind } from '@/features/tasks/recurrence';
 
 export const TASKS_QUERY_KEY = ['tasks'] as const;
 

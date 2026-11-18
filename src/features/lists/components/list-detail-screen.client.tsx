@@ -1,6 +1,6 @@
 'use client';
 
-import type { CoupleMember, List, ListItem } from '@vibru/shared';
+import type { CoupleMember } from '@vibru/shared';
 import { ChevronLeft, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -30,6 +30,7 @@ import { ListItemRow } from './list-item-row';
 import { ListItemSheet } from './list-item-sheet.client';
 import { ListProgress } from './list-progress';
 import { ListTitleSheet } from './list-title-sheet.client';
+import type { List, ListItem } from '@/features/lists/list-schemas';
 
 function ListDetailSkeleton() {
   return (
