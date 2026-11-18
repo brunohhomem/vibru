@@ -1,9 +1,12 @@
 import type { z } from 'zod';
 import { readSessionUserId } from './session';
 
+export type ActionFailureCode = 'unauthenticated' | 'invalid_input' | 'failed' | 'couple_required';
+
 export type ActionResult<TData> =
   | { ok: true; data: TData }
-  | { ok: false; code: 'unauthenticated' | 'invalid_input' | 'failed'; message: string };
+  // field: campo do formulário a que a mensagem se refere (validações de regra de negócio).
+  | { ok: false; code: ActionFailureCode; message: string; field?: string };
 
 type ActionConfig<TInput, TData> = {
   schema: z.ZodType<TInput>;
