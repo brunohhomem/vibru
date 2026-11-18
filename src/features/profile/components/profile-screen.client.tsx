@@ -19,6 +19,7 @@ import { onFormSubmit } from '@/lib/submit-form';
 import { ActionResultError, unwrapActionResult } from '@/lib/unwrap-action-result';
 import { formatCpf, formatPhone } from '@/lib/masks';
 import { updateProfileAction } from '../actions';
+import { PartnerPasswordCard } from './partner-password-card.client';
 import { PROFILE_QUERY_KEY, useProfile } from '../hooks/use-profile';
 import type { ProfileResponse } from '../profile-response';
 import { contactPayload, fullNameSchema, optionalCpf, optionalPhone } from '../schemas';
@@ -151,6 +152,7 @@ export function ProfileScreen() {
           <PasswordForm />
         </CardContent>
       </Card>
+      <PartnerPasswordCard />
     </div>
   );
 }

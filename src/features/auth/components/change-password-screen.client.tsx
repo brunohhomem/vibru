@@ -1,9 +1,9 @@
 'use client';
 
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Alert } from '@/components/ui/alert';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
+import { describeActionFailure } from '@/lib/unwrap-action-result';
 import { useMe } from '../hooks/use-me';
 import { PasswordForm } from './password-form.client';
 
@@ -14,8 +14,10 @@ export function ChangePasswordScreen() {
   if (me.isPending) return <LoadingState />;
 
   if (me.isError) {
-    const status = axios.isAxiosError(me.error) ? me.error.response?.status : undefined;
-    if (status === 401) return <LoadingState label="Redirecionando…" />;
+    // Sessão expirada: o QueryClient global já está mandando para o /login.
+    if (describeActionFailure(me.error) === 'redirect-to-login') {
+      return <LoadingState label="Redirecionando…" />;
+    }
     return (
       <ErrorState
         title="Não foi possível carregar a sessão"
