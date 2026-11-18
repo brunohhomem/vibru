@@ -32,6 +32,8 @@ export function LoginForm() {
       form.setError('password', { message: result.message });
       return;
     }
+    // Cache de outro usuário do mesmo aparelho nunca pode sobreviver ao login.
+    queryClient.clear();
     await queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
     if (result.data.mustChangePassword) {
       router.push('/change-password');

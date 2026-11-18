@@ -61,16 +61,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const couple = useCouple();
   const router = useRouter();
   const logout = useLogout();
+  // O redirecionamento em si é do QueryClient (src/lib/query-client.ts); aqui só o texto de espera.
   const mustLogin = me.isError && describeActionFailure(me.error) === 'redirect-to-login';
 
   useEffect(() => {
     if (!me.data?.user.mustChangePassword) return;
     router.replace('/change-password');
   }, [me.data, router]);
-
-  useEffect(() => {
-    if (mustLogin) router.replace('/login');
-  }, [mustLogin, router]);
 
   if (me.isPending || me.data?.user.mustChangePassword) return <LoadingState />;
 
