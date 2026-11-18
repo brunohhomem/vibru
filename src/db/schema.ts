@@ -7,3 +7,5 @@ export type { SystemSetting, NewSystemSetting } from './system-settings';
 export * from './auth-schema';
 export * from './couple-schema';
 export * from './people-schema';
+export * from './tasks-schema';
+export * from './lists-schema';
