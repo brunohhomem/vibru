@@ -16,22 +16,30 @@ import { IcsFeedCard } from '@/features/agenda/components/ics-feed-card.client';
 import { AGENDA_QUERY_KEY } from '@/features/agenda/hooks/use-agenda';
 import { COUPLE_QUERY_KEY, useCouple } from '@/features/couple/hooks/use-couple';
 import { coupleFormSchema, type CoupleFormValues } from '@/features/couple/schemas/forms';
-import { api } from '@/lib/api';
-import { applyApiError } from '@/lib/api-error';
 import { queryClient } from '@/lib/query-client';
 import { onFormSubmit } from '@/lib/submit-form';
+import { ActionResultError, unwrapActionResult } from '@/lib/unwrap-action-result';
+import { updateCoupleAction, updateMyMemberAction } from '../actions';
 
 async function saveCouple(values: CoupleFormValues): Promise<CoupleResponse> {
-  await api.patch<CoupleResponse>('/couple', {
-    datingStartedOn: values.datingStartedOn || null,
-    marriedOn: values.marriedOn || null,
-  });
+  unwrapActionResult(
+    await updateCoupleAction({
+      datingStartedOn: values.datingStartedOn || null,
+      marriedOn: values.marriedOn || null,
+    }),
+  );
 
-  const response = await api.patch<CoupleResponse>('/couple/members/me', {
-    displayName: values.displayName,
-  });
+  return unwrapActionResult(await updateMyMemberAction({ displayName: values.displayName }));
+}
 
-  return response.data;
+const FORM_FIELDS: ReadonlyArray<keyof CoupleFormValues> = [
+  'displayName',
+  'datingStartedOn',
+  'marriedOn',
+];
+
+function isFormField(field: string | undefined): field is keyof CoupleFormValues {
+  return FORM_FIELDS.some((formField) => formField === field);
 }
 
 export function CoupleSettingsScreen() {
@@ -58,7 +66,13 @@ export function CoupleSettingsScreen() {
       void queryClient.invalidateQueries({ queryKey: AGENDA_QUERY_KEY });
       toast.success('Configurações do casal salvas');
     },
-    onError: (error) => applyApiError(error, form.setError),
+    onError: (error) => {
+      if (error instanceof ActionResultError && isFormField(error.field)) {
+        form.setError(error.field, { message: error.message });
+        return;
+      }
+      toast.error(error instanceof ActionResultError ? error.message : 'Não foi possível salvar.');
+    },
   });
 
   if (couple.isPending) return <LoadingState />;
