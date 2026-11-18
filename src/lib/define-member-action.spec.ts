@@ -9,6 +9,7 @@ const findMemberContextByUserId = vi.fn();
 vi.mock('@/features/couple/membership', () => ({ findMemberContextByUserId }));
 
 const { defineMemberAction } = await import('./define-member-action');
+const { ActionFailure } = await import('./define-action');
 
 const inputSchema = z.object({ title: z.string().min(1) });
 const memberContext: MemberContext = { memberId: 'member-1', coupleId: 'couple-1', color: 'blue' };
@@ -74,5 +75,22 @@ describe('defineMemberAction', () => {
 
     expect(result).toMatchObject({ ok: false, code: 'failed' });
     expect(JSON.stringify(result)).not.toContain('hunter2');
+  });
+
+  it('converte ActionFailure do handler em resultado tipado com code, message e field', async () => {
+    readSessionUserId.mockResolvedValue('user-1');
+    findMemberContextByUserId.mockResolvedValue(memberContext);
+    const handler = vi
+      .fn()
+      .mockRejectedValue(new ActionFailure('invalid_input', 'Data inválida', 'marriedOn'));
+
+    const result = await defineMemberAction({ schema: inputSchema, handler })({ title: 'x' });
+
+    expect(result).toEqual({
+      ok: false,
+      code: 'invalid_input',
+      message: 'Data inválida',
+      field: 'marriedOn',
+    });
   });
 });

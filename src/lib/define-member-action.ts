@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 import { findMemberContextByUserId, type MemberContext } from '@/features/couple/membership';
-import type { ActionResult } from './define-action';
+import { toFailureResult, type ActionResult } from './define-action';
 import { readSessionUserId } from './session';
 
 type MemberActionConfig<TInput, TData> = {
@@ -31,8 +31,8 @@ export function defineMemberAction<TInput, TData>(config: MemberActionConfig<TIn
 
     try {
       return { ok: true, data: await config.handler({ input: parsed.data, userId, member }) };
-    } catch {
-      return { ok: false, code: 'failed', message: 'Não foi possível concluir a ação.' };
+    } catch (error) {
+      return toFailureResult(error);
     }
   };
 }

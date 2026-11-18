@@ -8,6 +8,25 @@ export type ActionResult<TData> =
   // field: campo do formulário a que a mensagem se refere (validações de regra de negócio).
   | { ok: false; code: ActionFailureCode; message: string; field?: string };
 
+// Lançada por um handler para recusar a ação com um resultado tipado (regra de negócio).
+export class ActionFailure extends Error {
+  constructor(
+    readonly code: ActionFailureCode,
+    message: string,
+    readonly field?: string,
+  ) {
+    super(message);
+  }
+}
+
+// Falha esperada vira resultado tipado; qualquer outra vira "failed" sem vazar a mensagem interna.
+export function toFailureResult(error: unknown): Extract<ActionResult<never>, { ok: false }> {
+  if (error instanceof ActionFailure) {
+    return { ok: false, code: error.code, message: error.message, field: error.field };
+  }
+  return { ok: false, code: 'failed', message: 'Não foi possível concluir a ação.' };
+}
+
 type ActionConfig<TInput, TData> = {
   schema: z.ZodType<TInput>;
   handler: (context: { input: TInput; userId: string }) => Promise<TData>;
@@ -28,8 +47,8 @@ export function defineAction<TInput, TData>(config: ActionConfig<TInput, TData>)
 
     try {
       return { ok: true, data: await config.handler({ input: parsed.data, userId }) };
-    } catch {
-      return { ok: false, code: 'failed', message: 'Não foi possível concluir a ação.' };
+    } catch (error) {
+      return toFailureResult(error);
     }
   };
 }
