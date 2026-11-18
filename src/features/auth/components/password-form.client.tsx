@@ -1,16 +1,16 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { changePasswordRequestSchema, type AuthResponse } from '@vibru/shared';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { api } from '@/lib/api';
+import { changePasswordSchema } from '@/features/profile/schemas';
 import { onFormSubmit } from '@/lib/submit-form';
-import { applyApiError } from '@/lib/api-error';
 import { queryClient } from '@/lib/query-client';
+import { ActionResultError, unwrapActionResult } from '@/lib/unwrap-action-result';
+import { changePasswordAction } from '../password-actions';
 import { ME_QUERY_KEY } from '../hooks/use-me';
 
 type PasswordValues = {
@@ -24,20 +24,23 @@ type PasswordFormProps = {
 
 export function PasswordForm({ onDone }: PasswordFormProps) {
   const form = useForm<PasswordValues>({
-    resolver: zodResolver(changePasswordRequestSchema),
+    resolver: zodResolver(changePasswordSchema),
     defaultValues: { currentPassword: '', newPassword: '' },
   });
 
   async function onSubmit(values: PasswordValues) {
     try {
-      const response = await api.post<AuthResponse>('/auth/change-password', values);
-      queryClient.setQueryData(ME_QUERY_KEY, response.data);
+      unwrapActionResult(await changePasswordAction(values));
       await queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
       toast.success('Senha alterada');
       form.reset();
       onDone?.();
     } catch (error) {
-      applyApiError(error, form.setError);
+      if (error instanceof ActionResultError && error.field === 'currentPassword') {
+        form.setError('currentPassword', { message: error.message });
+        return;
+      }
+      toast.error(error instanceof ActionResultError ? error.message : 'Não foi possível salvar.');
     }
   }
 

@@ -6,3 +6,4 @@ export { systemSettings } from './system-settings';
 export type { SystemSetting, NewSystemSetting } from './system-settings';
 export * from './auth-schema';
 export * from './couple-schema';
+export * from './people-schema';

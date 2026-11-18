@@ -1,12 +1,11 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { fullNameSchema, type ProfileResponse } from '@vibru/shared';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { z } from '@vibru/shared/zod';
+import { z } from 'zod';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
@@ -15,11 +14,15 @@ import { MaskedInput } from '@/components/ui/masked-input';
 import { Button } from '@/components/ui/button';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { PasswordForm } from '@/features/auth/components/password-form.client';
-import { contactPayload, optionalCpf, optionalPhone } from '@/features/auth/schemas/forms';
-import { api } from '@/lib/api';
+import { queryClient } from '@/lib/query-client';
 import { onFormSubmit } from '@/lib/submit-form';
-import { applyApiError } from '@/lib/api-error';
+import { ActionResultError, unwrapActionResult } from '@/lib/unwrap-action-result';
 import { formatCpf, formatPhone } from '@/lib/masks';
+import { updateProfileAction } from '../actions';
+import { PartnerPasswordCard } from './partner-password-card.client';
+import { PROFILE_QUERY_KEY, useProfile } from '../hooks/use-profile';
+import type { ProfileResponse } from '../profile-response';
+import { contactPayload, fullNameSchema, optionalCpf, optionalPhone } from '../schemas';
 
 const profileFormSchema = z.object({
   fullName: fullNameSchema,
@@ -33,15 +36,23 @@ type ProfileValues = {
   phone: string;
 };
 
-const PROFILE_QUERY_KEY = ['profile'] as const;
+const FORM_FIELDS: ReadonlyArray<keyof ProfileValues> = ['fullName', 'cpf', 'phone'];
 
-async function fetchProfile(): Promise<ProfileResponse> {
-  const response = await api.get<ProfileResponse>('/me/profile');
-  return response.data;
+function isFormField(field: string | undefined): field is keyof ProfileValues {
+  return FORM_FIELDS.some((formField) => formField === field);
+}
+
+async function saveProfile(values: ProfileValues): Promise<ProfileResponse> {
+  return unwrapActionResult(
+    await updateProfileAction({
+      fullName: values.fullName,
+      ...contactPayload(values.cpf, values.phone),
+    }),
+  );
 }
 
 export function ProfileScreen() {
-  const profile = useQuery({ queryKey: PROFILE_QUERY_KEY, queryFn: fetchProfile });
+  const profile = useProfile();
   const form = useForm<ProfileValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: { fullName: '', cpf: '', phone: '' },
@@ -57,24 +68,18 @@ export function ProfileScreen() {
   }, [profile.data, form]);
 
   const save = useMutation({
-    mutationFn: async (values: ProfileValues) => {
-      const body = {
-        fullName: values.fullName,
-        ...contactPayload(values.cpf, values.phone),
-      };
-      const response = await api.patch<ProfileResponse>('/me/profile', body);
-      return response.data;
-    },
-    onSuccess: async (data) => {
+    mutationFn: saveProfile,
+    onSuccess: (data) => {
       toast.success('Perfil atualizado');
-      await profile.refetch();
-      form.reset({
-        fullName: data.fullName,
-        cpf: data.cpf ? formatCpf(data.cpf) : '',
-        phone: data.phone ? formatPhone(data.phone) : '',
-      });
+      queryClient.setQueryData(PROFILE_QUERY_KEY, data);
     },
-    onError: (error) => applyApiError(error, form.setError),
+    onError: (error) => {
+      if (error instanceof ActionResultError && isFormField(error.field)) {
+        form.setError(error.field, { message: error.message });
+        return;
+      }
+      toast.error(error instanceof ActionResultError ? error.message : 'Não foi possível salvar.');
+    },
   });
 
   if (profile.isPending) return <LoadingState />;
@@ -147,6 +152,7 @@ export function ProfileScreen() {
           <PasswordForm />
         </CardContent>
       </Card>
+      <PartnerPasswordCard />
     </div>
   );
 }

@@ -25,11 +25,10 @@ function FullScreenError({ title, onRetry }: { title: string; onRetry: () => voi
 type AppFrameProps = {
   children: ReactNode;
   members: CoupleMember[];
-  isAdmin: boolean;
   onLogout: () => void;
 };
 
-function AppFrame({ children, members, isAdmin, onLogout }: AppFrameProps) {
+function AppFrame({ children, members, onLogout }: AppFrameProps) {
   return (
     <div className="min-h-dvh bg-background">
       <SideNav />
@@ -43,7 +42,7 @@ function AppFrame({ children, members, isAdmin, onLogout }: AppFrameProps) {
               Vibru
             </Link>
             <div className="ml-auto">
-              <CoupleMenu members={members} isAdmin={isAdmin} onLogout={onLogout} />
+              <CoupleMenu members={members} onLogout={onLogout} />
             </div>
           </div>
         </header>
@@ -95,11 +94,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AppFrame
-      members={couple.data.members}
-      isAdmin={me.data.user.role === 'admin'}
-      onLogout={() => void logout()}
-    >
+    <AppFrame members={couple.data.members} onLogout={() => void logout()}>
       {children}
     </AppFrame>
   );
