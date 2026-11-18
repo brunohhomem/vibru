@@ -1,4 +1,4 @@
-import { daysBetween } from '@vibru/shared';
+import { daysBetween } from '@/lib/calendar-date';
 
 export type CoupleDates = { datingStartedOn: string | null; marriedOn: string | null };
 export type CoupleDatesPatch = { datingStartedOn?: string | null; marriedOn?: string | null };

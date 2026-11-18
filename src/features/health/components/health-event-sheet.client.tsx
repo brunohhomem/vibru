@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { todayInSaoPaulo } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -17,6 +16,7 @@ import { healthEventFormSchema, type HealthEventFormValues } from '../schemas/fo
 import { HealthSheet } from './health-sheet.client';
 import { HEALTH_EVENT_KINDS } from '@/features/health/health-constants';
 import { type Doctor, type HealthEvent } from '@/features/health/health-schemas';
+import { todayInSaoPaulo } from '@/lib/calendar-date';
 
 type HealthEventSheetProps = {
   memberId: string;

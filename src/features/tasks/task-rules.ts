@@ -1,7 +1,7 @@
-import type { CalendarDate } from '@vibru/shared';
 import type { NewTaskRow, TaskRow } from '@/db/tasks-schema';
 import { nextRecurrence, type TaskRecurrenceKind } from './recurrence';
 import type { Task, UpdateTaskRequest } from './task-schemas';
+import type { CalendarDate } from '@/lib/calendar-date';
 
 const TIME_WITHOUT_SECONDS_LENGTH = 5;
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { CalendarDate } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -14,6 +13,7 @@ import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateAgendaItem, useDeleteAgendaItem, useUpdateAgendaItem } from '../hooks/use-agenda';
 import { eventFormSchema, type EventFormValues } from '../schemas/forms';
 import type { AgendaEvent } from '@/features/agenda/agenda-schemas';
+import type { CalendarDate } from '@/lib/calendar-date';
 
 type EventSheetProps = {
   open: boolean;

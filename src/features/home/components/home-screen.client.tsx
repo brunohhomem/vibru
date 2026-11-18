@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { type CoupleMember, type CoupleResponse } from '@vibru/shared';
 import { ChevronRight, Pill } from 'lucide-react';
 import { ErrorState } from '@/components/ui/screen-state';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,6 +26,7 @@ import { type ListSummary } from '@/features/lists/list-schemas';
 import { type TasksResponse } from '@/features/tasks/task-schemas';
 import { type AgendaUpcomingItem } from '@/features/agenda/agenda-schemas';
 import { type Wish } from '@/features/wishes/wish-schemas';
+import { type CoupleMember, type CoupleResponse } from '@/features/couple/couple-schemas';
 import {
   medicationProgressToday,
   type MedicationProgress,

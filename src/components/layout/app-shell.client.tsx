@@ -1,6 +1,5 @@
 'use client';
 
-import type { CoupleMember } from '@vibru/shared';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -13,6 +12,7 @@ import { CoupleRequiredScreen } from '@/features/couple/components/couple-requir
 import { useCouple } from '@/features/couple/hooks/use-couple';
 import { BottomNav, SideNav } from './app-nav.client';
 import { CoupleMenu } from './couple-menu.client';
+import type { CoupleMember } from '@/features/couple/couple-schemas';
 
 function FullScreenError({ title, onRetry }: { title: string; onRetry: () => void }) {
   return (

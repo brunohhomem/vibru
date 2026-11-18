@@ -1,4 +1,4 @@
-import type { MemberColor } from '@vibru/shared';
+import type { MemberColor } from '@/features/couple/couple-schemas';
 import {
   findCoupleDateIssues,
   type CoupleDates,

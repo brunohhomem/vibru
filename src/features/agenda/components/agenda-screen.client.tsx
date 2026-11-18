@@ -1,6 +1,5 @@
 'use client';
 
-import { todayInSaoPaulo, type CalendarDate } from '@vibru/shared';
 import { CalendarPlus, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
@@ -20,6 +19,7 @@ import {
 } from '../lib/agenda-calendar';
 import { EventSheet } from './event-sheet.client';
 import { ImportantDateSheet } from './important-date-sheet.client';
+import { todayInSaoPaulo, type CalendarDate } from '@/lib/calendar-date';
 import {
   type AgendaEvent,
   type AgendaResponse,

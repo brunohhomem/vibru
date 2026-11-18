@@ -1,7 +1,7 @@
-import type { CalendarDate } from '@vibru/shared';
 import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { getDatabase, type DatabaseExecutor } from '@/db/client';
 import { tasks, type NewTaskRow, type TaskRow } from '@/db/tasks-schema';
+import type { CalendarDate } from '@/lib/calendar-date';
 
 // Todo método recebe `coupleId`: um membro nunca lê nem grava tarefa de outro casal.
 // A exclusão é lógica (`is_active = false`).

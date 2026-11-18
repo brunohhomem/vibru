@@ -1,6 +1,5 @@
 'use client';
 
-import type { CoupleMember } from '@vibru/shared';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -14,6 +13,7 @@ import { hasReservationFields } from '../lib/gift-format';
 import { GiftCard } from './gift-card';
 import { GiftSheet } from './gift-sheet.client';
 import type { GiftResponse } from '@/features/gifts/gift-schemas';
+import type { CoupleMember } from '@/features/couple/couple-schemas';
 
 type GiftListProps = { owner: CoupleMember; me: CoupleMember };
 

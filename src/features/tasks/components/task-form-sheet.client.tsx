@@ -1,8 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { CoupleMember } from '@vibru/shared';
-import { type CalendarDate } from '@vibru/shared';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -27,6 +25,8 @@ import {
   TASK_CATEGORY_LABELS,
 } from '@/features/tasks/categories';
 import { addCalendarDays } from '@/features/tasks/recurrence';
+import type { CoupleMember } from '@/features/couple/couple-schemas';
+import { type CalendarDate } from '@/lib/calendar-date';
 
 const ASSIGNEE_NONE = 'nos';
 

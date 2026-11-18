@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { coupleMembers } from '@/db/couple-schema';
 import { getDatabase } from '@/db/client';
-import type { MemberColor } from '@vibru/shared';
+import type { MemberColor } from '@/features/couple/couple-schemas';
 
 export type MemberContext = { memberId: string; coupleId: string; color: MemberColor };
 

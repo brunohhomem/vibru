@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { calendarDateSchema } from '@vibru/shared';
 import { TASK_CATEGORIES } from './categories';
 import { TASK_RECURRENCE_KINDS } from './recurrence';
+import { calendarDateSchema } from '@/features/couple/couple-schemas';
 
 export const taskRecurrenceSchema = z.enum(TASK_RECURRENCE_KINDS);
 

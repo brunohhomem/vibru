@@ -1,6 +1,5 @@
 'use client';
 
-import type { CoupleMember } from '@vibru/shared';
 import { Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -23,6 +22,7 @@ import type { TaskCategory } from '@/features/tasks/categories';
 import type { TaskGroups } from '@/features/tasks/grouping';
 import { TASK_CATEGORIES } from '@/features/tasks/categories';
 import { groupTasks } from '@/features/tasks/grouping';
+import type { CoupleMember } from '@/features/couple/couple-schemas';
 
 const FILTER_NONE = 'nos';
 const FILTER_ALL = 'all';

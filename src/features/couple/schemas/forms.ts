@@ -1,4 +1,4 @@
-import { z } from '@vibru/shared/zod';
+import { z } from 'zod';
 
 export const coupleFormSchema = z.object({
   displayName: z

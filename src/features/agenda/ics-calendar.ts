@@ -1,4 +1,4 @@
-import type { CalendarDate } from '@vibru/shared';
+import type { CalendarDate } from '@/lib/calendar-date';
 
 export type IcsEntry = {
   uid: string;

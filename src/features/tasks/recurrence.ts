@@ -3,7 +3,7 @@ import {
   formatCalendarDate,
   parseCalendarDate,
   type CalendarDate,
-} from '@vibru/shared';
+} from '@/lib/calendar-date';
 
 export const TASK_RECURRENCE_KINDS = ['none', 'daily', 'weekly', 'monthly', 'yearly'] as const;
 

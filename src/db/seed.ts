@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import { todayInSaoPaulo } from '@vibru/shared';
 import { inArray } from 'drizzle-orm';
 import { user } from './auth-schema';
 import { getDatabase } from './client';
@@ -7,6 +6,7 @@ import { planCoupleSeed } from './couple-seed-plan';
 import { seedCouple } from './seed-couple';
 import { seedUsers } from './seed-users';
 import { readSeedUsersFromEnv } from './seed-users-from-env';
+import { todayInSaoPaulo } from '@/lib/calendar-date';
 
 function optionalDate(value: string | undefined): string | null {
   const trimmed = value?.trim();

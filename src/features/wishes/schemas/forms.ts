@@ -1,4 +1,4 @@
-import { z } from '@vibru/shared/zod';
+import { z } from 'zod';
 import { parseReaisToCents } from '@/lib/money';
 import { WISH_CATEGORIES } from '@/features/wishes/wish-constants';
 

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { phoneSchema } from '@/features/profile/schemas';
-import { calendarDateSchema } from '@vibru/shared';
 import { taskDueTimeSchema } from '@/features/tasks/task-schemas';
+import { calendarDateSchema } from '@/features/couple/couple-schemas';
 import {
   ALLERGY_SEVERITIES,
   BLOOD_TYPES,
