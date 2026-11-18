@@ -1,4 +1,35 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { LISTS_QUERY_KEY } from '@/features/lists/hooks/use-lists';
+import { TASKS_QUERY_KEY } from '@/features/tasks/hooks/use-tasks';
+import type { ActionResult } from '@/lib/define-action';
+import { unwrapActionResult } from '@/lib/unwrap-action-result';
+import {
+  createAllergyAction,
+  createConditionAction,
+  createContactAction,
+  createDoctorAction,
+  createEventAction,
+  getHealthRecordAction,
+  listHealthMembersAction,
+  removeAllergyAction,
+  removeConditionAction,
+  removeContactAction,
+  removeDoctorAction,
+  removeEventAction,
+  saveHealthProfileAction,
+  updateAllergyAction,
+  updateConditionAction,
+  updateContactAction,
+  updateDoctorAction,
+  updateEventAction,
+} from '../actions';
+import {
+  addMedicationToPharmacyAction,
+  createMedicationAction,
+  removeMedicationAction,
+  updateMedicationAction,
+} from '../medication-actions';
+import { HEALTH_QUERY_KEY } from '../lib/query-keys';
 import type {
   Allergy,
   CreateAllergyRequest,
@@ -11,11 +42,6 @@ import type {
   EmergencyContact,
   HealthCondition,
   HealthEvent,
-  HealthMembersResponse,
-  HealthProfile,
-  HealthRecord,
-  Medication,
-  PharmacyResult,
   UpdateAllergyRequest,
   UpdateDoctorRequest,
   UpdateEmergencyContactRequest,
@@ -23,11 +49,7 @@ import type {
   UpdateHealthEventRequest,
   UpdateHealthProfileRequest,
   UpdateMedicationRequest,
-} from '@vibru/shared';
-import { LISTS_QUERY_KEY } from '@/features/lists/hooks/use-lists';
-import { TASKS_QUERY_KEY } from '@/features/tasks/hooks/use-tasks';
-import { api } from '@/lib/api';
-import { HEALTH_QUERY_KEY } from '../lib/query-keys';
+} from '../health-schemas';
 
 /** Itens da ficha que seguem o mesmo contrato: criar, editar e excluir por membro. */
 export type HealthItemKind = 'allergies' | 'conditions' | 'contacts' | 'doctors' | 'events';
@@ -52,6 +74,39 @@ type HealthItemTypes = {
   };
 };
 
+type ItemActionSet<K extends HealthItemKind> = {
+  create: (input: {
+    memberId: string;
+    data: HealthItemTypes[K]['create'];
+  }) => Promise<ActionResult<HealthItemTypes[K]['item']>>;
+  update: (input: {
+    memberId: string;
+    itemId: string;
+    data: HealthItemTypes[K]['update'];
+  }) => Promise<ActionResult<HealthItemTypes[K]['item']>>;
+  remove: (input: { memberId: string; itemId: string }) => Promise<ActionResult<null>>;
+};
+
+const ITEM_ACTIONS: { [K in HealthItemKind]: ItemActionSet<K> } = {
+  allergies: {
+    create: createAllergyAction,
+    update: updateAllergyAction,
+    remove: removeAllergyAction,
+  },
+  conditions: {
+    create: createConditionAction,
+    update: updateConditionAction,
+    remove: removeConditionAction,
+  },
+  contacts: {
+    create: createContactAction,
+    update: updateContactAction,
+    remove: removeContactAction,
+  },
+  doctors: { create: createDoctorAction, update: updateDoctorAction, remove: removeDoctorAction },
+  events: { create: createEventAction, update: updateEventAction, remove: removeEventAction },
+};
+
 export function healthMembersQueryKey() {
   return [...HEALTH_QUERY_KEY, 'members'] as const;
 }
@@ -73,20 +128,14 @@ function invalidateHealthAndTasks(queryClient: QueryClient) {
 export function useHealthMembers() {
   return useQuery({
     queryKey: healthMembersQueryKey(),
-    queryFn: async () => {
-      const response = await api.get<HealthMembersResponse>('/health/members');
-      return response.data;
-    },
+    queryFn: async () => unwrapActionResult(await listHealthMembersAction(undefined)),
   });
 }
 
 export function useHealthRecord(memberId: string) {
   return useQuery({
     queryKey: healthRecordQueryKey(memberId),
-    queryFn: async () => {
-      const response = await api.get<HealthRecord>(`/health/members/${memberId}`);
-      return response.data;
-    },
+    queryFn: async () => unwrapActionResult(await getHealthRecordAction({ memberId })),
   });
 }
 
@@ -100,16 +149,14 @@ export function useUpdateHealthProfile() {
     }: {
       memberId: string;
       payload: UpdateHealthProfileRequest;
-    }) => {
-      const response = await api.put<HealthProfile>(`/health/members/${memberId}/profile`, payload);
-      return response.data;
-    },
+    }) => unwrapActionResult(await saveHealthProfileAction({ memberId, data: payload })),
     onSuccess: () => invalidateHealth(queryClient),
   });
 }
 
 export function useCreateHealthItem<K extends HealthItemKind>(kind: K) {
   const queryClient = useQueryClient();
+  const actions: ItemActionSet<K> = ITEM_ACTIONS[kind];
 
   return useMutation({
     mutationFn: async ({
@@ -118,19 +165,14 @@ export function useCreateHealthItem<K extends HealthItemKind>(kind: K) {
     }: {
       memberId: string;
       payload: HealthItemTypes[K]['create'];
-    }) => {
-      const response = await api.post<HealthItemTypes[K]['item']>(
-        `/health/members/${memberId}/${kind}`,
-        payload,
-      );
-      return response.data;
-    },
+    }) => unwrapActionResult(await actions.create({ memberId, data: payload })),
     onSuccess: () => invalidateHealth(queryClient),
   });
 }
 
 export function useUpdateHealthItem<K extends HealthItemKind>(kind: K) {
   const queryClient = useQueryClient();
+  const actions: ItemActionSet<K> = ITEM_ACTIONS[kind];
 
   return useMutation({
     mutationFn: async ({
@@ -141,13 +183,7 @@ export function useUpdateHealthItem<K extends HealthItemKind>(kind: K) {
       memberId: string;
       itemId: string;
       payload: HealthItemTypes[K]['update'];
-    }) => {
-      const response = await api.patch<HealthItemTypes[K]['item']>(
-        `/health/members/${memberId}/${kind}/${itemId}`,
-        payload,
-      );
-      return response.data;
-    },
+    }) => unwrapActionResult(await actions.update({ memberId, itemId, data: payload })),
     onSuccess: () => invalidateHealth(queryClient),
   });
 }
@@ -157,7 +193,7 @@ export function useDeleteHealthItem(kind: HealthItemKind) {
 
   return useMutation({
     mutationFn: async ({ memberId, itemId }: { memberId: string; itemId: string }) => {
-      await api.delete(`/health/members/${memberId}/${kind}/${itemId}`);
+      unwrapActionResult(await ITEM_ACTIONS[kind].remove({ memberId, itemId }));
     },
     onSuccess: () => invalidateHealth(queryClient),
   });
@@ -173,13 +209,7 @@ export function useCreateMedication() {
     }: {
       memberId: string;
       payload: CreateMedicationRequest;
-    }) => {
-      const response = await api.post<Medication>(
-        `/health/members/${memberId}/medications`,
-        payload,
-      );
-      return response.data;
-    },
+    }) => unwrapActionResult(await createMedicationAction({ memberId, data: payload })),
     onSuccess: () => invalidateHealthAndTasks(queryClient),
   });
 }
@@ -194,10 +224,7 @@ export function useUpdateMedication() {
     }: {
       medicationId: string;
       payload: UpdateMedicationRequest;
-    }) => {
-      const response = await api.patch<Medication>(`/health/medications/${medicationId}`, payload);
-      return response.data;
-    },
+    }) => unwrapActionResult(await updateMedicationAction({ id: medicationId, data: payload })),
     onSuccess: () => invalidateHealthAndTasks(queryClient),
   });
 }
@@ -207,7 +234,7 @@ export function useDeleteMedication() {
 
   return useMutation({
     mutationFn: async (medicationId: string) => {
-      await api.delete(`/health/medications/${medicationId}`);
+      unwrapActionResult(await removeMedicationAction({ id: medicationId }));
     },
     onSuccess: () => invalidateHealthAndTasks(queryClient),
   });
@@ -217,12 +244,8 @@ export function useAddToPharmacy() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (medicationId: string) => {
-      const response = await api.post<PharmacyResult>(
-        `/health/medications/${medicationId}/pharmacy`,
-      );
-      return response.data;
-    },
+    mutationFn: async (medicationId: string) =>
+      unwrapActionResult(await addMedicationToPharmacyAction({ id: medicationId })),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: LISTS_QUERY_KEY }),
   });
 }

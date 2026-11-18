@@ -76,6 +76,24 @@ describe('defineMemberAction', () => {
     });
   });
 
+  it('trata o invólucro `data` como transparente ao apontar o campo', async () => {
+    readSessionUserId.mockResolvedValue('user-1');
+    findMemberContextByUserId.mockResolvedValue(memberContext);
+    const wrapped = z.object({ memberId: z.string(), data: z.object({ name: z.string().min(1) }) });
+
+    const nested = await defineMemberAction({ schema: wrapped, handler: vi.fn() })({
+      memberId: 'm',
+      data: { name: '' },
+    });
+    const wholePayload = await defineMemberAction({ schema: wrapped, handler: vi.fn() })({
+      memberId: 'm',
+      data: 'x',
+    });
+
+    expect(nested).toMatchObject({ ok: false, field: 'name' });
+    expect(wholePayload).toMatchObject({ ok: false, field: undefined });
+  });
+
   it('aponta o campo mas não vaza mensagem padrão do zod', async () => {
     readSessionUserId.mockResolvedValue('user-1');
     findMemberContextByUserId.mockResolvedValue(memberContext);

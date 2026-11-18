@@ -2,11 +2,9 @@
 
 import Link from 'next/link';
 import {
-  medicationProgressToday,
   type AgendaUpcomingItem,
   type CoupleMember,
   type CoupleResponse,
-  type MedicationProgress,
   type Wish,
 } from '@vibru/shared';
 import { ChevronRight, Pill } from 'lucide-react';
@@ -32,6 +30,10 @@ import { useWishes } from '@/features/wishes/hooks/use-wishes';
 import { cn } from '@/lib/cn';
 import { type ListSummary } from '@/features/lists/list-schemas';
 import { type TasksResponse } from '@/features/tasks/task-schemas';
+import {
+  medicationProgressToday,
+  type MedicationProgress,
+} from '@/features/health/medication-progress';
 
 type WeddingAnniversary = NonNullable<CoupleResponse['nextWeddingAnniversary']>;
 type DatingAnniversary = NonNullable<CoupleResponse['nextDatingAnniversary']>;

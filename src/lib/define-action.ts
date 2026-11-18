@@ -28,6 +28,7 @@ export function toFailureResult(error: unknown): Extract<ActionResult<never>, { 
 }
 
 const INVALID_INPUT_MESSAGE = 'Dados inválidos.';
+const DATA_WRAPPER_KEY = 'data';
 
 /**
  * Resultado para dado que não passou no zod. Aponta o campo do primeiro problema;
@@ -38,12 +39,14 @@ export function toInvalidInputResult(
   error: z.ZodError,
 ): Extract<ActionResult<never>, { ok: false }> {
   const [issue] = error.issues;
-  const [firstPathSegment] = issue?.path ?? [];
+  const path = issue?.path ?? [];
+  // Actions que recebem `{ ..., data: <formulário> }` apontam o campo do formulário, não o invólucro.
+  const [fieldSegment] = path[0] === DATA_WRAPPER_KEY ? path.slice(1) : path;
   return {
     ok: false,
     code: 'invalid_input',
     message: issue?.code === 'custom' ? issue.message : INVALID_INPUT_MESSAGE,
-    field: typeof firstPathSegment === 'string' ? firstPathSegment : undefined,
+    field: typeof fieldSegment === 'string' ? fieldSegment : undefined,
   };
 }
 

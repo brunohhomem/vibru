@@ -1,13 +1,5 @@
 'use client';
 
-import type {
-  Allergy,
-  Doctor,
-  EmergencyContact,
-  HealthCondition,
-  HealthEvent,
-  Medication,
-} from '@vibru/shared';
 import { ArrowLeft, Siren } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -30,6 +22,14 @@ import {
 } from './health-sections';
 import { MedicationSheet } from './medication-sheet.client';
 import { ProfileSheet } from './profile-sheet.client';
+import type {
+  Allergy,
+  Doctor,
+  EmergencyContact,
+  HealthCondition,
+  HealthEvent,
+  Medication,
+} from '@/features/health/health-schemas';
 
 type Editor =
   | { kind: 'profile' }

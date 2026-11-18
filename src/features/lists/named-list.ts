@@ -1,4 +1,4 @@
-import type { PharmacyResult } from '@vibru/shared';
+import type { PharmacyResult } from '@/features/health/health-schemas';
 import {
   insertList,
   insertListItem,

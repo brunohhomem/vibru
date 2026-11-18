@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { BLOOD_TYPES, type HealthProfile } from '@vibru/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -15,6 +14,8 @@ import { useUpdateHealthProfile } from '../hooks/use-health';
 import { bloodTypeLabel } from '../lib/health-format';
 import { healthProfileFormSchema, type HealthProfileFormValues } from '../schemas/forms';
 import { HealthSheet } from './health-sheet.client';
+import { BLOOD_TYPES } from '@/features/health/health-constants';
+import { type HealthProfile } from '@/features/health/health-schemas';
 
 type ProfileSheetProps = {
   memberId: string;

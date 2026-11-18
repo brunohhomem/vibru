@@ -1,6 +1,5 @@
 'use client';
 
-import type { HealthRecord } from '@vibru/shared';
 import { AlertTriangle, ArrowLeft, Phone } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
@@ -8,6 +7,7 @@ import { ErrorState } from '@/components/ui/screen-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatPhone } from '@/lib/masks';
 import { useHealthRecord } from '../hooks/use-health';
+import type { HealthRecord } from '@/features/health/health-schemas';
 import {
   SEVERITY_LABELS,
   bloodTypeLabel,

@@ -9,3 +9,5 @@ export * from './couple-schema';
 export * from './people-schema';
 export * from './tasks-schema';
 export * from './lists-schema';
+export * from './medications-schema';
+export * from './health-schema';

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { getDatabase } from '@/db/client';
 import type { NewTaskRow, TaskRow } from '@/db/tasks-schema';
 import { findCoupleMembers } from '@/features/couple/couple-repository';
+import { consumeDose, returnDose } from '@/features/health/medication-stock-operations';
 import { ActionFailure } from '@/lib/define-action';
 import { defineMemberAction } from '@/lib/define-member-action';
 import {
@@ -176,16 +177,18 @@ export const completeTaskAction = defineMemberAction({
       );
       if (!completed) throw new ActionFailure('failed', 'Tarefa já concluída');
 
-      // Lote D: aqui entra o consumo de estoque quando a tarefa é de remédio.
+      const lowStock = completed.medicationId
+        ? await consumeDose(member.coupleId, completed.medicationId, transaction)
+        : null;
       const nextData = buildNextOccurrence(completed, todayInSaoPaulo(now));
       const next = nextData ? await insertTask(nextData, transaction) : null;
-      return { completed, next };
+      return { completed, next, lowStock };
     });
 
     return {
       completed: toTask(result.completed),
       next: result.next ? toTask(result.next) : null,
-      lowStock: null,
+      lowStock: result.lowStock,
     };
   },
 });
@@ -198,7 +201,9 @@ export const reopenTaskAction = defineMemberAction({
 
     const reopened = await getDatabase().transaction(async (transaction) => {
       const row = await clearTaskCompletion(member.coupleId, input.id, transaction);
-      // Lote D: aqui entra a devolução de estoque quando a tarefa é de remédio.
+      if (existing.medicationId) {
+        await returnDose(member.coupleId, existing.medicationId, transaction);
+      }
       const child = await findOpenGeneratedChild(member.coupleId, input.id, transaction);
       if (child && isUntouchedChild(child)) {
         await hardDeleteTask(member.coupleId, child.id, transaction);
