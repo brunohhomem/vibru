@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { AuthResponse } from '@vibru/shared';
-import { api } from '@/lib/api';
+import { getCurrentUserAction } from '../actions';
 
 export const ME_QUERY_KEY = ['me'] as const;
 
@@ -8,8 +7,9 @@ export function useMe() {
   return useQuery({
     queryKey: ME_QUERY_KEY,
     queryFn: async () => {
-      const response = await api.get<AuthResponse>('/auth/me');
-      return response.data;
+      const result = await getCurrentUserAction();
+      if (!result.ok) throw new Error(result.message);
+      return result.data;
     },
   });
 }

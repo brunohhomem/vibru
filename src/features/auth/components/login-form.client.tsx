@@ -1,20 +1,17 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginRequestSchema, type AuthResponse } from '@vibru/shared';
-import Link from 'next/link';
+import { loginRequestSchema } from '@vibru/shared';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { api } from '@/lib/api';
 import { onFormSubmit } from '@/lib/submit-form';
-import { applyApiError } from '@/lib/api-error';
 import { queryClient } from '@/lib/query-client';
 import { ME_QUERY_KEY } from '../hooks/use-me';
 import { safeAppPath } from '../lib/next-path';
-import { usePublicSettings } from '@/features/settings/hooks/use-public-settings';
+import { loginAction } from '../actions';
 
 type LoginValues = {
   email: string;
@@ -24,28 +21,24 @@ type LoginValues = {
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const settings = usePublicSettings();
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginRequestSchema),
     defaultValues: { email: '', password: '' },
   });
 
   async function onSubmit(values: LoginValues) {
-    try {
-      const response = await api.post<AuthResponse>('/auth/login', values);
-      queryClient.setQueryData(ME_QUERY_KEY, response.data);
-      await queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
-      if (response.data.user.mustChangePassword) {
-        router.push('/change-password');
-        return;
-      }
-      router.push(safeAppPath(searchParams.get('next')));
-    } catch (error) {
-      applyApiError(error, form.setError);
+    const result = await loginAction(values);
+    if (!result.ok) {
+      form.setError('password', { message: result.message });
+      return;
     }
+    await queryClient.invalidateQueries({ queryKey: ME_QUERY_KEY });
+    if (result.data.mustChangePassword) {
+      router.push('/change-password');
+      return;
+    }
+    router.push(safeAppPath(searchParams.get('next')));
   }
-
-  const registrationEnabled = settings.data?.registrationEnabled === true;
 
   return (
     <form
@@ -74,16 +67,6 @@ export function LoginForm() {
       <Button type="submit" disabled={form.formState.isSubmitting}>
         {form.formState.isSubmitting ? 'Entrando…' : 'Entrar'}
       </Button>
-      <div className="flex flex-col gap-2 text-sm">
-        <Link href="/forgot-password" className="inline-flex h-11 items-center">
-          Esqueci a senha
-        </Link>
-        {registrationEnabled ? (
-          <Link href="/register" className="inline-flex h-11 items-center">
-            Criar conta
-          </Link>
-        ) : null}
-      </div>
     </form>
   );
 }
