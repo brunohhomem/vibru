@@ -12,6 +12,7 @@ export default defineConfig({
         find: /^@vibru\/shared(\/.*)?$/,
         replacement: path.join(projectDirectory, 'legacy/shared/src') + '$1',
       },
+      { find: /^@\//, replacement: path.join(projectDirectory, 'src') + '/' },
     ],
   },
   test: {

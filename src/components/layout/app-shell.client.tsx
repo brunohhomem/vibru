@@ -1,7 +1,6 @@
 'use client';
 
 import type { CoupleMember } from '@vibru/shared';
-import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -9,14 +8,11 @@ import type { ReactNode } from 'react';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
 import { useLogout } from '@/features/auth/hooks/use-logout';
 import { useMe } from '@/features/auth/hooks/use-me';
+import { describeActionFailure } from '@/lib/unwrap-action-result';
 import { CoupleRequiredScreen } from '@/features/couple/components/couple-required-screen.client';
 import { useCouple } from '@/features/couple/hooks/use-couple';
 import { BottomNav, SideNav } from './app-nav.client';
 import { CoupleMenu } from './couple-menu.client';
-
-function statusOf(error: unknown): number | undefined {
-  return axios.isAxiosError(error) ? error.response?.status : undefined;
-}
 
 function FullScreenError({ title, onRetry }: { title: string; onRetry: () => void }) {
   return (
@@ -65,6 +61,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const couple = useCouple();
   const router = useRouter();
   const logout = useLogout();
+  // O redirecionamento em si é do QueryClient (src/lib/query-client.ts); aqui só o texto de espera.
+  const mustLogin = me.isError && describeActionFailure(me.error) === 'redirect-to-login';
 
   useEffect(() => {
     if (!me.data?.user.mustChangePassword) return;
@@ -74,7 +72,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   if (me.isPending || me.data?.user.mustChangePassword) return <LoadingState />;
 
   if (me.isError) {
-    if (statusOf(me.error) === 401) return <LoadingState label="Redirecionando…" />;
+    if (mustLogin) return <LoadingState label="Redirecionando…" />;
     return (
       <FullScreenError
         title="Não foi possível carregar a sessão"
@@ -86,7 +84,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   if (couple.isPending) return <LoadingState />;
 
   if (couple.isError) {
-    if (statusOf(couple.error) === 403)
+    if (describeActionFailure(couple.error) === 'couple-required')
       return <CoupleRequiredScreen onLogout={() => void logout()} />;
     return (
       <FullScreenError

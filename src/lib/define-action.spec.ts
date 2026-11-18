@@ -5,6 +5,7 @@ const readSessionUserId = vi.fn<() => Promise<string | null>>();
 vi.mock('./session', () => ({ readSessionUserId }));
 
 const { defineAction } = await import('./define-action');
+const { ActionFailure } = await import('./define-action');
 
 const inputSchema = z.object({ title: z.string().min(1) });
 
@@ -54,5 +55,21 @@ describe('defineAction', () => {
 
     expect(result).toMatchObject({ ok: false, code: 'failed' });
     expect(JSON.stringify(result)).not.toContain('hunter2');
+  });
+
+  it('converte ActionFailure do handler em resultado tipado com code, message e field', async () => {
+    readSessionUserId.mockResolvedValue('user-1');
+    const handler = vi
+      .fn()
+      .mockRejectedValue(new ActionFailure('invalid_input', 'Data inválida', 'marriedOn'));
+
+    const result = await defineAction({ schema: inputSchema, handler })({ title: 'x' });
+
+    expect(result).toEqual({
+      ok: false,
+      code: 'invalid_input',
+      message: 'Data inválida',
+      field: 'marriedOn',
+    });
   });
 });
