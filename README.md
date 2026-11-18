@@ -1,55 +1,46 @@
-# starter-template
+# Vibru
 
-Monorepo para fork. A API é NestJS, o web é Next.js e o contrato compartilhado fica em `packages/shared`. O v1 já traz autenticação, pessoas, convites, e-mail, configurações e a área logada.
+App para duas pessoas (um casal): tarefas, listas, saúde, agenda com feed de calendário, desejos e presentes. Um único app Next.js com server actions, Postgres no Neon (Drizzle) e Better Auth, hospedado na Vercel.
 
 ## Requisitos
 
 - Node.js na versão do `.nvmrc` (24.22.1). No nvm-windows: `nvm use 24.22.1`.
 - pnpm 12.14.0, declarado em `packageManager`.
-- Docker, para Postgres 18, Redis e Mailpit.
+- Um projeto Neon e a CLI `neon` (`npm i -g neon@latest`, depois `neon login`).
 
 O `.gitattributes` grava texto com LF.
 
 ## Primeiro uso
 
-O Compose lê senha e porta do `.env`. Gere as chaves antes de subir a infra.
-
 ```bash
 pnpm install
-pnpm keys:generate
-pnpm infra:up
-pnpm db:migrate
-pnpm db:seed
-pnpm --filter @vibru/api start:dev
-pnpm worker:dev
-pnpm --filter @vibru/web dev
+neon deploy          # cria o banco e preenche DATABASE_URL* no .env
 ```
 
-- `pnpm keys:generate` cria o `.env` e não sobrescreve valor que já existe.
-- `pnpm infra:up` sobe Postgres, Redis e Mailpit. Os e-mails de desenvolvimento aparecem em `http://localhost:28025`.
-- `pnpm db:seed` cria o admin de `ADMIN_EMAIL` com a senha de `ADMIN_INITIAL_PASSWORD`, quando definida. Sem ela, em development a senha inicial é `Admin@12345`, e em production é aleatória e aparece uma vez no terminal. Em development a troca obrigatória fica desligada; em production, ligada.
-- A API fica em `http://localhost:3101` e o web em `http://localhost:3100`. `GET /api/health` responde `200`.
+Copie `.env.example` para `.env` e preencha o que o Neon não preenche:
 
-## Checklist pós-fork
+- `BETTER_AUTH_SECRET`: 32 caracteres ou mais (ex.: `openssl rand -hex 32`).
+- `SEED_USER_ONE_*` e `SEED_USER_TWO_*`: e-mail e senha dos 2 usuários (não existe cadastro).
+- `COUPLE_DATING_STARTED_ON` e `COUPLE_MARRIED_ON` (`YYYY-MM-DD`, opcionais).
 
-- [ ] Definir `ADMIN_EMAIL` e gerar as chaves de novo com `pnpm keys:generate`.
-- [ ] Apagar a landing em `apps/web/src/app/page.tsx` se o produto não for usá-la.
-- [ ] Revisar `registration_enabled`: ligado em development, desligado em production, até um admin mudar em `/app/settings`.
+```bash
+pnpm db:migrate
+pnpm db:seed         # cria os 2 usuários e o casal (idempotente)
+pnpm dev             # http://localhost:3100
+```
+
+Na Vercel, defina as mesmas variáveis; `BETTER_AUTH_URL` precisa ser `https`.
 
 ## Comandos
 
-- `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm build`
+- `pnpm dev`, `pnpm build`, `pnpm start`
+- `pnpm lint`, `pnpm typecheck`, `pnpm test`
 - `pnpm format` e `pnpm format:check`
-- `pnpm --filter @vibru/api start:dev`, `pnpm worker:dev`, `pnpm --filter @vibru/web dev`
-- `pnpm infra:up` / `pnpm infra:down` / `pnpm infra:logs` / `pnpm infra:reset`
-- `pnpm keys:generate` [--file <caminho>] / `pnpm keys:rotate <NOME>` [--yes]
 - `pnpm db:generate <nome>` / `pnpm db:migrate` / `pnpm db:seed` / `pnpm db:studio`
-- `pnpm boot:check` sobe o build de produção da API e do worker e espera `GET /api/health`
-- `pnpm e2e` roda o smoke mobile contra o build de produção
 
 ## Onde ler
 
-- Decisões: [`docs/adr/0002-template-enxuto-v1.md`](docs/adr/0002-template-enxuto-v1.md)
+- Arquitetura e decisões: [`docs/adr/0005-nextjs-unico.md`](docs/adr/0005-nextjs-unico.md)
 - Autenticação: [`docs/auth.md`](docs/auth.md)
-- E-mail: [`docs/email.md`](docs/email.md)
+- Convenções: [`docs/conventions/`](docs/conventions)
 - Agentes: [`AGENTS.md`](AGENTS.md)
