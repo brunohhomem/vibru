@@ -76,6 +76,34 @@ describe('OgImageService', () => {
     );
   });
 
+  it('devolve null quando o redirect aponta para um host que resolve a endereço bloqueado', async () => {
+    handler = (_request, response) => {
+      response.writeHead(302, { location: `http://internal.example:${port}/` }).end();
+    };
+    const lookupByHost: LookupFunction = (hostname, options, callback) =>
+      lookupTo(hostname === 'internal.example' ? '169.254.169.254' : PUBLIC_ADDRESS)(
+        hostname,
+        options,
+        callback,
+      );
+    const service = new OgImageService({
+      lookup: lookupByHost,
+      connectOverride: () => '127.0.0.1',
+      timeoutMs: 1500,
+    });
+    expect(await service.findImageUrl(`http://public.example:${port}/`)).toBeNull();
+  });
+
+  it('devolve null quando o servidor não responde dentro do tempo', async () => {
+    handler = () => undefined;
+    const service = new OgImageService({
+      lookup: lookupTo(PUBLIC_ADDRESS),
+      connectOverride: () => '127.0.0.1',
+      timeoutMs: 300,
+    });
+    expect(await service.findImageUrl(`http://site.example:${port}/`)).toBeNull();
+  });
+
   it('desiste depois de 3 redirects', async () => {
     handler = (_request, response) => {
       response.writeHead(302, { location: '/again' }).end();

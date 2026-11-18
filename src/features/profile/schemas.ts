@@ -65,7 +65,10 @@ export const changePasswordSchema = z.object({
 
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
-export const resetPartnerPasswordSchema = z.object({ newPassword: passwordSchema });
+export const resetPartnerPasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Informe a sua senha atual').max(72),
+  newPassword: passwordSchema,
+});
 
 // Campos opcionais do formulário: em branco passa; preenchido, valida como o servidor.
 function blankable(schema: typeof cpfSchema) {

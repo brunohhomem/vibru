@@ -6,6 +6,7 @@ import {
   optionalCpf,
   passwordSchema,
   phoneSchema,
+  resetPartnerPasswordSchema,
   updateProfileSchema,
 } from './schemas';
 
@@ -65,6 +66,21 @@ describe('changePasswordSchema', () => {
     ).toBe(false);
     expect(
       changePasswordSchema.safeParse({ currentPassword: 'x', newPassword: 'senha-forte-1' })
+        .success,
+    ).toBe(true);
+  });
+});
+
+describe('resetPartnerPasswordSchema', () => {
+  it('exige a senha atual de quem redefine e valida a nova', () => {
+    expect(resetPartnerPasswordSchema.safeParse({ newPassword: 'senha-forte-1' }).success).toBe(
+      false,
+    );
+    expect(
+      resetPartnerPasswordSchema.safeParse({ currentPassword: 'x', newPassword: 'curta1' }).success,
+    ).toBe(false);
+    expect(
+      resetPartnerPasswordSchema.safeParse({ currentPassword: 'x', newPassword: 'senha-forte-1' })
         .success,
     ).toBe(true);
   });

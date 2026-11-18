@@ -13,7 +13,7 @@ import { onFormSubmit } from '@/lib/submit-form';
 import { ActionResultError, unwrapActionResult } from '@/lib/unwrap-action-result';
 import { resetPartnerPasswordSchema } from '../schemas';
 
-type PartnerPasswordValues = { newPassword: string };
+type PartnerPasswordValues = { currentPassword: string; newPassword: string };
 
 /** Quem esqueceu a senha pede ao outro: não há e-mail de redefinição. */
 export function PartnerPasswordCard() {
@@ -21,7 +21,7 @@ export function PartnerPasswordCard() {
   const partner = couple.data?.members.find((member) => !member.isMe);
   const form = useForm<PartnerPasswordValues>({
     resolver: zodResolver(resetPartnerPasswordSchema),
-    defaultValues: { newPassword: '' },
+    defaultValues: { currentPassword: '', newPassword: '' },
   });
 
   if (!partner) return null;
@@ -32,6 +32,10 @@ export function PartnerPasswordCard() {
       toast.success(`Senha de ${partner?.displayName ?? 'quem'} redefinida`);
       form.reset();
     } catch (error) {
+      if (error instanceof ActionResultError && error.field === 'currentPassword') {
+        form.setError('currentPassword', { message: error.message });
+        return;
+      }
       toast.error(error instanceof ActionResultError ? error.message : 'Não foi possível salvar.');
     }
   }
@@ -47,6 +51,19 @@ export function PartnerPasswordCard() {
           onSubmit={onFormSubmit(form.handleSubmit(onSubmit))}
           noValidate
         >
+          <Field
+            id="partnerCurrentPassword"
+            label="Sua senha atual"
+            hint="Confirma que é você."
+            error={form.formState.errors.currentPassword?.message}
+          >
+            <Input
+              id="partnerCurrentPassword"
+              type="password"
+              autoComplete="current-password"
+              {...form.register('currentPassword')}
+            />
+          </Field>
           <Field
             id="partnerNewPassword"
             label="Nova senha provisória"

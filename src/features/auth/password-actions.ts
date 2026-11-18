@@ -1,19 +1,19 @@
 'use server';
 
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { APIError } from 'better-auth/api';
 import { headers } from 'next/headers';
-import { account, session, user } from '@/db/auth-schema';
+import { user } from '@/db/auth-schema';
 import { getDatabase } from '@/db/client';
 import { findCoupleMembers } from '@/features/couple/couple-repository';
 import { changePasswordSchema, resetPartnerPasswordSchema } from '@/features/profile/schemas';
 import { auth } from '@/lib/auth';
 import { ActionFailure, defineAction } from '@/lib/define-action';
 import { defineMemberAction } from '@/lib/define-member-action';
+import { findCredentialHash, replacePartnerCredentials } from './credential-repository';
 import { findPartnerUserId } from './password-rules';
 
 const WRONG_CURRENT_PASSWORD_MESSAGE = 'Senha atual incorreta.';
-const CREDENTIAL_PROVIDER_ID = 'credential';
 
 function isWrongPasswordError(error: unknown): boolean {
   return error instanceof APIError && error.body?.code === 'INVALID_PASSWORD';
@@ -49,23 +49,17 @@ export const resetPartnerPasswordAction = defineMemberAction({
     const partnerUserId = findPartnerUserId(await findCoupleMembers(member.coupleId), userId);
     if (!partnerUserId) throw new ActionFailure('failed', 'Não há outra pessoa no casal.');
 
+    // Assumir a conta do outro exige provar quem está do lado de cá: uma sessão roubada não basta.
     const { password } = await auth.$context;
-    const passwordHash = await password.hash(input.newPassword);
+    const ownHash = await findCredentialHash(userId);
+    const isOwnPasswordCorrect =
+      ownHash !== null &&
+      (await password.verify({ hash: ownHash, password: input.currentPassword }));
+    if (!isOwnPasswordCorrect) {
+      throw new ActionFailure('invalid_input', WRONG_CURRENT_PASSWORD_MESSAGE, 'currentPassword');
+    }
 
-    await getDatabase().transaction(async (transaction) => {
-      await transaction
-        .update(account)
-        .set({ password: passwordHash })
-        .where(
-          and(eq(account.userId, partnerUserId), eq(account.providerId, CREDENTIAL_PROVIDER_ID)),
-        );
-      // A senha nova é provisória: a pessoa troca no próximo acesso, e as sessões antigas caem.
-      await transaction
-        .update(user)
-        .set({ mustChangePassword: true })
-        .where(eq(user.id, partnerUserId));
-      await transaction.delete(session).where(eq(session.userId, partnerUserId));
-    });
+    await replacePartnerCredentials(partnerUserId, await password.hash(input.newPassword));
     return null;
   },
 });
