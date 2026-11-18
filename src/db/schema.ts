@@ -11,3 +11,6 @@ export * from './tasks-schema';
 export * from './lists-schema';
 export * from './medications-schema';
 export * from './health-schema';
+export * from './wishes-schema';
+export * from './gifts-schema';
+export * from './agenda-schema';
