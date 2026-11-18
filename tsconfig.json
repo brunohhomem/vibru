@@ -2,9 +2,7 @@
   "extends": "./config/tsconfig/next.json",
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"],
-      "@vibru/shared": ["./legacy/shared/src/index.ts"],
-      "@vibru/shared/*": ["./legacy/shared/src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -15,5 +13,5 @@
     "neon.ts",
     "drizzle.config.ts"
   ],
-  "exclude": ["node_modules", "legacy"]
+  "exclude": ["node_modules"]
 }
