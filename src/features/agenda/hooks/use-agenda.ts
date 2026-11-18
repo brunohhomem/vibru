@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api';
 import type {
   AgendaEvent,
   AgendaResponse,
@@ -9,8 +10,7 @@ import type {
   ImportantDate,
   UpdateAgendaEventRequest,
   UpdateImportantDateRequest,
-} from '@vibru/shared';
-import { api } from '@/lib/api';
+} from '@/features/agenda/agenda-schemas';
 
 export const AGENDA_QUERY_KEY = ['agenda'] as const;
 const ICS_FEED_QUERY_KEY = ['ics-feed'] as const;

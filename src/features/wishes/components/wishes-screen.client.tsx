@@ -1,11 +1,11 @@
 'use client';
 
-import { WISH_CATEGORIES, type WishCategory } from '@vibru/shared';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { PageHeader } from '@/components/layout/page-header';
 import { GiftsTab } from '@/features/gifts/components/gifts-tab.client';
 import { FilterChip } from '@/features/tasks/components/filter-chip';
 import { WishesTab } from './wishes-tab.client';
+import { WISH_CATEGORIES, type WishCategory } from '@/features/wishes/wish-constants';
 
 type Tab = 'desejos' | 'presentes';
 

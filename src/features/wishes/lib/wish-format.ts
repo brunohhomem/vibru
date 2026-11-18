@@ -1,4 +1,4 @@
-import type { WishCategory } from '@vibru/shared';
+import type { WishCategory } from '@/features/wishes/wish-constants';
 
 // Função em vez de Record: a categoria `date_idea` não passa na regra de nomes
 // do ESLint como chave de objeto (mesmo caminho do `bloodTypeLabel` na F4).

@@ -1,6 +1,6 @@
-import { GIFT_CATEGORIES } from '@vibru/shared';
 import { z } from '@vibru/shared/zod';
 import { optionalHttpUrl, optionalPrice } from '@/features/wishes/schemas/forms';
+import { GIFT_CATEGORIES } from '@/features/gifts/gift-constants';
 
 export const giftFormSchema = z.object({
   title: z

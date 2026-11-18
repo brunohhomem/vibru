@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api';
 import type {
   CreateGiftRequest,
   GiftResponse,
-  GiftStatus,
   GiftsResponse,
   UpdateGiftRequest,
-} from '@vibru/shared';
-import { api } from '@/lib/api';
+} from '@/features/gifts/gift-schemas';
+import type { GiftStatus } from '@/features/gifts/gift-constants';
 
 export const GIFTS_QUERY_KEY = ['gifts'] as const;
 

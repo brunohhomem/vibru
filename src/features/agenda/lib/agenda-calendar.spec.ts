@@ -1,6 +1,6 @@
-import type { AgendaResponse } from '@vibru/shared';
 import { describe, expect, it } from 'vitest';
 import { agendaDays, monthGrid, monthLabel, shiftMonth } from './agenda-calendar';
+import type { AgendaResponse } from '@/features/agenda/agenda-schemas';
 
 describe('Calendário da agenda', () => {
   it('Virada de ano ao trocar de mês', () => {

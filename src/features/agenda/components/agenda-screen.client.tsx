@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  todayInSaoPaulo,
-  type AgendaEvent,
-  type AgendaResponse,
-  type CalendarDate,
-  type ImportantDate,
-} from '@vibru/shared';
+import { todayInSaoPaulo, type CalendarDate } from '@vibru/shared';
 import { CalendarPlus, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
@@ -26,6 +20,11 @@ import {
 } from '../lib/agenda-calendar';
 import { EventSheet } from './event-sheet.client';
 import { ImportantDateSheet } from './important-date-sheet.client';
+import {
+  type AgendaEvent,
+  type AgendaResponse,
+  type ImportantDate,
+} from '@/features/agenda/agenda-schemas';
 
 const WEEKDAY_INITIALS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 

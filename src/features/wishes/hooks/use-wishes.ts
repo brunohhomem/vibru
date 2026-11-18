@@ -1,15 +1,15 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { AGENDA_QUERY_KEY } from '@/features/agenda/hooks/use-agenda';
+import { api } from '@/lib/api';
+import type { AgendaEvent } from '@/features/agenda/agenda-schemas';
 import type {
-  AgendaEvent,
   CreateWishRequest,
   PlanWishRequest,
   UpdateWishRequest,
   Wish,
-  WishStatus,
   WishesResponse,
-} from '@vibru/shared';
-import { AGENDA_QUERY_KEY } from '@/features/agenda/hooks/use-agenda';
-import { api } from '@/lib/api';
+} from '@/features/wishes/wish-schemas';
+import type { WishStatus } from '@/features/wishes/wish-constants';
 
 export const WISHES_QUERY_KEY = ['wishes'] as const;
 

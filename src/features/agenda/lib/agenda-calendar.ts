@@ -1,11 +1,9 @@
+import { daysInMonth, formatCalendarDate, type CalendarDate } from '@vibru/shared';
 import {
-  daysInMonth,
-  formatCalendarDate,
   type AgendaEvent,
   type AgendaResponse,
-  type CalendarDate,
   type ImportantDateOccurrence,
-} from '@vibru/shared';
+} from '@/features/agenda/agenda-schemas';
 
 export type AgendaEntry =
   | { kind: 'event'; key: string; date: CalendarDate; title: string; event: AgendaEvent }
