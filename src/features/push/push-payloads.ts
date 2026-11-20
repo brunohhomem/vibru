@@ -25,10 +25,22 @@ export function taskCompletedPayload(completerName: string, taskTitle: string): 
   };
 }
 
+export function lowStockPayload(medicationName: string, daysLeft: number): PushPayload {
+  const daysText = daysLeft === 1 ? '1 dia' : `${daysLeft} dias`;
+  return {
+    title: 'Estoque de remédio baixo',
+    body: `${medicationName}: sobra para ${daysText}`,
+    url: '/app/health',
+    tag: 'low-stock',
+  };
+}
+
 export type DailySummaryInput = {
   taskTitles: string[];
   eventTitles: string[];
   importantDateTitles: string[];
+  /** Eventos e datas de amanhã, já juntos; vazio quando a pessoa desligou a prévia. */
+  tomorrowTitles: string[];
 };
 
 const MAX_TITLES_PER_SECTION = 3;
@@ -41,17 +53,22 @@ function section(label: string, titles: string[]): string | null {
   return hidden > 0 ? `${label}: ${shown} e mais ${hidden}` : `${label}: ${shown}`;
 }
 
-/** Sem nada para hoje não há o que avisar: devolve nulo e ninguém recebe notificação vazia. */
+/**
+ * Sem nada para hoje nem para amanhã não há o que avisar: devolve nulo e ninguém recebe
+ * notificação vazia. Quando só há coisa para amanhã, o título deixa de dizer "Hoje".
+ */
 export function dailySummaryPayload(input: DailySummaryInput): PushPayload | null {
-  const sections = [
+  const todaySections = [
     section('Tarefas', input.taskTitles),
     section('Eventos', input.eventTitles),
     section('Datas', input.importantDateTitles),
   ].filter((value): value is string => value !== null);
-  if (sections.length === 0) return null;
+  const tomorrowSection = section('Amanhã', input.tomorrowTitles);
+  if (todaySections.length === 0 && tomorrowSection === null) return null;
 
+  const sections = tomorrowSection ? [...todaySections, tomorrowSection] : todaySections;
   return {
-    title: 'Hoje no Vibru',
+    title: todaySections.length > 0 ? 'Hoje no Vibru' : 'Amanhã no Vibru',
     body: sections.join('\n'),
     url: '/app',
     tag: 'daily-summary',

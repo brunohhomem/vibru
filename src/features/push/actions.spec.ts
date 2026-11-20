@@ -5,6 +5,8 @@ const mocks = vi.hoisted(() => ({
   findMemberContextByUserId: vi.fn(),
   upsertPushSubscription: vi.fn(),
   deletePushSubscription: vi.fn(),
+  findNotificationPreferences: vi.fn(),
+  upsertNotificationPreferences: vi.fn(),
 }));
 
 vi.mock('@/lib/session', () => ({ readSessionUserId: mocks.readSessionUserId }));
@@ -14,9 +16,16 @@ vi.mock('@/features/couple/membership', () => ({
 vi.mock('./push-repository', () => ({
   upsertPushSubscription: mocks.upsertPushSubscription,
   deletePushSubscription: mocks.deletePushSubscription,
+  findNotificationPreferences: mocks.findNotificationPreferences,
+  upsertNotificationPreferences: mocks.upsertNotificationPreferences,
 }));
 
-import { subscribePushAction, unsubscribePushAction } from './actions';
+import {
+  getPreferencesAction,
+  subscribePushAction,
+  unsubscribePushAction,
+  updatePreferencesAction,
+} from './actions';
 
 const VALID_SUBSCRIPTION = {
   endpoint: 'https://fcm.googleapis.com/fcm/send/abc123',
@@ -81,5 +90,42 @@ describe('unsubscribePushAction', () => {
       'user-a',
       VALID_SUBSCRIPTION.endpoint,
     );
+  });
+});
+
+describe('preferências de aviso', () => {
+  it('lê as preferências do usuário da sessão', async () => {
+    mocks.findNotificationPreferences.mockResolvedValue({ lowStock: false });
+
+    expect(await getPreferencesAction(undefined)).toEqual({ ok: true, data: { lowStock: false } });
+    expect(mocks.findNotificationPreferences).toHaveBeenCalledWith('user-a');
+  });
+
+  it('grava só o que veio no pedido, para o usuário da sessão, e devolve o estado atual', async () => {
+    mocks.findNotificationPreferences.mockResolvedValue({ lowStock: true });
+
+    const result = await updatePreferencesAction({ lowStock: true });
+
+    expect(mocks.upsertNotificationPreferences).toHaveBeenCalledWith('user-a', { lowStock: true });
+    expect(result).toEqual({ ok: true, data: { lowStock: true } });
+  });
+
+  it('recusa pedido vazio ou com valor que não é booleano', async () => {
+    expect(await updatePreferencesAction({})).toMatchObject({ ok: false, code: 'invalid_input' });
+    expect(await updatePreferencesAction({ lowStock: 'sim' })).toMatchObject({
+      ok: false,
+      code: 'invalid_input',
+    });
+    expect(mocks.upsertNotificationPreferences).not.toHaveBeenCalled();
+  });
+
+  it('sem sessão recusa antes de tocar no banco', async () => {
+    mocks.readSessionUserId.mockResolvedValue(null);
+
+    expect(await updatePreferencesAction({ lowStock: true })).toMatchObject({
+      ok: false,
+      code: 'unauthenticated',
+    });
+    expect(mocks.upsertNotificationPreferences).not.toHaveBeenCalled();
   });
 });

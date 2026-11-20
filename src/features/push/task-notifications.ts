@@ -31,6 +31,7 @@ async function notifyTaskAssigned(event: TaskAssignedEvent): Promise<void> {
     coupleId,
     assigneeMemberId,
     taskAssignedPayload(actor.displayName, taskTitle),
+    'taskAssigned',
   );
 }
 
@@ -44,7 +45,9 @@ async function notifyTaskCompleted(event: TaskCompletedEvent): Promise<void> {
 
   const payload = taskCompletedPayload(actor.displayName, taskTitle);
   const partners = members.filter((member) => member.id !== actorMemberId);
-  await Promise.all(partners.map((partner) => sendPushToMember(coupleId, partner.id, payload)));
+  await Promise.all(
+    partners.map((partner) => sendPushToMember(coupleId, partner.id, payload, 'taskCompleted')),
+  );
 }
 
 // As actions respondem ao usuário sem esperar o envio; o `catch` impede que um erro
