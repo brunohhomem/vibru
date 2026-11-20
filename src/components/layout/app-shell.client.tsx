@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { ErrorState, LoadingState } from '@/components/ui/screen-state';
@@ -29,6 +29,8 @@ type AppFrameProps = {
 };
 
 function AppFrame({ children, members, onLogout }: AppFrameProps) {
+  const pathname = usePathname();
+
   return (
     <div className="min-h-dvh bg-background">
       <SideNav />
@@ -47,7 +49,10 @@ function AppFrame({ children, members, onLogout }: AppFrameProps) {
           </div>
         </header>
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 pt-4 pb-32 md:px-8 md:pb-10">
-          {children}
+          {/* A chave refaz a animação de entrada a cada tela nova. */}
+          <div key={pathname} className="animate-enter">
+            {children}
+          </div>
         </main>
       </div>
       <BottomNav />

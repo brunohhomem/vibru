@@ -168,7 +168,7 @@ export function AgendaScreen() {
         </Button>
       </div>
 
-      {agenda.isPending ? <LoadingState /> : null}
+      {agenda.isPending ? <LoadingState variant="rows" /> : null}
       {agenda.isError ? (
         <ErrorState
           title="Não foi possível carregar a agenda"

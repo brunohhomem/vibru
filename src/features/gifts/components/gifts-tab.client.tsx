@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus } from 'lucide-react';
+import { Gift, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -101,7 +101,7 @@ function GiftList({ owner, me }: GiftListProps) {
     />
   );
 
-  if (wanted.isPending) return <LoadingState />;
+  if (wanted.isPending) return <LoadingState variant="rows" />;
   if (wanted.isError) {
     return (
       <ErrorState
@@ -124,6 +124,7 @@ function GiftList({ owner, me }: GiftListProps) {
       ) : null}
       {wanted.data.gifts.length === 0 ? (
         <EmptyState
+          icon={<Gift className="size-6" aria-hidden />}
           title="Nenhum presente na lista"
           description={
             isMine ? 'Anote o que você gostaria de ganhar.' : 'A lista ainda está vazia.'
@@ -157,7 +158,7 @@ export function GiftsTab() {
   const couple = useCouple();
   const [ownerId, setOwnerId] = useState<string | null>(null);
 
-  if (couple.isPending) return <LoadingState />;
+  if (couple.isPending) return <LoadingState variant="rows" />;
   if (couple.isError) {
     return (
       <ErrorState

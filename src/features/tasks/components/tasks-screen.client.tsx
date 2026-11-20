@@ -1,12 +1,12 @@
 'use client';
 
-import { Plus } from 'lucide-react';
+import { CheckCheck, Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
-import { ErrorState } from '@/components/ui/screen-state';
+import { EmptyState, ErrorState } from '@/components/ui/screen-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCouple } from '@/features/couple/hooks/use-couple';
 import { FilterChip } from './filter-chip';
@@ -105,10 +105,21 @@ export function TasksScreen() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const [formOpen, setFormOpen] = useState(false);
+  // O atalho "Nova tarefa" do app instalado chega com ?novo=1 e já abre o formulário.
+  const [formOpen, setFormOpen] = useState(() => searchParams.get('novo') === '1');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [notesTask, setNotesTask] = useState<Task | null>(null);
   const [lowStock, setLowStock] = useState<TaskLowStock | null>(null);
+
+  // Tira o ?novo=1 da URL depois de usado, para recarregar a página não reabrir o formulário.
+  useEffect(() => {
+    if (searchParams.get('novo') !== '1') return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('novo');
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }, [searchParams, router, pathname]);
 
   if (tasks.isPending || couple.isPending) return <TasksSkeleton />;
 
@@ -231,12 +242,11 @@ export function TasksScreen() {
       <Summary openCount={openTasks.length} completedCount={completedTasks.length} />
 
       {openTasks.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border px-4 py-10 text-center">
-          <p className="text-base font-medium">Nenhuma tarefa aberta</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Crie a primeira no botão Nova tarefa.
-          </p>
-        </div>
+        <EmptyState
+          icon={<CheckCheck className="size-6" aria-hidden />}
+          title="Nenhuma tarefa aberta"
+          description="Crie a primeira no botão Nova tarefa."
+        />
       ) : (
         <div className="flex flex-col gap-5">
           {GROUP_ORDER.map((group) => {
