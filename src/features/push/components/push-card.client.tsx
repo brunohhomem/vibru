@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { applyActionError } from '@/lib/action-error';
 import { usePushNotifications } from '../hooks/use-push-notifications';
+import { PreferencesList } from './preferences-list.client';
 
 const STATIC_MESSAGES = {
   unsupported: 'Este navegador não permite receber avisos.',
@@ -14,8 +15,7 @@ const STATIC_MESSAGES = {
     'Os avisos estão bloqueados para o Vibru. Libere nas configurações de notificações do navegador ou do aparelho e volte aqui.',
 } as const;
 
-const WHAT_YOU_GET =
-  'Você recebe: tarefa atribuída a você, tarefa concluída por quem divide a casa com você e um resumo de manhã com o que é de hoje.';
+const WHAT_YOU_GET = 'Ative para receber avisos neste aparelho. Depois você escolhe quais.';
 
 export function PushCard() {
   const { status, enable, disable } = usePushNotifications();
@@ -47,11 +47,11 @@ export function PushCard() {
         <CardTitle>Avisos</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
-        {status === 'off' || status === 'on' ? (
-          <p className="text-sm text-muted-foreground">{WHAT_YOU_GET}</p>
-        ) : (
+        {status === 'off' ? <p className="text-sm text-muted-foreground">{WHAT_YOU_GET}</p> : null}
+        {status === 'on' ? <PreferencesList /> : null}
+        {status !== 'off' && status !== 'on' ? (
           <p className="text-sm text-muted-foreground">{STATIC_MESSAGES[status]}</p>
-        )}
+        ) : null}
         {status === 'off' ? (
           <Button type="button" disabled={busy} onClick={handleEnable}>
             {enable.isPending ? 'Ativando…' : 'Ativar avisos neste aparelho'}

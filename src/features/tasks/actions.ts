@@ -6,6 +6,7 @@ import { getDatabase } from '@/db/client';
 import type { NewTaskRow, TaskRow } from '@/db/tasks-schema';
 import { findCoupleMembers } from '@/features/couple/couple-repository';
 import { consumeDose, returnDose } from '@/features/health/medication-stock-operations';
+import { queueLowStockPush } from '@/features/push/stock-notifications';
 import { queueTaskAssignedPush, queueTaskCompletedPush } from '@/features/push/task-notifications';
 import { ActionFailure } from '@/lib/define-action';
 import { defineMemberAction } from '@/lib/define-member-action';
@@ -211,6 +212,9 @@ export const completeTaskAction = defineMemberAction({
       taskTitle: result.completed.title,
       isMedicationTask: result.completed.medicationId !== null,
     });
+    if (result.lowStock) {
+      queueLowStockPush({ coupleId: member.coupleId, warning: result.lowStock });
+    }
 
     return {
       completed: toTask(result.completed),

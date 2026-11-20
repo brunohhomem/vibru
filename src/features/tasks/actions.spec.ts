@@ -16,6 +16,11 @@ const mocks = vi.hoisted(() => ({
   returnDose: vi.fn(),
   queueTaskAssignedPush: vi.fn(),
   queueTaskCompletedPush: vi.fn(),
+  queueLowStockPush: vi.fn(),
+}));
+
+vi.mock('@/features/push/stock-notifications', () => ({
+  queueLowStockPush: mocks.queueLowStockPush,
 }));
 
 vi.mock('@/features/push/task-notifications', () => ({
@@ -430,6 +435,26 @@ describe('avisos de push das tarefas', () => {
     expect(mocks.queueTaskCompletedPush).toHaveBeenCalledWith(
       expect.objectContaining({ isMedicationTask: true }),
     );
+  });
+
+  it('estoque baixo ao concluir enfileira o aviso de estoque', async () => {
+    mocks.completeTaskIfOpen.mockResolvedValue(
+      openTask({ medicationId: 'med-1', completedAt: new Date() }),
+    );
+    const warning = { medicationId: 'med-1', name: 'Dipirona', daysLeft: 3 };
+    mocks.consumeDose.mockResolvedValue(warning);
+
+    await completeTaskAction({ id: TASK_ID });
+
+    expect(mocks.queueLowStockPush).toHaveBeenCalledWith({ coupleId: 'couple-1', warning });
+  });
+
+  it('concluir sem estoque baixo não enfileira aviso de estoque', async () => {
+    mocks.completeTaskIfOpen.mockResolvedValue(openTask({ completedAt: new Date() }));
+
+    await completeTaskAction({ id: TASK_ID });
+
+    expect(mocks.queueLowStockPush).not.toHaveBeenCalled();
   });
 
   it('tarefa já concluída falha e não avisa ninguém', async () => {

@@ -37,6 +37,7 @@ describe('notifyTaskAssigned', () => {
       'couple-1',
       PARTNER,
       expect.objectContaining({ body: 'Bruno: Lavar a louça' }),
+      'taskAssigned',
     );
   });
 
@@ -78,6 +79,7 @@ describe('notifyTaskCompleted', () => {
       'couple-1',
       PARTNER,
       expect.objectContaining({ title: 'Bruno concluiu uma tarefa' }),
+      'taskCompleted',
     );
   });
 

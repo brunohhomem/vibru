@@ -2,7 +2,7 @@ import { listEventsBetween } from '@/features/agenda/agenda-repository';
 import { importantDateOccurrences } from '@/features/agenda/agenda-entries';
 import { listImportantDates } from '@/features/agenda/important-dates-repository';
 import { listOpenTasks } from '@/features/tasks/tasks-repository';
-import { todayInSaoPaulo } from '@/lib/calendar-date';
+import { addDays, todayInSaoPaulo } from '@/lib/calendar-date';
 import { groupByMember, selectTaskTitlesDueToday } from './daily-summary-rules';
 import { dailySummaryPayload } from './push-payloads';
 import { listSubscribedMembers, type SubscribedMember } from './push-repository';
@@ -15,22 +15,35 @@ async function sendCoupleSummary(
   subscribers: SubscribedMember[],
   today: string,
 ): Promise<number> {
+  const tomorrow = addDays(today, 1);
   const [openTasks, events, importantDates] = await Promise.all([
     listOpenTasks(coupleId),
-    listEventsBetween(coupleId, today, today),
+    listEventsBetween(coupleId, today, tomorrow),
     listImportantDates(coupleId),
   ]);
-  const importantDateTitles = importantDates.flatMap((row) =>
-    importantDateOccurrences(row, { from: today, to: today }).map((occurrence) => occurrence.title),
+  const dateOccurrences = importantDates.flatMap((row) =>
+    importantDateOccurrences(row, { from: today, to: tomorrow }),
   );
-  const eventTitles = events.map((event) => event.title);
+  const titlesOn = (day: string) => ({
+    events: events.filter((event) => event.startsOn === day).map((event) => event.title),
+    dates: dateOccurrences.filter((item) => item.date === day).map((item) => item.title),
+  });
+  const todayTitles = titlesOn(today);
+  const tomorrowTitles = titlesOn(tomorrow);
 
   let sent = 0;
   for (const [memberId, devices] of groupByMember(subscribers)) {
+    // Todos os aparelhos de um membro são da mesma pessoa, então têm as mesmas preferências.
+    const preferences = devices[0]?.preferences;
+    if (!preferences?.dailySummary) continue;
+
     const payload = dailySummaryPayload({
       taskTitles: selectTaskTitlesDueToday(openTasks, memberId, today),
-      eventTitles,
-      importantDateTitles,
+      eventTitles: todayTitles.events,
+      importantDateTitles: todayTitles.dates,
+      tomorrowTitles: preferences.tomorrowPreview
+        ? [...tomorrowTitles.events, ...tomorrowTitles.dates]
+        : [],
     });
     if (!payload) continue;
 

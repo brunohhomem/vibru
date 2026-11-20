@@ -1,6 +1,7 @@
 import { sendNotification, setVapidDetails, WebPushError } from 'web-push';
 import { getEnv } from '@/lib/env';
 import type { PushPayload } from './push-payloads';
+import type { PushKind } from './push-preferences';
 import {
   deleteExpiredPushSubscription,
   listMemberSubscriptions,
@@ -49,23 +50,26 @@ async function sendToSubscription(
 }
 
 /**
- * Envia para todos os aparelhos de uma pessoa e apaga os que o serviço de push disse
- * que não existem mais. Nunca lança: aviso que falha não pode derrubar quem o causou.
+ * Envia para os aparelhos de uma pessoa que querem este tipo de aviso e apaga os que o serviço
+ * de push disse que não existem mais. Nunca lança: aviso que falha não pode derrubar quem o causou.
  */
 export async function sendPushToMember(
   coupleId: string,
   memberId: string,
   payload: PushPayload,
+  kind: PushKind,
 ): Promise<void> {
   try {
     if (!ensureVapidConfigured()) return;
 
     const subscriptions = await listMemberSubscriptions(coupleId, memberId);
     await Promise.all(
-      subscriptions.map(async (subscription) => {
-        const outcome = await sendToSubscription(subscription, payload);
-        if (outcome === 'expired') await deleteExpiredPushSubscription(subscription.endpoint);
-      }),
+      subscriptions
+        .filter((subscription) => subscription.preferences[kind])
+        .map(async (subscription) => {
+          const outcome = await sendToSubscription(subscription, payload);
+          if (outcome === 'expired') await deleteExpiredPushSubscription(subscription.endpoint);
+        }),
     );
   } catch {
     // Falha de banco ou de rede no aviso é ignorada de propósito (ver o comentário acima).

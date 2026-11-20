@@ -1,4 +1,4 @@
-import { index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { user } from './auth-schema';
 import { coreColumns } from './core-columns';
 
@@ -23,6 +23,28 @@ export const pushSubscriptions = pgTable(
   },
   (table) => [index('push_subscriptions_user_id_idx').on(table.userId)],
 );
+
+/**
+ * Quais avisos a pessoa quer, valendo para todos os aparelhos dela. Sem linha, valem os
+ * padrões das colunas. `low_stock` nasce desligado: fala de remédio e aparece na tela de
+ * bloqueio, então a pessoa precisa escolher receber.
+ */
+export const notificationPreferences = pgTable('notification_preferences', {
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  taskAssigned: boolean('task_assigned').notNull().default(true),
+  taskCompleted: boolean('task_completed').notNull().default(true),
+  dailySummary: boolean('daily_summary').notNull().default(true),
+  tomorrowPreview: boolean('tomorrow_preview').notNull().default(true),
+  lowStock: boolean('low_stock').notNull().default(false),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+export type NotificationPreferencesRow = typeof notificationPreferences.$inferSelect;
 
 export type PushSubscriptionRow = typeof pushSubscriptions.$inferSelect;
 export type NewPushSubscriptionRow = typeof pushSubscriptions.$inferInsert;
