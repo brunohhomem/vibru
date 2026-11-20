@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus } from 'lucide-react';
+import { Plus, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -99,6 +99,7 @@ export function WishesTab({ category, onCategoryChange }: WishesTabProps) {
       ) : null}
       {open.isSuccess && openWishes.length === 0 ? (
         <EmptyState
+          icon={<Sparkles className="size-6" aria-hidden />}
           title="Nenhum desejo aqui"
           description="Anote o próximo filme, viagem ou rolê."
         />
