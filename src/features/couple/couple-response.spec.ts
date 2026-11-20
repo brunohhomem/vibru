@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { buildCoupleResponse } from './couple-response';
 
 const members = [
-  { id: 'member-blue', displayName: 'Bruno', color: 'blue' as const },
-  { id: 'member-purple', displayName: 'Ela', color: 'purple' as const },
+  { id: 'member-blue', displayName: 'Bruno', color: 'blue' as const, avatarUrl: null },
+  { id: 'member-purple', displayName: 'Ela', color: 'purple' as const, avatarUrl: null },
 ];
 
 describe('buildCoupleResponse', () => {
@@ -56,9 +56,21 @@ describe('buildCoupleResponse', () => {
     });
 
     expect(response.members).toEqual([
-      { id: 'member-blue', displayName: 'Bruno', color: 'blue', isMe: false },
-      { id: 'member-purple', displayName: 'Ela', color: 'purple', isMe: true },
+      { id: 'member-blue', displayName: 'Bruno', color: 'blue', avatarUrl: null, isMe: false },
+      { id: 'member-purple', displayName: 'Ela', color: 'purple', avatarUrl: null, isMe: true },
     ]);
+  });
+
+  it('repassa a foto de cada membro e deixa nula a de quem não tem', () => {
+    const photo = 'data:image/jpeg;base64,/9j/4AAQ';
+    const response = buildCoupleResponse({
+      couple: { id: 'couple-1', datingStartedOn: null, marriedOn: null },
+      members: [{ ...members[0]!, avatarUrl: photo }, members[1]!],
+      currentMemberId: 'member-blue',
+      today: '2026-11-18',
+    });
+
+    expect(response.members.map((member) => member.avatarUrl)).toEqual([photo, null]);
   });
 
   it('devolve o dia de hoje recebido', () => {

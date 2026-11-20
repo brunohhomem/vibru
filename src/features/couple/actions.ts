@@ -6,6 +6,7 @@ import { ActionFailure } from '@/lib/define-action';
 import { findCoupleDateIssues, mergeCoupleDates } from './couple-dates';
 import {
   findCoupleById,
+  findCoupleMemberAvatars,
   findCoupleMembers,
   updateCoupleDates,
   updateMemberDisplayName,
@@ -22,10 +23,18 @@ async function loadCoupleResponse(coupleId: string, memberId: string): Promise<C
   const couple = await findCoupleById(coupleId);
   if (!couple) throw new Error('Couple not found for the current member');
 
-  const members = await findCoupleMembers(coupleId);
+  const [members, avatars] = await Promise.all([
+    findCoupleMembers(coupleId),
+    findCoupleMemberAvatars(coupleId),
+  ]);
   return buildCoupleResponse({
     couple,
-    members,
+    members: members.map((row) => ({
+      id: row.id,
+      displayName: row.displayName,
+      color: row.color,
+      avatarUrl: avatars.find((avatar) => avatar.memberId === row.id)?.avatarUrl ?? null,
+    })),
     currentMemberId: memberId,
     today: todayInSaoPaulo(new Date()),
   });

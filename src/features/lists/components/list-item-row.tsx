@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { MemberAvatar } from '@/features/couple/components/member-avatar';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
 import { cn } from '@/lib/cn';
 import type { ListItem } from '@/features/lists/list-schemas';
@@ -46,7 +47,10 @@ export function ListItemRow({ item, members, me, onToggle, onOpen }: ListItemRow
           {item.title}
         </span>
         {isChecked ? (
-          <span className="text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+            {checker ? (
+              <MemberAvatar member={checker} size="extraSmall" className="ring-0" />
+            ) : null}
             marcado por {checker?.displayName ?? 'alguém'}
           </span>
         ) : null}

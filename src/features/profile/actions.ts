@@ -11,9 +11,10 @@ import {
   findProfileByUserId,
   findUserDisplayName,
   isCpfUsedByAnotherUser,
+  updateUserImage,
   upsertProfile,
 } from './profile-repository';
-import { updateProfileSchema } from './schemas';
+import { updateAvatarSchema, updateProfileSchema } from './schemas';
 
 async function loadProfile(userId: string): Promise<ProfileResponse> {
   const row = await findProfileByUserId(userId);
@@ -24,6 +25,20 @@ async function loadProfile(userId: string): Promise<ProfileResponse> {
 export const getProfileAction = defineAction({
   schema: z.undefined(),
   handler: ({ userId }) => loadProfile(userId),
+});
+
+export const updateAvatarAction = defineAction({
+  schema: updateAvatarSchema,
+  handler: async ({ input, userId }) => {
+    await updateUserImage(userId, input.image);
+  },
+});
+
+export const removeAvatarAction = defineAction({
+  schema: z.undefined(),
+  handler: async ({ userId }) => {
+    await updateUserImage(userId, null);
+  },
 });
 
 export const updateProfileAction = defineAction({

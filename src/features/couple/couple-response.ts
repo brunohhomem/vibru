@@ -8,7 +8,12 @@ export type CoupleRecord = {
   marriedOn: string | null;
 };
 
-export type MemberRecord = { id: string; displayName: string; color: MemberColor };
+export type MemberRecord = {
+  id: string;
+  displayName: string;
+  color: MemberColor;
+  avatarUrl: string | null;
+};
 
 type BuildCoupleResponseInput = {
   couple: CoupleRecord;
@@ -45,6 +50,7 @@ export function buildCoupleResponse(input: BuildCoupleResponseInput): CoupleResp
       id: member.id,
       displayName: member.displayName,
       color: member.color,
+      avatarUrl: member.avatarUrl,
       isMe: member.id === currentMemberId,
     })),
     married: couple.marriedOn ? elapsedParts(couple.marriedOn, today) : null,

@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import { isAvatarDataUrl } from './avatar-rules';
+
+export const updateAvatarSchema = z.object({
+  image: z.string().refine(isAvatarDataUrl, { message: 'Foto inválida. Escolha outra imagem.' }),
+});
 
 // O bundle de produção do browser reescreve o global `Buffer` do Node e a
 // validação passa a lançar. TextEncoder existe nos dois lados.

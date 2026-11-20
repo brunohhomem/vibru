@@ -182,6 +182,7 @@ export function GiftsTab() {
             key={member.id}
             active={owner.id === member.id}
             color={member.color}
+            member={member}
             onClick={() => setOwnerId(member.id)}
           >
             {member.isMe ? 'Meus' : member.displayName}
