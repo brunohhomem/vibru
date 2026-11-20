@@ -14,3 +14,4 @@ export * from './health-schema';
 export * from './wishes-schema';
 export * from './gifts-schema';
 export * from './agenda-schema';
+export * from './push-schema';

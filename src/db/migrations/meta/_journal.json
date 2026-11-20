@@ -57,6 +57,13 @@
       "when": 1795027955132,
       "tag": "0007_agenda_wishes_gifts",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795198360339,
+      "tag": "0008_push_subscriptions",
+      "breakpoints": true
     }
   ]
 }

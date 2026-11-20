@@ -1,5 +1,6 @@
 import { useCallback, useSyncExternalStore } from 'react';
 import { decideInstallMode, type InstallMode } from '../install-environment';
+import { readStandalone } from '../read-standalone';
 
 // O tipo do evento ainda não está no lib.dom do TypeScript (só Chromium dispara).
 type BeforeInstallPromptEvent = Event & {
@@ -31,14 +32,6 @@ if (typeof window !== 'undefined') {
 function subscribe(listener: () => void): () => void {
   listeners.add(listener);
   return () => listeners.delete(listener);
-}
-
-function readStandalone(): boolean {
-  const navigatorWithStandalone = navigator as Navigator & { standalone?: boolean };
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    navigatorWithStandalone.standalone === true
-  );
 }
 
 // useSyncExternalStore exige um valor estável entre leituras: devolver texto

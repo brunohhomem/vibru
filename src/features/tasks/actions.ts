@@ -6,6 +6,7 @@ import { getDatabase } from '@/db/client';
 import type { NewTaskRow, TaskRow } from '@/db/tasks-schema';
 import { findCoupleMembers } from '@/features/couple/couple-repository';
 import { consumeDose, returnDose } from '@/features/health/medication-stock-operations';
+import { queueTaskAssignedPush, queueTaskCompletedPush } from '@/features/push/task-notifications';
 import { ActionFailure } from '@/lib/define-action';
 import { defineMemberAction } from '@/lib/define-member-action';
 import { todayInSaoPaulo } from '@/lib/calendar-date';
@@ -118,6 +119,12 @@ export const createTaskAction = defineMemberAction({
       recurrenceInterval: recurrence.interval,
       recurrenceAnchorOn: recurrence.kind === 'none' ? null : (input.dueOn ?? null),
     });
+    queueTaskAssignedPush({
+      coupleId: member.coupleId,
+      actorMemberId: member.memberId,
+      assigneeMemberId: input.assigneeMemberId,
+      taskTitle: input.title,
+    });
     return toTask(row);
   },
 });
@@ -157,7 +164,20 @@ export const updateTaskAction = defineMemberAction({
     if (patch.assigneeMemberId !== undefined) changes.assigneeMemberId = patch.assigneeMemberId;
     if (patch.dueOn !== undefined) changes.dueOn = patch.dueOn;
 
-    return toTask(await updateTask(member.coupleId, input.id, changes));
+    const updated = await updateTask(member.coupleId, input.id, changes);
+    // Só avisa quando o responsável de fato mudou: editar o título não reenvia o aviso.
+    if (
+      patch.assigneeMemberId !== undefined &&
+      patch.assigneeMemberId !== existing.assigneeMemberId
+    ) {
+      queueTaskAssignedPush({
+        coupleId: member.coupleId,
+        actorMemberId: member.memberId,
+        assigneeMemberId: patch.assigneeMemberId,
+        taskTitle: updated.title,
+      });
+    }
+    return toTask(updated);
   },
 });
 
@@ -183,6 +203,13 @@ export const completeTaskAction = defineMemberAction({
       const nextData = buildNextOccurrence(completed, todayInSaoPaulo(now));
       const next = nextData ? await insertTask(nextData, transaction) : null;
       return { completed, next, lowStock };
+    });
+
+    queueTaskCompletedPush({
+      coupleId: member.coupleId,
+      actorMemberId: member.memberId,
+      taskTitle: result.completed.title,
+      isMedicationTask: result.completed.medicationId !== null,
     });
 
     return {

@@ -19,6 +19,7 @@ import { onFormSubmit } from '@/lib/submit-form';
 import { ActionResultError, unwrapActionResult } from '@/lib/unwrap-action-result';
 import { formatCpf, formatPhone } from '@/lib/masks';
 import { updateProfileAction } from '../actions';
+import { PushCard } from '@/features/push/components/push-card.client';
 import { AvatarCard } from './avatar-card.client';
 import { PartnerPasswordCard } from './partner-password-card.client';
 import { PROFILE_QUERY_KEY, useProfile } from '../hooks/use-profile';
@@ -98,6 +99,7 @@ export function ProfileScreen() {
     <div className="mx-auto flex w-full flex-col gap-6 md:w-[40rem]">
       <PageHeader title="Perfil" description="Foto, dados pessoais e senha." />
       <AvatarCard />
+      <PushCard />
       <Card>
         <CardHeader>
           <CardTitle>Dados pessoais</CardTitle>
