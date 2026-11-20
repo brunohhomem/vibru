@@ -1,4 +1,5 @@
 import { Check, Repeat } from 'lucide-react';
+import { MemberAvatar } from '@/features/couple/components/member-avatar';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
 import { dueLabel, isOverdue } from '../lib/task-format';
 import { cn } from '@/lib/cn';
@@ -34,12 +35,13 @@ function AssigneeChip({ task, assignee }: { task: Task; assignee: CoupleMember |
   return (
     <span
       className={cn(
-        'inline-flex max-w-32 truncate rounded-md px-1.5 py-0.5 text-xs font-medium',
+        'inline-flex max-w-36 items-center gap-1 rounded-md py-0.5 pr-1.5 pl-0.5 text-xs font-medium',
         classes.tile,
         classes.onTile,
       )}
     >
-      {assignee.displayName}
+      <MemberAvatar member={assignee} size="extraSmall" className="ring-0" />
+      <span className="truncate">{assignee.displayName}</span>
     </span>
   );
 }
@@ -106,7 +108,8 @@ export function CompletedTaskItem({ task, members, pending, onReopen }: Complete
       </span>
       <div className="flex min-h-11 flex-1 flex-col items-start justify-center gap-1 py-0.5">
         <span className="text-base font-medium text-muted-foreground">{task.title}</span>
-        <span className="text-xs text-muted-foreground">
+        <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+          {author ? <MemberAvatar member={author} size="extraSmall" className="ring-0" /> : null}
           feita por {author?.displayName ?? 'alguém'}
         </span>
       </div>

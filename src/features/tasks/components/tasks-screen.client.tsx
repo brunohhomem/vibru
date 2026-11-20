@@ -208,6 +208,7 @@ export function TasksScreen() {
             key={member.id}
             active={filter === member.id}
             color={member.color}
+            member={member}
             onClick={() => setFilter(member.id)}
           >
             {member.displayName}

@@ -44,6 +44,11 @@ export async function upsertProfile(
     .onConflictDoUpdate({ target: people.userId, set: updates });
 }
 
+/** `null` remove a foto e devolve o avatar à inicial colorida. */
+export async function updateUserImage(userId: string, image: string | null): Promise<void> {
+  await getDatabase().update(user).set({ image }).where(eq(user.id, userId));
+}
+
 export async function findUserDisplayName(userId: string): Promise<string> {
   const [row] = await getDatabase()
     .select({ name: user.name })

@@ -1,5 +1,6 @@
 import { and, asc, eq } from 'drizzle-orm';
 import { getDatabase } from '@/db/client';
+import { user } from '@/db/auth-schema';
 import { coupleMembers, couples, type CoupleMemberRow, type CoupleRow } from '@/db/couple-schema';
 import type { CoupleDates } from './couple-dates';
 
@@ -16,6 +17,20 @@ export async function findCoupleMembers(coupleId: string): Promise<CoupleMemberR
     .from(coupleMembers)
     .where(eq(coupleMembers.coupleId, coupleId))
     .orderBy(asc(coupleMembers.createdAt));
+}
+
+/**
+ * A foto mora em `user.image`. Fica numa busca à parte para que os outros
+ * chamadores de `findCoupleMembers` não carreguem o texto da imagem à toa.
+ */
+export async function findCoupleMemberAvatars(
+  coupleId: string,
+): Promise<Array<{ memberId: string; avatarUrl: string | null }>> {
+  return getDatabase()
+    .select({ memberId: coupleMembers.id, avatarUrl: user.image })
+    .from(coupleMembers)
+    .innerJoin(user, eq(user.id, coupleMembers.userId))
+    .where(eq(coupleMembers.coupleId, coupleId));
 }
 
 export async function updateCoupleDates(coupleId: string, dates: CoupleDates): Promise<CoupleRow> {

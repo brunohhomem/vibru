@@ -1,8 +1,9 @@
 'use client';
 
-import { Check, HeartPulse, Palette, Settings, User } from 'lucide-react';
+import { Check, Download, HeartPulse, Palette, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
+import { useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +15,9 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { memberColorClasses } from '@/features/couple/lib/member-color';
+import { MemberAvatar } from '@/features/couple/components/member-avatar';
+import { IosInstallDialog } from '@/features/install/components/ios-install-dialog.client';
+import { useInstallApp } from '@/features/install/hooks/use-install-app';
 import { cn } from '@/lib/cn';
 import type { CoupleMember } from '@/features/couple/couple-schemas';
 
@@ -26,27 +29,6 @@ const THEME_OPTIONS = [
 
 const MENU_ICON_CLASSES = 'size-4 shrink-0';
 
-function memberInitial(displayName: string): string {
-  return displayName.trim().charAt(0).toUpperCase();
-}
-
-function MemberAvatar({ member }: { member: CoupleMember }) {
-  const classes = memberColorClasses(member.color);
-
-  return (
-    <span
-      aria-hidden
-      className={cn(
-        'flex size-9 items-center justify-center rounded-full text-sm font-semibold ring-2 ring-background',
-        classes.tile,
-        classes.onTile,
-      )}
-    >
-      {memberInitial(member.displayName)}
-    </span>
-  );
-}
-
 type CoupleMenuProps = {
   members: CoupleMember[];
   onLogout: () => void;
@@ -55,65 +37,85 @@ type CoupleMenuProps = {
 export function CoupleMenu({ members, onLogout }: CoupleMenuProps) {
   const { theme, setTheme } = useTheme();
   const coupleNames = members.map((member) => member.displayName).join(' e ');
+  const { mode: installMode, promptInstall } = useInstallApp();
+  const [iosDialogOpen, setIosDialogOpen] = useState(false);
+  const canInstall = installMode === 'native-prompt' || installMode === 'ios-manual';
+
+  function handleInstall() {
+    if (installMode === 'ios-manual') {
+      setIosDialogOpen(true);
+      return;
+    }
+    void promptInstall();
+  }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          aria-label="Abrir menu do casal"
-          className="flex items-center -space-x-2 rounded-full p-1 hover:bg-accent"
-        >
-          {members.map((member) => (
-            <MemberAvatar key={member.id} member={member} />
-          ))}
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-56">
-        <DropdownMenuLabel>{coupleNames}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/app/couple">
-            <Settings className={MENU_ICON_CLASSES} aria-hidden />
-            Configurações do casal
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/app/profile">
-            <User className={MENU_ICON_CLASSES} aria-hidden />
-            Perfil
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/app/health">
-            <HeartPulse className={MENU_ICON_CLASSES} aria-hidden />
-            Saúde
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <Palette className={MENU_ICON_CLASSES} aria-hidden />
-            Tema
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent>
-            {THEME_OPTIONS.map((option) => (
-              <DropdownMenuItem key={option.value} onSelect={() => setTheme(option.value)}>
-                <Check
-                  className={cn(
-                    MENU_ICON_CLASSES,
-                    theme === option.value ? 'opacity-100' : 'opacity-0',
-                  )}
-                  aria-hidden
-                />
-                {option.label}
-              </DropdownMenuItem>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            aria-label="Abrir menu do casal"
+            className="flex items-center -space-x-2 rounded-full p-1 hover:bg-accent"
+          >
+            {members.map((member) => (
+              <MemberAvatar key={member.id} member={member} />
             ))}
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={onLogout}>Sair</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-56">
+          <DropdownMenuLabel>{coupleNames}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link href="/app/couple">
+              <Settings className={MENU_ICON_CLASSES} aria-hidden />
+              Configurações do casal
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/app/profile">
+              <User className={MENU_ICON_CLASSES} aria-hidden />
+              Perfil
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/app/health">
+              <HeartPulse className={MENU_ICON_CLASSES} aria-hidden />
+              Saúde
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <Palette className={MENU_ICON_CLASSES} aria-hidden />
+              Tema
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              {THEME_OPTIONS.map((option) => (
+                <DropdownMenuItem key={option.value} onSelect={() => setTheme(option.value)}>
+                  <Check
+                    className={cn(
+                      MENU_ICON_CLASSES,
+                      theme === option.value ? 'opacity-100' : 'opacity-0',
+                    )}
+                    aria-hidden
+                  />
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+          {canInstall ? (
+            <DropdownMenuItem onSelect={handleInstall}>
+              <Download className={MENU_ICON_CLASSES} aria-hidden />
+              Instalar app
+            </DropdownMenuItem>
+          ) : null}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={onLogout}>Sair</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <IosInstallDialog open={iosDialogOpen} onOpenChange={setIosDialogOpen} />
+    </>
   );
 }

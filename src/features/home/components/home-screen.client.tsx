@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ChevronRight, Pill } from 'lucide-react';
 import { ErrorState } from '@/components/ui/screen-state';
 import { Skeleton } from '@/components/ui/skeleton';
+import { MemberAvatar } from '@/features/couple/components/member-avatar';
 import { memberColorClasses } from '@/features/couple/lib/member-color';
 import { useCouple } from '@/features/couple/hooks/use-couple';
 import { tasksTodayLabel } from '@/features/tasks/lib/task-format';
@@ -97,7 +98,7 @@ function MemberTile({ member, taskCount }: { member: CoupleMember; taskCount: nu
         classes.onTile,
       )}
     >
-      <span className={cn('size-2.5 rounded-full', classes.strong)} aria-hidden />
+      <MemberAvatar member={member} size="medium" className="ring-0" />
       <span className="flex flex-col gap-1">
         <span className="text-lg font-medium break-words">{member.displayName}</span>
         <span className="text-sm">

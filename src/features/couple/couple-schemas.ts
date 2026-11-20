@@ -19,6 +19,8 @@ export const coupleMemberSchema = z.object({
   id: z.string().uuid(),
   displayName: z.string(),
   color: memberColorSchema,
+  // Foto em data URL (`user.image`); nula mostra a inicial colorida.
+  avatarUrl: z.string().nullable(),
   isMe: z.boolean(),
 });
 
