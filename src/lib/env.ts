@@ -12,6 +12,13 @@ const environmentSchema = z.object({
   DATABASE_POOL_MAX: z.coerce.number().int().positive().default(1),
   BETTER_AUTH_SECRET: z.string().min(MINIMUM_SECRET_LENGTH),
   BETTER_AUTH_URL: z.url().default(DEVELOPMENT_AUTH_URL),
+  // Push: sem as chaves o app funciona normalmente, só não envia notificações.
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().min(1).optional(),
+  VAPID_PRIVATE_KEY: z.string().min(1).optional(),
+  // Endereço do app (não um e-mail pessoal): vai junto com o envio para o serviço de push.
+  VAPID_SUBJECT: z.url().optional(),
+  // A Vercel manda este valor no cabeçalho Authorization ao chamar as rotas de cron.
+  CRON_SECRET: z.string().min(MINIMUM_SECRET_LENGTH).optional(),
   SEED_USER_ONE_EMAIL: z.string().optional(),
   SEED_USER_ONE_PASSWORD: z.string().optional(),
   SEED_USER_TWO_EMAIL: z.string().optional(),

@@ -14,6 +14,13 @@ const mocks = vi.hoisted(() => ({
   hardDeleteTask: vi.fn(),
   consumeDose: vi.fn(),
   returnDose: vi.fn(),
+  queueTaskAssignedPush: vi.fn(),
+  queueTaskCompletedPush: vi.fn(),
+}));
+
+vi.mock('@/features/push/task-notifications', () => ({
+  queueTaskAssignedPush: mocks.queueTaskAssignedPush,
+  queueTaskCompletedPush: mocks.queueTaskCompletedPush,
 }));
 
 vi.mock('@/features/health/medication-stock-operations', () => ({
@@ -364,5 +371,72 @@ describe('removeTaskAction', () => {
 
     expect(await removeTaskAction({ id: TASK_ID })).toMatchObject({ ok: false });
     expect(mocks.softDeleteTask).not.toHaveBeenCalled();
+  });
+});
+
+describe('avisos de push das tarefas', () => {
+  it('criar tarefa para o parceiro enfileira o aviso de atribuição', async () => {
+    mocks.insertTask.mockImplementation(async (data: Record<string, unknown>) => openTask(data));
+
+    await createTaskAction({ title: 'Comprar pão', assigneeMemberId: PARTNER_ID });
+
+    expect(mocks.queueTaskAssignedPush).toHaveBeenCalledWith({
+      coupleId: 'couple-1',
+      actorMemberId: MEMBER_ID,
+      assigneeMemberId: PARTNER_ID,
+      taskTitle: 'Comprar pão',
+    });
+  });
+
+  it('editar sem trocar o responsável não reenvia o aviso', async () => {
+    mocks.updateTask.mockResolvedValue(openTask({ title: 'Novo título' }));
+
+    await updateTaskAction({ id: TASK_ID, patch: { title: 'Novo título' } });
+
+    expect(mocks.queueTaskAssignedPush).not.toHaveBeenCalled();
+  });
+
+  it('trocar o responsável para o parceiro avisa com o título atualizado', async () => {
+    mocks.updateTask.mockResolvedValue(openTask({ assigneeMemberId: PARTNER_ID }));
+
+    await updateTaskAction({ id: TASK_ID, patch: { assigneeMemberId: PARTNER_ID } });
+
+    expect(mocks.queueTaskAssignedPush).toHaveBeenCalledWith(
+      expect.objectContaining({ assigneeMemberId: PARTNER_ID, taskTitle: 'Lavar o carro' }),
+    );
+  });
+
+  it('concluir tarefa comum enfileira o aviso de conclusão', async () => {
+    mocks.completeTaskIfOpen.mockResolvedValue(openTask({ completedAt: new Date() }));
+
+    await completeTaskAction({ id: TASK_ID });
+
+    expect(mocks.queueTaskCompletedPush).toHaveBeenCalledWith({
+      coupleId: 'couple-1',
+      actorMemberId: MEMBER_ID,
+      taskTitle: 'Lavar o carro',
+      isMedicationTask: false,
+    });
+  });
+
+  it('concluir tarefa de remédio marca o aviso como de saúde', async () => {
+    mocks.findActiveTaskById.mockResolvedValue(openTask({ medicationId: 'med-1' }));
+    mocks.completeTaskIfOpen.mockResolvedValue(
+      openTask({ medicationId: 'med-1', completedAt: new Date() }),
+    );
+
+    await completeTaskAction({ id: TASK_ID });
+
+    expect(mocks.queueTaskCompletedPush).toHaveBeenCalledWith(
+      expect.objectContaining({ isMedicationTask: true }),
+    );
+  });
+
+  it('tarefa já concluída falha e não avisa ninguém', async () => {
+    mocks.completeTaskIfOpen.mockResolvedValue(null);
+
+    await completeTaskAction({ id: TASK_ID });
+
+    expect(mocks.queueTaskCompletedPush).not.toHaveBeenCalled();
   });
 });
