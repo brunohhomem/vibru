@@ -6,7 +6,6 @@ import * as schema from '@/db/schema';
 import { getEnv } from './env';
 
 const NINETY_DAYS_IN_SECONDS = 60 * 60 * 24 * 90;
-const SESSION_COOKIE_CACHE_IN_SECONDS = 60 * 5;
 const LOGIN_ATTEMPT_WINDOW_IN_SECONDS = 60;
 const MAXIMUM_LOGIN_ATTEMPTS_PER_WINDOW = 5;
 
@@ -28,12 +27,9 @@ function createAuth() {
       // Os 2 usuários vêm do seed; não existe cadastro aberto.
       disableSignUp: true,
     },
-    session: {
-      expiresIn: NINETY_DAYS_IN_SECONDS,
-      // Cada action lê a sessão; com o cache no cookie assinado isso deixa de ir ao banco a cada
-      // chamada. Custo aceito: um logout em outro aparelho vale em até 5 minutos.
-      cookieCache: { enabled: true, maxAge: SESSION_COOKIE_CACHE_IN_SECONDS },
-    },
+    // Não ligar `cookieCache`: ele grava o usuário inteiro no cookie, e `user.image` guarda a foto
+    // de perfil em data URL. O cookie estoura o limite de cabeçalho da Vercel (erro 494).
+    session: { expiresIn: NINETY_DAYS_IN_SECONDS },
     user: {
       additionalFields: {
         mustChangePassword: { type: 'boolean', required: false, defaultValue: false },
