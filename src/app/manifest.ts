@@ -11,6 +11,30 @@ export default function manifest(): MetadataRoute.Manifest {
     display: 'standalone',
     background_color: '#F8F3EE',
     theme_color: '#F8F3EE',
+    // Menu de pressionar o ícone no Android e no desktop. O iOS ainda não lê este campo.
+    shortcuts: [
+      {
+        name: 'Nova tarefa',
+        short_name: 'Tarefa',
+        url: '/app/tasks?novo=1',
+        icons: [{ src: '/icon/192', sizes: '192x192', type: 'image/png' }],
+      },
+      {
+        name: 'Agenda',
+        url: '/app/agenda',
+        icons: [{ src: '/icon/192', sizes: '192x192', type: 'image/png' }],
+      },
+      {
+        name: 'Listas',
+        url: '/app/lists',
+        icons: [{ src: '/icon/192', sizes: '192x192', type: 'image/png' }],
+      },
+      {
+        name: 'Desejos',
+        url: '/app/wishes',
+        icons: [{ src: '/icon/192', sizes: '192x192', type: 'image/png' }],
+      },
+    ],
     icons: [
       { src: '/icon/192', sizes: '192x192', type: 'image/png', purpose: 'any' },
       { src: '/icon/512', sizes: '512x512', type: 'image/png', purpose: 'any' },

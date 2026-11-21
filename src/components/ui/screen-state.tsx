@@ -4,22 +4,60 @@ import type { ReactNode } from 'react';
 import { Button } from './button';
 import { Skeleton } from './skeleton';
 
-export function LoadingState({ label = 'Carregando…' }: { label?: string }) {
+const ROW_PLACEHOLDERS = [0, 1, 2, 3];
+
+type LoadingStateProps = {
+  label?: string;
+  /** `rows` imita uma lista (bolinha e duas linhas), para telas que são listas. */
+  variant?: 'blocks' | 'rows';
+};
+
+export function LoadingState({ label = 'Carregando…', variant = 'blocks' }: LoadingStateProps) {
   return (
     <div className="flex flex-col gap-3" role="status" aria-live="polite">
       <span className="sr-only">{label}</span>
       <Skeleton className="h-8 w-40" />
-      <Skeleton className="h-24 w-full" />
-      <Skeleton className="h-24 w-full" />
+      {variant === 'rows' ? (
+        <div className="flex flex-col gap-3 rounded-xl bg-card p-3">
+          {ROW_PLACEHOLDERS.map((placeholder) => (
+            <div key={placeholder} className="flex items-center gap-3">
+              <Skeleton className="size-11 shrink-0 rounded-full" />
+              <div className="flex flex-1 flex-col gap-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/3" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+        </>
+      )}
     </div>
   );
 }
 
-export function EmptyState({ title, description }: { title: string; description: string }) {
+type EmptyStateProps = {
+  title: string;
+  description: string;
+  /** Elemento do lucide já pronto, ex.: <Gift className="size-6" aria-hidden />. */
+  icon?: ReactNode;
+  action?: ReactNode;
+};
+
+export function EmptyState({ title, description, icon, action }: EmptyStateProps) {
   return (
-    <div className="rounded-lg border border-dashed border-border px-4 py-10 text-center">
+    <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border px-4 py-10 text-center">
+      {icon ? (
+        <span className="mb-1 inline-flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+          {icon}
+        </span>
+      ) : null}
       <p className="text-base font-medium">{title}</p>
-      <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+      <p className="text-sm text-muted-foreground">{description}</p>
+      {action ? <div className="mt-2">{action}</div> : null}
     </div>
   );
 }

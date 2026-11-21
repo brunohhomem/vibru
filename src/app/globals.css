@@ -123,8 +123,28 @@
   padding-top: calc(env(safe-area-inset-top, 0px) + 0px);
 }
 
+/* Entrada suave da tela ao navegar: sobe 8px e aparece em 200ms. */
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility animate-enter {
+  animation: enter 200ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .motion-pop {
     transition: none;
+  }
+
+  .animate-enter {
+    animation: none;
   }
 }

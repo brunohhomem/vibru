@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus } from 'lucide-react';
+import { ListChecks, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
@@ -46,7 +46,11 @@ export function ListsScreen() {
       <PageHeader title="Listas" description="Mercado, farmácia e o que mais couber." />
 
       {lists.data.lists.length === 0 ? (
-        <EmptyState title="Nenhuma lista ainda" description="Crie a primeira no botão Nova lista" />
+        <EmptyState
+          icon={<ListChecks className="size-6" aria-hidden />}
+          title="Nenhuma lista ainda"
+          description="Crie a primeira no botão Nova lista"
+        />
       ) : (
         <ul className="flex flex-col gap-2">
           {lists.data.lists.map((list) => (
