@@ -123,20 +123,20 @@
   padding-top: calc(env(safe-area-inset-top, 0px) + 0px);
 }
 
-/* Entrada suave da tela ao navegar: sobe 8px e aparece em 200ms. */
+/*
+ * Entrada suave da tela ao navegar: só opacidade, em 200ms.
+ * Não usar transform aqui: um ancestral com transform (ou com animação de transform ainda
+ * preenchida) vira o bloco de contenção dos filhos `fixed`, e o botão flutuante deixa de se
+ * posicionar pela janela. O fill-mode é `backwards` para nada ficar aplicado depois.
+ */
 @keyframes enter {
   from {
     opacity: 0;
-    transform: translateY(0.5rem);
-  }
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 
 @utility animate-enter {
-  animation: enter 200ms ease-out both;
+  animation: enter 200ms ease-out backwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
