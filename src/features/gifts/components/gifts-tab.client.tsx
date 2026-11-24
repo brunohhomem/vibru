@@ -10,7 +10,9 @@ import { FilterChip } from '@/features/tasks/components/filter-chip';
 import { applyActionError } from '@/lib/action-error';
 import { useGifts, useMarkGiftReceived, useToggleGiftReservation } from '../hooks/use-gifts';
 import { hasReservationFields } from '../lib/gift-format';
+import { filterGiftsByPrice, type GiftPriceFilter } from '../lib/gift-price-filter';
 import { GiftCard } from './gift-card';
+import { GiftPriceFilters } from './gift-price-filters';
 import { GiftSheet } from './gift-sheet.client';
 import type { GiftResponse } from '@/features/gifts/gift-schemas';
 import type { CoupleMember } from '@/features/couple/couple-schemas';
@@ -79,6 +81,7 @@ function GiftList({ owner, me }: GiftListProps) {
   const wanted = useGifts(owner.id, 'wanted');
   const received = useGifts(owner.id, 'received');
   const [editing, setEditing] = useState<{ gift: GiftResponse | null } | null>(null);
+  const [priceFilter, setPriceFilter] = useState<GiftPriceFilter>('all');
   const isMine = owner.id === me.id;
 
   const renderCard = (gift: GiftResponse) => (
@@ -113,6 +116,9 @@ function GiftList({ owner, me }: GiftListProps) {
   }
 
   const receivedGifts = received.data?.gifts ?? [];
+  const hasAnyGift = wanted.data.gifts.length > 0 || receivedGifts.length > 0;
+  const visibleWanted = filterGiftsByPrice(wanted.data.gifts, priceFilter);
+  const visibleReceived = filterGiftsByPrice(receivedGifts, priceFilter);
 
   return (
     <div className="flex flex-col gap-4">
@@ -131,12 +137,20 @@ function GiftList({ owner, me }: GiftListProps) {
           }
         />
       ) : null}
-      <div className="grid gap-3 sm:grid-cols-2">{wanted.data.gifts.map(renderCard)}</div>
+      {hasAnyGift ? <GiftPriceFilters value={priceFilter} onChange={setPriceFilter} /> : null}
+      {hasAnyGift && visibleWanted.length === 0 && visibleReceived.length === 0 ? (
+        <EmptyState
+          icon={<Gift className="size-6" aria-hidden />}
+          title="Nenhum presente nessa faixa de preço"
+          description="Escolha outra faixa para ver mais presentes."
+        />
+      ) : null}
+      <div className="grid gap-3 sm:grid-cols-2">{visibleWanted.map(renderCard)}</div>
 
-      {receivedGifts.length > 0 ? (
+      {visibleReceived.length > 0 ? (
         <section aria-label="Recebidos" className="flex flex-col gap-2">
           <h2 className="text-lg font-semibold">Recebidos</h2>
-          <div className="grid gap-3 sm:grid-cols-2">{receivedGifts.map(renderCard)}</div>
+          <div className="grid gap-3 sm:grid-cols-2">{visibleReceived.map(renderCard)}</div>
         </section>
       ) : null}
 
