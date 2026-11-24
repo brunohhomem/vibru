@@ -2,7 +2,18 @@ import { index, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-
 import { coreColumns } from './core-columns';
 import { coupleMembers, couples } from './couple-schema';
 
-export const giftCategoryEnum = pgEnum('gift_category', ['clothing', 'accessory', 'other']);
+export const giftCategoryEnum = pgEnum('gift_category', [
+  'clothing',
+  'accessory',
+  'electronics',
+  'gym',
+  'setup',
+  'romantic',
+  'home',
+  'beauty',
+  'experience',
+  'other',
+]);
 
 /**
  * Lista individual de presentes. A reserva é segredo do dono: a resposta ao dono

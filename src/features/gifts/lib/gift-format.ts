@@ -1,15 +1,21 @@
 import type { GiftCategory } from '@/features/gifts/gift-constants';
 import type { GiftForPartner, GiftResponse } from '@/features/gifts/gift-schemas';
 
+const CATEGORY_LABELS: Record<GiftCategory, string> = {
+  clothing: 'Roupa',
+  accessory: 'Acessório',
+  electronics: 'Eletrônicos',
+  gym: 'Academia',
+  setup: 'Setup',
+  romantic: 'Romântico',
+  home: 'Casa',
+  beauty: 'Beleza',
+  experience: 'Experiência',
+  other: 'Outro',
+};
+
 export function giftCategoryLabel(category: GiftCategory): string {
-  switch (category) {
-    case 'clothing':
-      return 'Roupa';
-    case 'accessory':
-      return 'Acessório';
-    case 'other':
-      return 'Outro';
-  }
+  return CATEGORY_LABELS[category];
 }
 
 /** A API só manda os campos de reserva para quem não é o dono da lista. */

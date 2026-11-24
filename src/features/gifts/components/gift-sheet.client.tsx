@@ -13,6 +13,7 @@ import { applyActionError } from '@/lib/action-error';
 import { formatCents, parseReaisToCents } from '@/lib/money';
 import { onFormSubmit } from '@/lib/submit-form';
 import { useCreateGift, useDeleteGift, useUpdateGift } from '../hooks/use-gifts';
+import { useLinkPrefill } from '../hooks/use-link-prefill';
 import { giftCategoryLabel } from '../lib/gift-format';
 import { giftFormSchema, type GiftFormValues } from '../schemas/forms';
 import { GIFT_CATEGORIES } from '@/features/gifts/gift-constants';
@@ -59,6 +60,8 @@ export function GiftSheet({ ownerId, open, gift, onOpenChange }: GiftSheetProps)
     resolver: zodResolver(giftFormSchema),
     defaultValues: valuesFrom(gift),
   });
+
+  const prefillFromLink = useLinkPrefill(form);
 
   useEffect(() => {
     if (open) form.reset(valuesFrom(gift));
@@ -126,7 +129,13 @@ export function GiftSheet({ ownerId, open, gift, onOpenChange }: GiftSheetProps)
         </NativeSelect>
       </Field>
       <Field id="gift-url" label="Link" error={errors.url?.message}>
-        <Input id="gift-url" type="url" inputMode="url" {...form.register('url')} />
+        <Input
+          id="gift-url"
+          type="url"
+          inputMode="url"
+          {...form.register('url', { onBlur: prefillFromLink })}
+          onPaste={() => setTimeout(prefillFromLink, 0)}
+        />
       </Field>
       <Field
         id="gift-image"
