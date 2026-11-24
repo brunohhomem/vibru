@@ -1,14 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "regions": ["gru1"],
-  "crons": [{ "path": "/api/cron/daily-summary", "schedule": "0 11 * * *" }],
-  "headers": [
-    {
-      "source": "/sw.js",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
-        { "key": "Content-Type", "value": "application/javascript; charset=utf-8" }
-      ]
-    }
-  ]
+  "buildCommand": "pnpm db:migrate && pnpm build",
+  "ignoreCommand": "test \"$VERCEL_GIT_COMMIT_REF\" != \"main\""
 }

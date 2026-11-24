@@ -32,6 +32,7 @@ Datas de calendário são `YYYY-MM-DD` (`date` com `mode: 'string'`), nunca `Dat
 
 - `pnpm db:generate <nome>` gera o SQL em `src/db/migrations/` (excluída do Prettier e das métricas de lint); revise o SQL antes de aplicar.
 - `pnpm db:migrate` aplica. Não há `db:push`: só migrations versionadas.
+- Em produção a migration roda sozinha: o `buildCommand` do `vercel.json` é `pnpm db:migrate && pnpm build`, com `DATABASE_URL_UNPOOLED` do ambiente de produção. Se a migration falhar, o deploy não sai. O `ignoreCommand` pula o build de qualquer branch que não seja a `main`, então não há preview de PR (os previews usariam o banco de produção).
 - Confira sempre o que o gerador escreveu (enums, `check`, FKs, índices) contra o schema.
 
 ## Repositório como única porta
