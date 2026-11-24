@@ -5,6 +5,9 @@ import type { LookupAddress } from 'node:dns';
 import type { LookupFunction } from 'node:net';
 import { isBlockedAddress } from './blocked-address';
 import { extractOgImageUrl } from './og-image';
+import { extractPageMetadata, type PageMetadata } from './page-metadata';
+
+export type LinkPreview = PageMetadata & { imageUrl: string | null };
 
 const MAX_REDIRECTS = 3;
 const MAX_BYTES = 1024 * 1024;
@@ -66,6 +69,19 @@ export class OgImageService {
   }
 
   async findImageUrl(url: string): Promise<string | null> {
+    const page = await this.loadHead(url);
+    return page ? extractOgImageUrl(page.html, page.url) : null;
+  }
+
+  /** Imagem, título e preço do link; qualquer falha vira tudo `null`. */
+  async findPreview(url: string): Promise<LinkPreview> {
+    const page = await this.loadHead(url);
+    if (!page) return { imageUrl: null, title: null, priceCents: null };
+
+    return { imageUrl: extractOgImageUrl(page.html, page.url), ...extractPageMetadata(page.html) };
+  }
+
+  private async loadHead(url: string): Promise<{ html: string; url: string } | null> {
     try {
       return await this.follow(new URL(url), AbortSignal.timeout(this.timeoutMs));
     } catch {
@@ -73,13 +89,16 @@ export class OgImageService {
     }
   }
 
-  private async follow(start: URL, signal: AbortSignal): Promise<string | null> {
+  private async follow(
+    start: URL,
+    signal: AbortSignal,
+  ): Promise<{ html: string; url: string } | null> {
     let current = start;
 
     for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
       const step = await this.fetchOnce(current, signal);
       if (!step) return null;
-      if (step.kind === 'page') return extractOgImageUrl(step.html, current.href);
+      if (step.kind === 'page') return { html: step.html, url: current.href };
       current = new URL(step.location, current);
     }
 
@@ -154,6 +173,11 @@ export class OgImageService {
 }
 
 const defaultService = new OgImageService();
+
+/** Busca imagem, título e preço de uma URL informada pelo membro. */
+export function findLinkPreview(url: string): Promise<LinkPreview> {
+  return defaultService.findPreview(url);
+}
 
 /** Busca o og:image de uma URL informada pelo membro; qualquer falha vira `null`. */
 export function findOgImageUrl(url: string): Promise<string | null> {

@@ -1,4 +1,15 @@
-export const GIFT_CATEGORIES = ['clothing', 'accessory', 'other'] as const;
+export const GIFT_CATEGORIES = [
+  'clothing',
+  'accessory',
+  'electronics',
+  'gym',
+  'setup',
+  'romantic',
+  'home',
+  'beauty',
+  'experience',
+  'other',
+] as const;
 
 export type GiftCategory = (typeof GIFT_CATEGORIES)[number];
 
